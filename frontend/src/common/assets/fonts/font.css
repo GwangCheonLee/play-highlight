@@ -1,8 +1,8 @@
 /* Pretendard-Bold */
 @font-face {
     font-family: 'Pretendard';
-    src: url('./Pretendard-Bold.otf') format('opentype'),
-    url('./Pretendard-Bold.woff') format('woff');
+    src: url('Pretendard-Bold.otf') format('opentype'),
+    url('Pretendard-Bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
 }
@@ -10,8 +10,8 @@
 /* Pretendard-Light */
 @font-face {
     font-family: 'Pretendard';
-    src: url('./Pretendard-Light.otf') format('opentype'),
-    url('./Pretendard-Light.woff') format('woff');
+    src: url('Pretendard-Light.otf') format('opentype'),
+    url('Pretendard-Light.woff') format('woff');
     font-weight: 300; /* Light */
     font-style: normal;
 }
@@ -19,8 +19,8 @@
 /* Pretendard-Regular */
 @font-face {
     font-family: 'Pretendard';
-    src: url('./Pretendard-Regular.otf') format('opentype'),
-    url('./Pretendard-Regular.woff') format('woff');
+    src: url('Pretendard-Regular.otf') format('opentype'),
+    url('Pretendard-Regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }

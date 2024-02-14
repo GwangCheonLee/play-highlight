@@ -1,25 +1,9 @@
 import styled from "styled-components";
 import React from "react";
-import Logo from "../../../common/components/Logo";
+import {SignPageLogo} from "../../../common/components/Logo";
 import {useForm} from "react-hook-form";
 import SignInInputContainer from "./SignInInputContainer";
 import RememberMeContainer from "./RememberMeContainer";
-
-const LogoStyled = styled(Logo)`
-    text-align: center;
-
-    img {
-        width: 36px;
-        height: 36px;
-        margin: 0 10px;
-    }
-
-    span {
-        font-weight: bold;
-        font-size: 24px;
-        color: #000000;
-    }
-`;
 
 
 const Form = styled.form`
@@ -59,7 +43,7 @@ const SignInForm = () => {
     
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
-            <LogoStyled/>
+            <SignPageLogo/>
             <SignInInputContainer
                 register={register}
                 validation={{

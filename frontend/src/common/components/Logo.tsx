@@ -27,7 +27,7 @@ const Span = styled.span`
     color: #000000;
 `;
 
-function Logo({className}: { className?: string }) {
+export const Logo = ({className}: { className?: string }) => {
     return (
         <LogoTitle className={className}>
             <LogoLink to="/" isPointerEvent={false}>
@@ -38,4 +38,32 @@ function Logo({className}: { className?: string }) {
     );
 }
 
-export default Logo;
+
+export const SignPageLogo = styled(Logo)`
+    text-align: center;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    img {
+        width: 36px;
+        height: 36px;
+        margin: 0 10px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    span {
+        font-weight: bold;
+        font-size: 24px;
+        color: #000000;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+`;

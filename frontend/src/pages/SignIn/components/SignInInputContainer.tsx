@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from "styled-components"; // 올바른 import 문법 사용
+import styled from "styled-components";
 import {UseFormRegister} from "react-hook-form";
 
 const Input = styled.input`

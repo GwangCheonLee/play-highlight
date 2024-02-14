@@ -1,7 +1,7 @@
 import React from "react";
 import {styled} from "styled-components";
 import YouTube from "react-youtube";
-import {youtubeViewerOnReady, youtubeViewerOptions} from "../configs/youtubeViewer.config";
+import {youtubeViewerOnReady, youtubeViewerOptions} from "../configs/youtubeVideoViewer.config";
 
 const _VideoView = styled.div`
     position: relative;

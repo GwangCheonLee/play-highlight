@@ -41,11 +41,11 @@ export const Logo = ({className}: { className?: string }) => {
 
 export const SignPageLogo = styled(Logo)`
     text-align: center;
-
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    padding-right: 20px;
 
     img {
         width: 36px;

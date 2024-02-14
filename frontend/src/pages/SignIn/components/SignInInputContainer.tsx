@@ -24,7 +24,7 @@ interface LoginInputProps {
     title: string;
 }
 
-const LoginInputContainer = ({register, name, type, placeholder, title, validation = {}}: LoginInputProps) => {
+const SignInInputContainer = ({register, name, type, placeholder, title, validation = {}}: LoginInputProps) => {
     return (
         <>
             <Title>{title}</Title>
@@ -33,4 +33,4 @@ const LoginInputContainer = ({register, name, type, placeholder, title, validati
     );
 }
 
-export default LoginInputContainer;
+export default SignInInputContainer;

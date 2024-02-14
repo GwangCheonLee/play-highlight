@@ -2,8 +2,8 @@ import styled from "styled-components";
 import React from "react";
 import Logo from "../../../common/components/Logo";
 import {useForm} from "react-hook-form";
-import LoginInputContainer from "../../../common/components/login/LoginInputContainer";
-import RememberMeContainer from "../../../common/components/login/RememberMeContainer";
+import SignInInputContainer from "./SignInInputContainer";
+import RememberMeContainer from "./RememberMeContainer";
 
 const LogoStyled = styled(Logo)`
     text-align: center;
@@ -60,7 +60,7 @@ const SignInForm = () => {
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <LogoStyled/>
-            <LoginInputContainer
+            <SignInInputContainer
                 register={register}
                 validation={{
                     required: "필수 응답 항목입니다.",
@@ -74,7 +74,7 @@ const SignInForm = () => {
                 placeholder="Enter your email"
                 title="Email"
             />
-            <LoginInputContainer
+            <SignInInputContainer
                 register={register}
                 validation={{required: "필수 응답 항목입니다."}}
                 name="password"

@@ -3,11 +3,11 @@ import logo from '../assets/logo.png';
 import styled from "styled-components";
 import {Link} from "react-router-dom";
 
-const _LogoTitle = styled.h1`
+const LogoTitle = styled.h1`
     margin: 0;
 `;
 
-const _LogoAnchor = styled(Link)<{ isPointerEvent: boolean }>`
+const LogoLink = styled(Link)<{ isPointerEvent: boolean }>`
     display: inline-flex;
     align-items: center;
     height: 48px;
@@ -15,13 +15,13 @@ const _LogoAnchor = styled(Link)<{ isPointerEvent: boolean }>`
     pointer-events: ${({isPointerEvent}) => (isPointerEvent ? `auto` : 'none')};
 `;
 
-const _Img = styled.img`
+const Img = styled.img`
     width: 24px;
     height: 24px;
     margin: 0 5px;
 `;
 
-const _Span = styled.span`
+const Span = styled.span`
     font-weight: bold;
     font-size: 16px;
     color: #000000;
@@ -29,12 +29,12 @@ const _Span = styled.span`
 
 function Logo({className}: { className?: string }) {
     return (
-        <_LogoTitle className={className}>
-            <_LogoAnchor to="/" isPointerEvent={false}>
-                <_Img src={logo} alt="logo image"/>
-                <_Span>Play Highlight</_Span>
-            </_LogoAnchor>
-        </_LogoTitle>
+        <LogoTitle className={className}>
+            <LogoLink to="/" isPointerEvent={false}>
+                <Img src={logo} alt="logo image"/>
+                <Span>Play Highlight</Span>
+            </LogoLink>
+        </LogoTitle>
     );
 }
 

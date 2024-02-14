@@ -3,7 +3,7 @@ import {styled} from "styled-components";
 import YouTube from "react-youtube";
 import {youtubeViewerOnReady, youtubeViewerOptions} from "../configs/youtubeVideoViewer.config";
 
-const _VideoView = styled.div`
+const VideoView = styled.div`
     position: relative;
     overflow: hidden;
     pointer-events: none;
@@ -29,13 +29,13 @@ interface VideoViewProps {
 
 function YoutubeVideoViewer({videoId, startTime = 0}: VideoViewProps) {
     return (
-        <_VideoView>
+        <VideoView>
             <YouTube
                 videoId={videoId}
                 opts={youtubeViewerOptions(videoId)}
                 onReady={youtubeViewerOnReady(startTime)}
             />
-        </_VideoView>
+        </VideoView>
     );
 }
 

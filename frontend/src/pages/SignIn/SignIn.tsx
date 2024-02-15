@@ -17,6 +17,16 @@ const SignInContainer = styled.div`
     > div:last-child {
         width: 65%
     }
+
+    @media (max-width: 1200px) {
+        div:first-child {
+            width: 100%;
+        }
+
+        div:last-child {
+            display: none;
+        }
+    }
 `
 
 const SignInFormContainer = styled.div`

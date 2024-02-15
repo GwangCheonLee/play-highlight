@@ -8,11 +8,15 @@ export class TypeormConfigService implements TypeOrmOptionsFactory {
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
     return {
-      type: 'sqlite',
-      database: this.configService.get('DB_DATABASE'),
+      type: 'postgres',
+      host: this.configService.get('DB_HOST'),
+      port: this.configService.get('DB_PORT'),
+      username: this.configService.get('DB_USER_NAME'),
+      password: this.configService.get('DB_USER_PASSWORD'),
+      database: this.configService.get('DB_NAME'),
       synchronize: true,
       logging: false,
-      entities: ['dist/**/*.entity{.ts,.js}'],
+      entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
     };
   }
 }

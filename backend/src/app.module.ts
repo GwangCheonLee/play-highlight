@@ -6,9 +6,11 @@ import { TypeormConfigService } from './common/config/typeorm.config.service';
 import { ConfigModule } from '@nestjs/config';
 import { getEnvPath } from './common/common.constant';
 import { validationSchemaConfig } from './common/config/validation.config.service';
+import { AuthenticationModule } from './authentication/authentication.module';
 
 @Module({
   imports: [
+    AuthenticationModule,
     TypeOrmModule.forRootAsync({
       useClass: TypeormConfigService,
     }),

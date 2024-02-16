@@ -1,10 +1,11 @@
 import {useForm} from "react-hook-form";
 import styled from "styled-components";
 import {SignPageLogo} from "../../../common/components/Logo";
-import React from "react";
+import React, {useState} from "react";
 import SignUpInput from "./SignUpInput";
 import {useNavigate} from "react-router-dom";
-import {postSignInCall} from "../../../common/api/auth/sign-in";
+import {fetchSignUpBody} from "../../../common/interfaces/api/authentication/authentication.interface";
+import {fetchSignUp} from "../../../common/api/authentication/authentication.service";
 
 const Form = styled.form`
     display: flex;
@@ -28,23 +29,29 @@ const SignInButton = styled.button`
     }
 `;
 
-export type FormValues = {
-    email: string;
-    password: string;
-    rememberMe?: boolean;
-};
+const ErrorText = styled.p`
+    margin: 10px 0 0;
+    font-size: 12px;
+    color: #A50016;
+`;
+
 
 const SignInForm = () => {
+    const [errorMessage, setErrorMessage] = useState('')
     const navigate = useNavigate();
     const {
         register,
         handleSubmit,
         formState: {errors},
-    } = useForm<FormValues>();
+    } = useForm<fetchSignUpBody>();
     
-    const onSubmit = async (data: FormValues) => {
-        await postSignInCall(data);
-        navigate("/");
+    const onSubmit = async (data: fetchSignUpBody) => {
+        try {
+            await fetchSignUp(data);
+            navigate("/");
+        } catch (error: any) {
+            setErrorMessage(error.response?.data.message);
+        }
     };
     
     return (
@@ -74,6 +81,7 @@ const SignInForm = () => {
                 placeholder="Enter your email"
                 title="Email"
             />
+            {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
             <SignUpInput
                 register={register}
                 validation={{required: "필수 응답 항목입니다."}}

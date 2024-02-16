@@ -22,19 +22,19 @@ const VideoCardLink = styled(Link)`
     }
 
     @media (max-width: 1250px) {
-        width: calc((100% / 4) - 16px);
+        width: calc((100% / 4));
     }
 
     @media (max-width: 1024px) {
-        width: calc((100% / 3) - 16px);
+        width: calc((100% / 3));
     }
 
     @media (max-width: 768px) {
-        width: calc((100% / 2) - 16px);
+        width: calc((100% / 2));
     }
 
     @media (max-width: 480px) {
-        width: calc((100% / 1) - 16px);
+        width: calc((100% / 1));
     }
 `
 

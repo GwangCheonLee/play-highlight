@@ -4,6 +4,9 @@ import {SignPageLogo} from "../../../common/components/Logo";
 import {useForm} from "react-hook-form";
 import SignInInputContainer from "./SignInInputContainer";
 import RememberMeContainer from "./RememberMeContainer";
+import axios, {AxiosResponse} from "axios";
+import {PostSignInterface} from "../../../common/interfaces/sign/sign.interface";
+import {useNavigate} from "react-router-dom";
 
 
 const Form = styled.form`
@@ -34,11 +37,32 @@ type FormValues = {
 }
 
 const SignInForm = () => {
+    const navigate = useNavigate();
     const {register, handleSubmit, formState: {errors}} = useForm<FormValues>()
     
-    const onSubmit = (data: FormValues) => {
-        console.log(data)
-    }
+    const onSubmit = async (data: FormValues) => {
+        try {
+            const apiHost = process.env.REACT_APP_BACKEND_HOST;
+            const {
+                data: {
+                    data: {
+                        accessToken,
+                        refreshToken
+                    }
+                }
+            }: AxiosResponse<PostSignInterface, any> = await axios.post(`${apiHost}/api/authentication/sign-in`, data);
+            
+            localStorage.setItem("accessToken", accessToken);
+            
+            if (data.rememberMe) {
+                localStorage.setItem("refreshToken", refreshToken);
+            }
+            
+            navigate('/')
+        } catch (error: any) {
+            console.error('Sign in error:', error.response?.data || error);
+        }
+    };
     
     
     return (

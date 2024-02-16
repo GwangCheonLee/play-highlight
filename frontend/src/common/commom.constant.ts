@@ -1,4 +1,6 @@
-export const parseJwt = (token: string | null) => {
+import {JwtInterface} from "./interfaces/jwt.interface";
+
+export const parseJwt = (token: string | null): null | JwtInterface => {
     if (token === null) return null
     try {
         const base64Url = token.split('.')[1];

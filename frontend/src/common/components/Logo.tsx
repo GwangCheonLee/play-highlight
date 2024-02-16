@@ -7,12 +7,15 @@ const LogoTitle = styled.h1`
     margin: 0;
 `;
 
-const LogoLink = styled(Link)<{ isPointerEvent: boolean }>`
+const LogoLink = styled(Link)`
     display: inline-flex;
     align-items: center;
     height: 48px;
     text-decoration: none;
-    pointer-events: ${({isPointerEvent}) => (isPointerEvent ? `auto` : 'none')};
+
+    &.no-pointer-events {
+        pointer-events: none;
+    }
 `;
 
 const Img = styled.img`
@@ -30,7 +33,7 @@ const Span = styled.span`
 export const Logo = ({className, isPointerEvent = false}: { className?: string, isPointerEvent?: boolean }) => {
     return (
         <LogoTitle className={className}>
-            <LogoLink to="/" isPointerEvent={isPointerEvent}>
+            <LogoLink to="/" className={!isPointerEvent ? 'no-pointer-events' : ''}>
                 <Img src={logo} alt="logo image"/>
                 <Span>Play Highlight</Span>
             </LogoLink>

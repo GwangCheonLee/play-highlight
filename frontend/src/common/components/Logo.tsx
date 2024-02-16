@@ -27,10 +27,10 @@ const Span = styled.span`
     color: #000000;
 `;
 
-export const Logo = ({className}: { className?: string }) => {
+export const Logo = ({className, isPointerEvent = false}: { className?: string, isPointerEvent?: boolean }) => {
     return (
         <LogoTitle className={className}>
-            <LogoLink to="/" isPointerEvent={false}>
+            <LogoLink to="/" isPointerEvent={isPointerEvent}>
                 <Img src={logo} alt="logo image"/>
                 <Span>Play Highlight</Span>
             </LogoLink>

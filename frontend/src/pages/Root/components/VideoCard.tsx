@@ -3,8 +3,7 @@ import {Link} from "react-router-dom";
 import {formatTimeAgo} from "../../../common/commom.constant";
 
 const VideoCardLink = styled(Link)`
-    width: calc((100% / 5) - 16px);
-    margin: 0 8px 16px;
+    width: calc((100% / 5));
     height: fit-content;
     padding: 4px;
     box-sizing: border-box;

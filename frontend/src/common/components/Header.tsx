@@ -2,19 +2,25 @@ import {Logo} from "./Logo";
 import styled from "styled-components";
 import {Link} from "react-router-dom";
 import {signInPath} from "../routers/path";
+import {useAuth} from "../hooks/useAuth";
 
 
 const StyledHeader = styled.header`
     display: flex;
     justify-content: space-between;
-    padding: 10px calc(15% + 12px + 8px);
+    padding: 10px 15%;
     border-bottom: 1px solid rgba(51, 51, 51, 0.1);
 `
 
-const SignInButtonWrapper = styled.div`
+const ProfileWrapper = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+`
+
+const StyledNickname = styled.span`
+    font-size: 12px;
+    color: #606060;
 `
 
 const SignInButton = styled(Link)`
@@ -36,12 +42,18 @@ const SignInButton = styled(Link)`
     }
 `
 const Header = () => {
+    const {isAuthenticated, user} = useAuth();
     return (
         <StyledHeader>
             <Logo isPointerEvent={true}/>
-            <SignInButtonWrapper>
-                <SignInButton to={signInPath}>Sign In</SignInButton>
-            </SignInButtonWrapper>
+            <ProfileWrapper>
+                {
+                    (isAuthenticated && user) ?
+                        <StyledNickname>{user.nickname}</StyledNickname>
+                        :
+                        <SignInButton to={signInPath}>Sign In</SignInButton>
+                }
+            </ProfileWrapper>
         </StyledHeader>
     )
 }

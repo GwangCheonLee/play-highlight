@@ -18,7 +18,7 @@ const SignInContainer = styled.div`
         width: 65%
     }
 
-    @media (max-width: 1200px) {
+    @media (max-width: 640px) {
         div:first-child {
             width: 100%;
         }

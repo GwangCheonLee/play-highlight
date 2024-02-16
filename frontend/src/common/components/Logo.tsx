@@ -21,7 +21,7 @@ const LogoLink = styled(Link)`
 const Img = styled.img`
     width: 24px;
     height: 24px;
-    margin: 0 5px;
+    margin-right: 5px;
 `;
 
 const Span = styled.span`

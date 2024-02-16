@@ -2,12 +2,11 @@ import styled from "styled-components";
 import React from "react";
 import {SignPageLogo} from "../../../common/components/Logo";
 import {useForm} from "react-hook-form";
-import SignInInputContainer from "./SignInInputContainer";
-import RememberMeContainer from "./RememberMeContainer";
+import SignInInput from "./SignInInput";
+import RememberMe from "./RememberMe";
 import axios, {AxiosResponse} from "axios";
 import {PostSignInterface} from "../../../common/interfaces/sign/sign.interface";
 import {useNavigate} from "react-router-dom";
-
 
 const Form = styled.form`
     display: flex;
@@ -64,25 +63,24 @@ const SignInForm = () => {
         }
     };
     
-    
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <SignPageLogo/>
-            <SignInInputContainer
+            <SignInInput
                 register={register}
                 validation={{
                     required: "필수 응답 항목입니다.",
                     pattern: {
                         value: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i,
-                        message: "이메일 형식이 아닙니다."
-                    }
+                        message: "이메일 형식이 아닙니다.",
+                    },
                 }}
                 name="email"
                 type="text"
                 placeholder="Enter your email"
                 title="Email"
             />
-            <SignInInputContainer
+            <SignInInput
                 register={register}
                 validation={{required: "필수 응답 항목입니다."}}
                 name="password"
@@ -90,7 +88,7 @@ const SignInForm = () => {
                 placeholder="Enter your password"
                 title="Password"
             />
-            <RememberMeContainer register={register} name="rememberMe"/>
+            <RememberMe register={register} name="rememberMe"/>
             <SignInButton type="submit">Sign In</SignInButton>
         </Form>
     );

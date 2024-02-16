@@ -5,7 +5,7 @@ import YoutubeVideoViewer from "../../common/components/YoutubeVideoViewer";
 import SignUpForm from "./components/SignUpForm";
 
 
-const SignUpContainer = styled.div`
+const SignUpWrapper = styled.div`
     display: flex;
     height: 100vh;
 
@@ -28,7 +28,7 @@ const SignUpContainer = styled.div`
     }
 `
 
-const SignUpFormContainer = styled.div`
+const SignUpFormWrapper = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -39,12 +39,12 @@ const SignUpFormContainer = styled.div`
 const SignUp = () => {
     const youtubeVideoInformation = pickYoutubeVideoInformation()
     return (
-        <SignUpContainer>
-            <SignUpFormContainer>
+        <SignUpWrapper>
+            <SignUpFormWrapper>
                 <SignUpForm/>
-            </SignUpFormContainer>
+            </SignUpFormWrapper>
             <YoutubeVideoViewer videoId={youtubeVideoInformation.id} startTime={youtubeVideoInformation.startTime}/>
-        </SignUpContainer>
+        </SignUpWrapper>
     );
 }
 

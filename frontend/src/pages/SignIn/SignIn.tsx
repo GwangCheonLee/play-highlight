@@ -3,10 +3,9 @@ import YoutubeVideoViewer from "../../common/components/YoutubeVideoViewer";
 import {styled} from "styled-components";
 import {pickYoutubeVideoInformation} from "../../common/configs/youtubeVideoViewer.config";
 import SignInForm from "./components/SignInForm";
-import SignUpLinkContainer from "./components/SiginUpLinkContainer";
+import SignUpLink from "./components/SiginUpLink";
 
-
-const SignInContainer = styled.div`
+const SignInWrapper = styled.div`
     display: flex;
     height: 100vh;
 
@@ -29,7 +28,7 @@ const SignInContainer = styled.div`
     }
 `
 
-const SignInFormContainer = styled.div`
+const SignInFormWrapper = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -41,13 +40,13 @@ const SignInFormContainer = styled.div`
 const SignIn = () => {
     const youtubeVideoInformation = pickYoutubeVideoInformation()
     return (
-        <SignInContainer>
-            <SignInFormContainer>
+        <SignInWrapper>
+            <SignInFormWrapper>
                 <SignInForm/>
-                <SignUpLinkContainer/>
-            </SignInFormContainer>
+                <SignUpLink/>
+            </SignInFormWrapper>
             <YoutubeVideoViewer videoId={youtubeVideoInformation.id} startTime={youtubeVideoInformation.startTime}/>
-        </SignInContainer>
+        </SignInWrapper>
     );
 }
 

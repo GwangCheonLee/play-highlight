@@ -26,7 +26,7 @@ interface RememberMeContainerProps {
 }
 
 
-const RememberMeContainer = ({register, name}: RememberMeContainerProps) => {
+const RememberMe = ({register, name}: RememberMeContainerProps) => {
     
     
     return (
@@ -42,4 +42,4 @@ const RememberMeContainer = ({register, name}: RememberMeContainerProps) => {
 }
 
 
-export default RememberMeContainer;
+export default RememberMe;

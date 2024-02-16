@@ -3,6 +3,9 @@ import styled from "styled-components";
 import {SignPageLogo} from "../../../common/components/Logo";
 import React from "react";
 import SignUpInputContainer from "./SignUpInputContainer";
+import axios, {AxiosResponse} from "axios";
+import {useNavigate} from "react-router-dom";
+import {PostSignInterface} from "../../../common/interfaces/sign/sign.interface";
 
 
 const Form = styled.form`
@@ -34,14 +37,34 @@ type FormValues = {
 }
 
 const SignInForm = () => {
+    const navigate = useNavigate();
     const {register, handleSubmit, formState: {errors}} = useForm<FormValues>()
     
-    const onSubmit = (data: FormValues) => {
-        console.log(data)
-    }
+    const onSubmit = async (data: FormValues) => {
+        try {
+            const apiHost = process.env.REACT_APP_BACKEND_HOST;
+            const {
+                data: {
+                    data: {
+                        accessToken,
+                        refreshToken
+                    }
+                }
+            }: AxiosResponse<PostSignInterface, any> = await axios.post(`${apiHost}/api/authentication/sign-up`, data);
+            
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
+            
+            navigate('/')
+        } catch (error: any) {
+            console.error('Sign up error:', error.response?.data || error);
+        }
+    };
+    
     
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
+            <span>{process.env.REACT_BACKEND_HOST}</span>
             <SignPageLogo/>
             <SignUpInputContainer
                 register={register}

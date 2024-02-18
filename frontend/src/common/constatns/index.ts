@@ -1,6 +1,6 @@
-import {JwtInterface} from "./interfaces/jwt.interface";
+import {JwtTypes} from "../types/jwtTypes";
 
-export const parseJwt = (token: string | null): null | JwtInterface => {
+export const parseJwt = (token: string | null): null | JwtTypes => {
     if (token === null) return null
     try {
         const base64Url = token.split('.')[1];

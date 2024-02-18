@@ -1,9 +1,9 @@
 import React from 'react';
 import YoutubeVideoViewer from "../../common/components/YoutubeVideoViewer";
 import {styled} from "styled-components";
-import {pickYoutubeVideoInformation} from "../../common/configs/youtubeVideoViewer.config";
+import {pickYoutubeVideoInformation} from "../../common/utils/youtubeConfig";
 import SignInForm from "./components/SignInForm";
-import SignUpLink from "./components/SiginUpLink";
+import SignUpLink from "./components/SignUpLink";
 
 const SignInWrapper = styled.div`
     display: flex;

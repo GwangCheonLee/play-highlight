@@ -4,8 +4,8 @@ import {SignPageLogo} from "../../../common/components/Logo";
 import React, {useState} from "react";
 import SignUpInput from "./SignUpInput";
 import {useNavigate} from "react-router-dom";
-import {fetchSignUpBody} from "../../../common/interfaces/api/authentication/authentication.interface";
-import {fetchSignUp} from "../../../common/api/authentication/authentication.service";
+import {fetchSignUpBody} from "../../../common/types/api/authentication/authenticationTypes";
+import {fetchSignUp} from "../../../common/services/authentication/authenticationService";
 
 const Form = styled.form`
     display: flex;

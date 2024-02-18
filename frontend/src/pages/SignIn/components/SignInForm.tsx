@@ -5,8 +5,9 @@ import {useForm} from "react-hook-form";
 import SignInInput from "./SignInInput";
 import RememberMe from "./RememberMe";
 import {useNavigate} from "react-router-dom";
-import {fetchSignInBody} from "../../../common/interfaces/api/authentication/authentication.interface";
-import {fetchSignIn} from "../../../common/api/authentication/authentication.service";
+import {fetchSignInBody} from "../../../common/types/api/authentication/authenticationTypes";
+import {fetchSignIn} from "../../../common/services/authentication/authenticationService";
+import {extractAxiosErrorDetails} from "../../../common/utils/axiosUtils";
 
 const Form = styled.form`
     display: flex;
@@ -44,12 +45,22 @@ const SignInForm = () => {
         handleSubmit,
         formState: {errors},
     } = useForm<fetchSignInBody>();
+    
+    
+    if (errors) {
+        console.error(errors);
+    }
+    
+    
     const onSubmit = async (data: fetchSignInBody) => {
         try {
             await fetchSignIn(data);
             navigate("/");
         } catch (error: any) {
-            setErrorMessage(error.response?.data.message);
+            const errorDetails = extractAxiosErrorDetails(error);
+            
+            if (errorDetails.statusCode !== null)
+                setErrorMessage(errorDetails.errorMessage);
         }
     };
     

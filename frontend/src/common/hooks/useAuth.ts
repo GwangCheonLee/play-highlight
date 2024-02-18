@@ -1,4 +1,4 @@
-import {parseJwt} from "../commom.constant";
+import {parseJwt} from "../constatns";
 
 export const useAuth = () => {
     const token = localStorage.getItem('accessToken');

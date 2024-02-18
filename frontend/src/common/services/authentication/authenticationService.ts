@@ -4,7 +4,7 @@ import {
     fetchSignInResponse,
     fetchSignUpBody,
     fetchSignUpResponse
-} from "../../interfaces/api/authentication/authentication.interface";
+} from "../../types/api/authentication/authenticationTypes";
 
 const apiHost = process.env.REACT_APP_BACKEND_HOST;
 

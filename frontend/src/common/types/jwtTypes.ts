@@ -1,11 +1,11 @@
-export interface JwtInterface {
+export type JwtTypes = {
     exp: number;
     iat: number;
     user: User
 }
 
 
-export interface User {
+export type User = {
     id: number,
     nickname: string
     email: string

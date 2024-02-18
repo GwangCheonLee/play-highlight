@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from "styled-components";
-import {pickYoutubeVideoInformation} from "../../common/configs/youtubeVideoViewer.config";
+import {pickYoutubeVideoInformation} from "../../common/utils/youtubeConfig";
 import YoutubeVideoViewer from "../../common/components/YoutubeVideoViewer";
 import SignUpForm from "./components/SignUpForm";
 

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import {Link} from "react-router-dom";
-import {formatTimeAgo} from "../../../common/commom.constant";
+import {formatTimeAgo} from "../../../common/constatns";
 
 const VideoCardLink = styled(Link)`
     width: calc((100% / 5));

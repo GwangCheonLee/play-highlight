@@ -1,23 +1,23 @@
-export interface fetchSignUpBody {
+export type fetchSignUpBody = {
     nickname: string;
     email: string;
     password: string;
 }
 
-export interface fetchSignInBody {
+export type fetchSignInBody = {
     email: string;
     password: string;
     rememberMe: boolean;
 }
 
-export interface fetchSignUpResponse {
+export type fetchSignUpResponse = {
     data: {
         accessToken: string;
         refreshToken: string;
     }
 }
 
-export interface fetchSignInResponse {
+export type fetchSignInResponse = {
     data: {
         accessToken: string;
         refreshToken: string;

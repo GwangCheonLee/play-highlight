@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from '../assets/logo.png';
+import logo from '../assets/images/logo.png';
 import styled from "styled-components";
 import {Link} from "react-router-dom";
 
@@ -7,18 +7,21 @@ const LogoTitle = styled.h1`
     margin: 0;
 `;
 
-const LogoLink = styled(Link)<{ isPointerEvent: boolean }>`
+const LogoLink = styled(Link)`
     display: inline-flex;
     align-items: center;
     height: 48px;
     text-decoration: none;
-    pointer-events: ${({isPointerEvent}) => (isPointerEvent ? `auto` : 'none')};
+
+    &.no-pointer-events {
+        pointer-events: none;
+    }
 `;
 
 const Img = styled.img`
     width: 24px;
     height: 24px;
-    margin: 0 5px;
+    margin-right: 5px;
 `;
 
 const Span = styled.span`
@@ -27,10 +30,10 @@ const Span = styled.span`
     color: #000000;
 `;
 
-export const Logo = ({className}: { className?: string }) => {
+export const Logo = ({className, isPointerEvent = false}: { className?: string, isPointerEvent?: boolean }) => {
     return (
         <LogoTitle className={className}>
-            <LogoLink to="/" isPointerEvent={false}>
+            <LogoLink to="/" className={!isPointerEvent ? 'no-pointer-events' : ''}>
                 <Img src={logo} alt="logo image"/>
                 <Span>Play Highlight</Span>
             </LogoLink>
@@ -41,11 +44,11 @@ export const Logo = ({className}: { className?: string }) => {
 
 export const SignPageLogo = styled(Logo)`
     text-align: center;
-
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    padding-right: 20px;
 
     img {
         width: 36px;

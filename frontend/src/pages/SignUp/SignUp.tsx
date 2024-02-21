@@ -1,11 +1,11 @@
 import React from 'react';
-import YoutubeVideoViewer from "../../common/components/YoutubeVideoViewer";
-import {styled} from "styled-components";
+import styled from "styled-components";
 import {pickYoutubeVideoInformation} from "../../common/utils/youtubeConfig";
-import SignInForm from "./components/SignInForm";
-import SignUpLink from "./components/SignUpLink";
+import YoutubeVideoViewer from "../../common/components/YoutubeVideoViewer";
+import SignUpForm from "./components/SignUpForm";
 
-const SignInWrapper = styled.div`
+
+const SignUpWrapper = styled.div`
     display: flex;
     height: 100vh;
 
@@ -28,7 +28,7 @@ const SignInWrapper = styled.div`
     }
 `
 
-const SignInFormWrapper = styled.div`
+const SignUpFormWrapper = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -36,18 +36,16 @@ const SignInFormWrapper = styled.div`
     height: 100vh;
 `;
 
-
-const SignIn = () => {
+const SignUp = () => {
     const youtubeVideoInformation = pickYoutubeVideoInformation()
     return (
-        <SignInWrapper>
-            <SignInFormWrapper>
-                <SignInForm/>
-                <SignUpLink/>
-            </SignInFormWrapper>
+        <SignUpWrapper>
+            <SignUpFormWrapper>
+                <SignUpForm/>
+            </SignUpFormWrapper>
             <YoutubeVideoViewer videoId={youtubeVideoInformation.id} startTime={youtubeVideoInformation.startTime}/>
-        </SignInWrapper>
+        </SignUpWrapper>
     );
 }
 
-export default SignIn;
+export default SignUp;

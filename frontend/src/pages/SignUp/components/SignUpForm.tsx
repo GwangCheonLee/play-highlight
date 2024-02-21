@@ -1,13 +1,11 @@
-import styled from "styled-components";
-import React, {useState} from "react";
-import {SignPageLogo} from "../../../common/components/Logo";
 import {useForm} from "react-hook-form";
-import SignInInput from "./SignInInput";
-import RememberMe from "./RememberMe";
+import styled from "styled-components";
+import {SignPageLogo} from "../../../common/components/Logo";
+import React, {useState} from "react";
+import SignUpInput from "./SignUpInput";
 import {useNavigate} from "react-router-dom";
-import {fetchSignInBody} from "../../../common/types/api/authentication/authenticationTypes";
-import {fetchSignIn} from "../../../common/services/authentication/authenticationService";
-import {extractAxiosErrorDetails} from "../../../common/utils/axiosUtils";
+import {fetchSignUpBody} from "../../../common/types/api/authentication/authenticationTypes";
+import {fetchSignUp} from "../../../common/services/authentication/authenticationService";
 
 const Form = styled.form`
     display: flex;
@@ -18,6 +16,7 @@ const Form = styled.form`
 `;
 
 const SignInButton = styled.button`
+    margin-top: 20px;
     padding: 13px 10px;
     background-color: #4164e3;
     color: white;
@@ -44,30 +43,31 @@ const SignInForm = () => {
         register,
         handleSubmit,
         formState: {errors},
-    } = useForm<fetchSignInBody>();
+    } = useForm<fetchSignUpBody>();
     
-    
-    if (errors) {
-        console.error(errors);
-    }
-    
-    
-    const onSubmit = async (data: fetchSignInBody) => {
+    const onSubmit = async (data: fetchSignUpBody) => {
         try {
-            await fetchSignIn(data);
+            await fetchSignUp(data);
             navigate("/");
         } catch (error: any) {
-            const errorDetails = extractAxiosErrorDetails(error);
-            
-            if (errorDetails.statusCode !== null)
-                setErrorMessage(errorDetails.errorMessage);
+            setErrorMessage(error.response?.data.message);
         }
     };
     
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <SignPageLogo/>
-            <SignInInput
+            <SignUpInput
+                register={register}
+                validation={{
+                    required: "필수 응답 항목입니다.",
+                }}
+                name="nickname"
+                type="text"
+                placeholder="Enter your nickname"
+                title="Nickname"
+            />
+            <SignUpInput
                 register={register}
                 validation={{
                     required: "필수 응답 항목입니다.",
@@ -81,7 +81,8 @@ const SignInForm = () => {
                 placeholder="Enter your email"
                 title="Email"
             />
-            <SignInInput
+            {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
+            <SignUpInput
                 register={register}
                 validation={{required: "필수 응답 항목입니다."}}
                 name="password"
@@ -89,9 +90,7 @@ const SignInForm = () => {
                 placeholder="Enter your password"
                 title="Password"
             />
-            {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
-            <RememberMe register={register} name="rememberMe"/>
-            <SignInButton type="submit">Sign In</SignInButton>
+            <SignInButton type="submit">Sign Up</SignInButton>
         </Form>
     );
 };

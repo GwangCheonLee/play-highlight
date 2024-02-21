@@ -4,17 +4,18 @@ import {styled} from "styled-components";
 import {pickYoutubeVideoInformation} from "../../common/utils/youtubeConfig";
 import SignInForm from "./components/SignInForm";
 import SignUpLink from "./components/SignUpLink";
+import {Modal} from "../../common/components/Modal";
 
 const SignInWrapper = styled.div`
     display: flex;
     height: 100vh;
 
     > div:first-child {
-        width: 35%
+        width: 25%
     }
 
     > div:last-child {
-        width: 65%
+        width: 75%
     }
 
     @media (max-width: 640px) {
@@ -40,13 +41,16 @@ const SignInFormWrapper = styled.div`
 const SignIn = () => {
     const youtubeVideoInformation = pickYoutubeVideoInformation()
     return (
-        <SignInWrapper>
-            <SignInFormWrapper>
-                <SignInForm/>
-                <SignUpLink/>
-            </SignInFormWrapper>
-            <YoutubeVideoViewer videoId={youtubeVideoInformation.id} startTime={youtubeVideoInformation.startTime}/>
-        </SignInWrapper>
+        <>
+            <SignInWrapper>
+                <SignInFormWrapper>
+                    <SignInForm/>
+                    <SignUpLink/>
+                </SignInFormWrapper>
+                <YoutubeVideoViewer videoId={youtubeVideoInformation.id} startTime={youtubeVideoInformation.startTime}/>
+            </SignInWrapper>
+            <Modal/>
+        </>
     );
 }
 

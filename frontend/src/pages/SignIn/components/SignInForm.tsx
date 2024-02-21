@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import React, {useState} from "react";
+import React from "react";
 import {SignPageLogo} from "../../../common/components/Logo";
 import {useForm} from "react-hook-form";
 import SignInInput from "./SignInInput";
@@ -8,6 +8,9 @@ import {useNavigate} from "react-router-dom";
 import {fetchSignInBody} from "../../../common/types/api/authentication/authenticationTypes";
 import {fetchSignIn} from "../../../common/services/authentication/authenticationService";
 import {extractAxiosErrorDetails} from "../../../common/utils/axiosUtils";
+import {useAppDispatch} from "../../../common/hooks/selectors";
+import {showModal} from "../../../features/modal/modalSlice";
+
 
 const Form = styled.form`
     display: flex;
@@ -38,42 +41,35 @@ const ErrorText = styled.p`
 
 
 const SignInForm = () => {
-    const [errorMessage, setErrorMessage] = useState('')
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const {
         register,
         handleSubmit,
         formState: {errors},
     } = useForm<fetchSignInBody>();
-    
-    
-    if (errors) {
-        console.error(errors);
-    }
-    
-    
+
     const onSubmit = async (data: fetchSignInBody) => {
         try {
             await fetchSignIn(data);
             navigate("/");
         } catch (error: any) {
             const errorDetails = extractAxiosErrorDetails(error);
-            
-            if (errorDetails.statusCode !== null)
-                setErrorMessage(errorDetails.errorMessage);
+            if (errorDetails.statusCode !== null) return
+            dispatch(showModal({message: errorDetails.errorMessage}));
         }
     };
-    
+
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <SignPageLogo/>
             <SignInInput
                 register={register}
                 validation={{
-                    required: "필수 응답 항목입니다.",
+                    required: "Required.",
                     pattern: {
                         value: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i,
-                        message: "이메일 형식이 아닙니다.",
+                        message: "It's not in the form of an email.",
                     },
                 }}
                 name="email"
@@ -81,15 +77,15 @@ const SignInForm = () => {
                 placeholder="Enter your email"
                 title="Email"
             />
+            {errors.email && <ErrorText>{errors.email.message}</ErrorText>}
             <SignInInput
                 register={register}
-                validation={{required: "필수 응답 항목입니다."}}
+                validation={{required: "Required."}}
                 name="password"
                 type="password"
                 placeholder="Enter your password"
                 title="Password"
             />
-            {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
             <RememberMe register={register} name="rememberMe"/>
             <SignInButton type="submit">Sign In</SignInButton>
         </Form>

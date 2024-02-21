@@ -18,7 +18,6 @@ const Section = styled.section`
     overflow: auto;
     flex-wrap: wrap;
     padding: 20px 0;
-
     -ms-overflow-style: none;
     scrollbar-width: none;
 
@@ -40,7 +39,7 @@ const Home = () => {
     }
     return (
         <>
-            
+
             <Header/>
             <Main>
                 <Section>

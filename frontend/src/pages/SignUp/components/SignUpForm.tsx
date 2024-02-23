@@ -1,11 +1,14 @@
 import {useForm} from "react-hook-form";
 import styled from "styled-components";
 import {SignPageLogo} from "../../../common/components/Logo";
-import React, {useState} from "react";
+import React from "react";
 import SignUpInput from "./SignUpInput";
 import {useNavigate} from "react-router-dom";
 import {fetchSignUpBody} from "../../../common/types/api/authentication/authenticationTypes";
 import {fetchSignUp} from "../../../common/services/authentication/authenticationService";
+import {extractAxiosErrorDetails} from "../../../common/utils/axiosUtils";
+import {showModal} from "../../../features/modal/modalSlice";
+import {useAppDispatch} from "../../../common/hooks/selectors";
 
 const Form = styled.form`
     display: flex;
@@ -37,23 +40,25 @@ const ErrorText = styled.p`
 
 
 const SignInForm = () => {
-    const [errorMessage, setErrorMessage] = useState('')
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const {
         register,
         handleSubmit,
         formState: {errors},
     } = useForm<fetchSignUpBody>();
-    
+
     const onSubmit = async (data: fetchSignUpBody) => {
         try {
             await fetchSignUp(data);
             navigate("/");
         } catch (error: any) {
-            setErrorMessage(error.response?.data.message);
+            const errorDetails = extractAxiosErrorDetails(error);
+            if (errorDetails.statusCode !== null) return
+            dispatch(showModal({message: errorDetails.errorMessage}));
         }
     };
-    
+
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <SignPageLogo/>
@@ -70,10 +75,10 @@ const SignInForm = () => {
             <SignUpInput
                 register={register}
                 validation={{
-                    required: "필수 응답 항목입니다.",
+                    required: "Required.",
                     pattern: {
                         value: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i,
-                        message: "이메일 형식이 아닙니다.",
+                        message: "It's not in the form of an email.",
                     },
                 }}
                 name="email"
@@ -81,10 +86,10 @@ const SignInForm = () => {
                 placeholder="Enter your email"
                 title="Email"
             />
-            {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
+            {errors.email && <ErrorText>{errors.email.message}</ErrorText>}
             <SignUpInput
                 register={register}
-                validation={{required: "필수 응답 항목입니다."}}
+                validation={{required: "Required."}}
                 name="password"
                 type="password"
                 placeholder="Enter your password"

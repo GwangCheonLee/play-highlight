@@ -3,6 +3,7 @@ import styled from "styled-components";
 import {pickYoutubeVideoInformation} from "../../common/utils/youtubeConfig";
 import YoutubeVideoViewer from "../../common/components/YoutubeVideoViewer";
 import SignUpForm from "./components/SignUpForm";
+import {Modal} from "../../common/components/Modal";
 
 
 const SignUpWrapper = styled.div`
@@ -10,11 +11,11 @@ const SignUpWrapper = styled.div`
     height: 100vh;
 
     > div:first-child {
-        width: 35%
+        width: 25%
     }
 
     > div:last-child {
-        width: 65%
+        width: 75%
     }
 
     @media (max-width: 640px) {
@@ -39,12 +40,15 @@ const SignUpFormWrapper = styled.div`
 const SignUp = () => {
     const youtubeVideoInformation = pickYoutubeVideoInformation()
     return (
-        <SignUpWrapper>
-            <SignUpFormWrapper>
-                <SignUpForm/>
-            </SignUpFormWrapper>
-            <YoutubeVideoViewer videoId={youtubeVideoInformation.id} startTime={youtubeVideoInformation.startTime}/>
-        </SignUpWrapper>
+        <>
+            <SignUpWrapper>
+                <SignUpFormWrapper>
+                    <SignUpForm/>
+                </SignUpFormWrapper>
+                <YoutubeVideoViewer videoId={youtubeVideoInformation.id} startTime={youtubeVideoInformation.startTime}/>
+            </SignUpWrapper>
+            <Modal/>
+        </>
     );
 }
 

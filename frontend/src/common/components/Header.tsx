@@ -1,7 +1,7 @@
 import {Logo} from "./Logo";
 import styled from "styled-components";
 import {Link} from "react-router-dom";
-import {signInPath} from "../routers/path";
+import {signInPath, uploadPath} from "../routers/path";
 import {useAuth} from "../hooks/useAuth";
 
 
@@ -18,9 +18,28 @@ const ProfileWrapper = styled.div`
     align-items: center;
 `
 
+const UploadButton = styled(Link)`
+    font-size: 12px;
+    line-height: 28px;
+    text-decoration: none;
+    color: #212529;
+    margin-right: 10px;
+    cursor: pointer;
+    padding: 1px 16px;
+    border-radius: 16px;
+    background-color: #f8f9fa;
+    border: 1px solid #212529;
+
+    &:hover {
+        background-color: #212529;
+        color: #ffffff
+    }
+`
+
 const StyledNickname = styled.span`
     font-size: 12px;
     color: #606060;
+    line-height: 28px;
 `
 
 const SignInButton = styled(Link)`
@@ -49,7 +68,10 @@ const Header = () => {
             <ProfileWrapper>
                 {
                     (isAuthenticated && user) ?
-                        <StyledNickname>{user.nickname}</StyledNickname>
+                        <>
+                            <UploadButton to={uploadPath}>Upload</UploadButton>
+                            <StyledNickname>{user.nickname}</StyledNickname>
+                        </>
                         :
                         <SignInButton to={signInPath}>Sign In</SignInButton>
                 }

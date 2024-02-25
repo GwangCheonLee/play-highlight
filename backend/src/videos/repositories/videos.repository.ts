@@ -17,7 +17,7 @@ export class VideosRepository extends Repository<Videos> {
       .select([
         'videos.id',
         'videos.filePath',
-        'videos.isDeleted',
+        'videos.thumbnailPath',
         'videos.createdAt',
         'videos.updatedAt',
         'user.id',

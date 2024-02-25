@@ -7,9 +7,11 @@ import { ConfigModule } from '@nestjs/config';
 import { getEnvPath } from './common/common.constant';
 import { validationSchemaConfig } from './common/config/validation.config.service';
 import { AuthenticationModule } from './authentication/authentication.module';
+import { VideosModule } from './videos/videos.module';
 
 @Module({
   imports: [
+    VideosModule,
     AuthenticationModule,
     TypeOrmModule.forRootAsync({
       useClass: TypeormConfigService,

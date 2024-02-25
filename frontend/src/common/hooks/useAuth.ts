@@ -6,10 +6,10 @@ import {parseJwt} from "../constatns";
 export const useAuth = () => {
     const [user, setUser] = useState<User | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
 
     useEffect(() => {
-        const accessToken = localStorage.getItem('accessToken');
-        const refreshToken = localStorage.getItem('refreshToken');
 
         if (!accessToken && !refreshToken) {
             logoutUser();
@@ -26,19 +26,20 @@ export const useAuth = () => {
                 if (!refreshToken) {
                     logoutUser();
                 }
+
+                if (refreshToken) {
+                    const refreshTokenPayload = parseJwt(refreshToken);
+                    const refreshTokenCurrentTime = Date.now() / 1000;
+
+                    if (refreshTokenPayload.exp > refreshTokenCurrentTime) {
+                        refreshAccessToken(refreshToken)
+                    } else {
+                        logoutUser();
+                    }
+                }
             }
         }
 
-        if (refreshToken) {
-            const refreshTokenPayload = parseJwt(refreshToken);
-            const refreshTokenCurrentTime = Date.now() / 1000;
-
-            if (refreshTokenPayload.exp > refreshTokenCurrentTime) {
-                refreshAccessToken(refreshToken)
-            } else {
-                logoutUser();
-            }
-        }
 
     }, []);
 
@@ -64,5 +65,5 @@ export const useAuth = () => {
         setUser(null);
     };
 
-    return {isAuthenticated, user};
+    return {isAuthenticated, user, accessToken};
 };

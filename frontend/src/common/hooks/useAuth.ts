@@ -1,13 +1,69 @@
+import {useEffect, useState} from 'react';
+import {User} from "../types/jwtTypes";
+import {fetchAccessToken} from "../services/authentication/authenticationService";
 import {parseJwt} from "../constatns";
 
 export const useAuth = () => {
-    const token = localStorage.getItem('accessToken');
-    const payload = parseJwt(token);
-    if (!payload) return {isAuthenticated: false, user: null};
-    
-    const currentTime = Date.now() / 1000;
-    return {
-        user: payload.user,
-        isAuthenticated: payload.exp > currentTime,
+    const [user, setUser] = useState<User | null>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
+
+    useEffect(() => {
+
+        if (!accessToken && !refreshToken) {
+            logoutUser();
+        }
+
+        if (accessToken) {
+            const accessTokenPayload = parseJwt(accessToken);
+            const accessTokenCurrentTime = Date.now() / 1000;
+
+            if (accessTokenPayload.exp > accessTokenCurrentTime) {
+                setIsAuthenticated(true);
+                setUser(accessTokenPayload.user);
+            } else {
+                if (!refreshToken) {
+                    logoutUser();
+                }
+
+                if (refreshToken) {
+                    const refreshTokenPayload = parseJwt(refreshToken);
+                    const refreshTokenCurrentTime = Date.now() / 1000;
+
+                    if (refreshTokenPayload.exp > refreshTokenCurrentTime) {
+                        refreshAccessToken(refreshToken)
+                    } else {
+                        logoutUser();
+                    }
+                }
+            }
+        }
+
+
+    }, []);
+
+
+    const refreshAccessToken = async (refreshToken: string) => {
+        try {
+            await fetchAccessToken(refreshToken);
+            const accessToken = localStorage.getItem('accessToken') as string;
+
+            const accessTokenPayload = parseJwt(accessToken);
+            setIsAuthenticated(true);
+            setUser(accessTokenPayload.user);
+        } catch (error) {
+            console.error('Token refresh failed:', error);
+            logoutUser();
+        }
     };
+
+    const logoutUser = () => {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setIsAuthenticated(false);
+        setUser(null);
+    };
+
+    return {isAuthenticated, user, accessToken};
 };

@@ -4,8 +4,11 @@ import {Provider} from 'react-redux';
 import Home from "./pages/Home/Home";
 import SignIn from "./pages/SignIn/SignIn";
 import SignUp from "./pages/SignUp/SignUp";
-import {rootPath, signInPath, signUpPath} from "./common/routers/path";
+import {rootPath, signInPath, signUpPath, uploadPath} from "./common/routers/path";
 import {index} from "./store";
+import Upload from "./pages/Upload/Upload";
+import PrivateRoute from "./common/components/PrivateRoute";
+import VideoDetail from "./pages/Video/VideoDetail";
 
 
 function App() {
@@ -16,6 +19,10 @@ function App() {
                     <Route path={rootPath} element={<Home/>}/>
                     <Route path={signUpPath} element={<SignUp/>}></Route>
                     <Route path={signInPath} element={<SignIn/>}></Route>
+                    <Route element={<PrivateRoute/>}>
+                        <Route path={uploadPath} element={<Upload/>}></Route>
+                        <Route path='/video/:uuid' element={<VideoDetail/>}/>
+                    </Route>
                     <Route path="*" element={<Navigate to={rootPath} replace/>}/>
                 </Routes>
             </BrowserRouter>

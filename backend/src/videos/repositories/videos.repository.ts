@@ -29,7 +29,7 @@ export class VideosRepository extends Repository<Videos> {
       ])
       .where('videos.id >= :cursor', { cursor })
       .andWhere('videos.isDeleted = :isDeleted', { isDeleted: false })
-      .orderBy('videos.id', 'ASC')
+      .orderBy('videos.id', 'DESC')
       .take(limit + 1);
 
     const videos = await queryBuilder.getMany();

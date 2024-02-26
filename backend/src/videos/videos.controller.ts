@@ -17,7 +17,6 @@ import * as multer from 'multer';
 import { RequestByUser } from '../common/decorator/request-by-user.decorator';
 import { Users } from '../authentication/entities/users.entity';
 
-@UseGuards(AuthGuard(GuardTypeEnum.JWT_ACCESS))
 @Controller('api/videos')
 export class VideosController {
   constructor(private readonly videosService: VideosService) {}
@@ -44,6 +43,7 @@ export class VideosController {
     };
   }
 
+  @UseGuards(AuthGuard(GuardTypeEnum.JWT_ACCESS))
   @Post()
   @UseInterceptors(
     FileInterceptor('video', { storage: multer.memoryStorage() }),

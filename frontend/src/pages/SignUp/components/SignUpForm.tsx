@@ -54,7 +54,6 @@ const SignInForm = () => {
             navigate("/");
         } catch (error: any) {
             const errorDetails = extractAxiosErrorDetails(error);
-            if (errorDetails.statusCode !== null) return
             dispatch(showModal({message: errorDetails.errorMessage}));
         }
     };

@@ -6,6 +6,12 @@ export type fetchFindVideosQuery = {
 }
 
 
+export type fetchFindVideoResponse = {
+    data: {
+        video: videoDetails;
+    }
+}
+
 export type fetchFindVideosResponse = {
     data: {
         videos: videoDetails[];

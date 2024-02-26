@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Param,
   Post,
   Query,
   UploadedFile,
@@ -30,6 +31,15 @@ export class VideosController {
       data: {
         videos,
         nextCursor,
+      },
+    };
+  }
+
+  @Get('/:uuid')
+  async findVideo(@Param('uuid') uuid: string) {
+    return {
+      data: {
+        video: await this.videosService.findVideo(uuid),
       },
     };
   }

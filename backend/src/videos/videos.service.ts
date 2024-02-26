@@ -22,6 +22,10 @@ export class VideosService {
     );
   }
 
+  findVideo(uuid: string) {
+    return this.videosRepository.findOne({ where: { uuid } });
+  }
+
   async saveVideo(user: Users, file: Express.Multer.File) {
     const uuid = uuidv4();
     const baseDir = path.resolve(__dirname, '..', '..', 'data');

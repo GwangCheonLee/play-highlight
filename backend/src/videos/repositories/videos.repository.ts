@@ -1,6 +1,7 @@
 import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { Videos } from '../entities/videos.entity';
+import { Users } from '../../authentication/entities/users.entity';
 
 @Injectable()
 export class VideosRepository extends Repository<Videos> {
@@ -16,8 +17,10 @@ export class VideosRepository extends Repository<Videos> {
       .leftJoinAndSelect('videos.user', 'user')
       .select([
         'videos.id',
-        'videos.filePath',
+        'videos.uuid',
+        'videos.baseDir',
         'videos.thumbnailPath',
+        'videos.hlsFilePath',
         'videos.createdAt',
         'videos.updatedAt',
         'user.id',
@@ -37,5 +40,17 @@ export class VideosRepository extends Repository<Videos> {
     }
 
     return { videos, nextCursor };
+  }
+
+  async saveVideo(user: Users, uuid: string, baseDir: string) {
+    const entity = this.create({
+      user: user,
+      uuid,
+      baseDir,
+      thumbnailPath: `${uuid}/thumbnail.jpg`,
+      hlsFilePath: `${uuid}/output.m3u8`,
+    });
+
+    return this.save(entity);
   }
 }

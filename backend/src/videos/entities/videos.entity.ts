@@ -16,11 +16,17 @@ export class Videos {
   @ManyToOne(() => Users, (user) => user.videos)
   user: Users;
 
-  @Column({ name: 'file_path' })
-  filePath: string;
+  @Column({ name: 'uuid' })
+  uuid: string;
+
+  @Column({ name: 'base_dir' })
+  baseDir: string;
 
   @Column({ name: 'thumbnail_path' })
   thumbnailPath: string;
+
+  @Column({ name: 'hls_file_path' })
+  hlsFilePath: string;
 
   @Column({ name: 'is_deleted', default: false })
   isDeleted: boolean;

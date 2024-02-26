@@ -15,8 +15,10 @@ export type fetchFindVideosResponse = {
 
 export type videoDetails = {
     id: number,
+    uuid: string,
+    baseDir: string,
     thumbnailPath: string
-    filePath: string,
+    hlsFilePath: string
     createdAt: Date,
     updatedAt: Date,
     user: User

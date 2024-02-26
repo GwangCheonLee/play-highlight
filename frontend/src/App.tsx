@@ -8,6 +8,7 @@ import {rootPath, signInPath, signUpPath, uploadPath} from "./common/routers/pat
 import {index} from "./store";
 import Upload from "./pages/Upload/Upload";
 import PrivateRoute from "./common/components/PrivateRoute";
+import VideoDetail from "./pages/Video/VideoDetail";
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
                     <Route path={signInPath} element={<SignIn/>}></Route>
                     <Route element={<PrivateRoute/>}>
                         <Route path={uploadPath} element={<Upload/>}></Route>
+                        <Route path='/video/:uuid' element={<VideoDetail/>}/>
                     </Route>
                     <Route path="*" element={<Navigate to={rootPath} replace/>}/>
                 </Routes>

@@ -46,8 +46,8 @@ export const useAuth = () => {
 
     const refreshAccessToken = async (refreshToken: string) => {
         try {
-            const {accessToken} = await fetchAccessToken(refreshToken);
-            localStorage.setItem('accessToken', accessToken);
+            await fetchAccessToken(refreshToken);
+            const accessToken = localStorage.getItem('accessToken') as string;
 
             const accessTokenPayload = parseJwt(accessToken);
             setIsAuthenticated(true);

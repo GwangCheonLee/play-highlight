@@ -1,19 +1,16 @@
-import axios, {AxiosResponse} from 'axios';
+import {AxiosResponse} from 'axios';
 import {fetchFindVideosQuery, fetchFindVideosResponse} from "../../types/api/videos/videoTypes";
+import api from "../../utils/axios";
 
-const apiHost = process.env.REACT_APP_BACKEND_HOST;
-
-export const fetchFindVideos = async (query: fetchFindVideosQuery, accessToken: string) => {
-    const response: AxiosResponse<fetchFindVideosResponse, any> = await axios.get(`${apiHost}/api/videos?cursor=${query.cursor}&limit=${query.limit}`, {headers: {Authorization: `Bearer ${accessToken}`}});
+export const fetchFindVideos = async (query: fetchFindVideosQuery) => {
+    const response: AxiosResponse<fetchFindVideosResponse, any> = await api.get(`/api/videos?cursor=${query.cursor}&limit=${query.limit}`,);
     return response.data.data
 };
 
-
-export const fetchUploadVideos = async (formData: FormData, accessToken: string) => {
-    const response: AxiosResponse<any, any> = await axios.post(`${apiHost}/api/videos`, formData, {
+export const fetchUploadVideos = async (formData: FormData) => {
+    const response: AxiosResponse<any, any> = await api.post(`/api/videos`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${accessToken}`
         }
     });
     return response.data.data

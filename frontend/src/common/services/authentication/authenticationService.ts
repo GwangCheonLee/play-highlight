@@ -27,6 +27,6 @@ export const fetchAccessToken = async (refreshToken: string) => {
     const response: AxiosResponse<fetchSignInResponse, any> = await axios.get(`${apiHost}/api/authentication/access-token`, {
         headers: {Authorization: `Bearer ${refreshToken}`},
     });
-    return response.data.data as { accessToken: string }
+    localStorage.setItem("accessToken", response.data.data.accessToken);
 };
 

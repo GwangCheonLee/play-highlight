@@ -23,5 +23,6 @@ export const validationSchemaConfig = () => {
     JWT_ACCESS_TOKEN_EXPIRATION_TIME: Joi.string().required(),
     JWT_REFRESH_TOKEN_SECRET: Joi.string().required(),
     JWT_REFRESH_TOKEN_EXPIRATION_TIME: Joi.string().required(),
+    SIGN_UP_ENABLED: Joi.boolean().required(),
   });
 };

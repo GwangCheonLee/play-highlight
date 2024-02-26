@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -12,13 +13,22 @@ import { GuardTypeEnum } from './strategy/guard-type.enum';
 import { RequestByUser } from '../common/decorator/request-by-user.decorator';
 import { Users } from './entities/users.entity';
 import { SignUpDto } from './dto/signUp.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('api/authentication')
 export class AuthenticationController {
-  constructor(private readonly authenticationService: AuthenticationService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly authenticationService: AuthenticationService,
+  ) {}
 
   @Post('/sign-up')
   async signUp(@Body() signUpDto: SignUpDto) {
+    const signUpEnabled = this.configService.get<boolean>('SIGN_UP_ENABLED');
+    if (!signUpEnabled) {
+      throw new BadRequestException('Membership is not currently permitted.');
+    }
+
     const user = await this.authenticationService.signUp(signUpDto);
 
     return {

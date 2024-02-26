@@ -81,7 +81,7 @@ const Home = () => {
                         videos.map((video) => (
                             <VideoCard
                                 key={video.id}
-                                videoId={video.id.toString()}
+                                videoId={video.uuid}
                                 alt={`Video by ${video.user.nickname}`}
                                 src={`/videos/${video.thumbnailPath}`}
                                 nickname={video.user.nickname}

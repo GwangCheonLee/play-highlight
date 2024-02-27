@@ -3,7 +3,7 @@ import {fetchAccessToken} from "../services/authentication/authenticationService
 import {logout, parseJwt} from "../constatns";
 
 const api = axios.create({
-    baseURL: process.env.REACT_APP_BACKEND_HOST
+    baseURL: window.location.origin
 });
 
 api.interceptors.request.use(

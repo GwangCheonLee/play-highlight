@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcryptjs';
+import * as path from 'path';
 
 export const getEnvPath = (): string => {
   const envMap = {
@@ -30,4 +31,11 @@ export const generateRandomString = (length: number): string => {
     result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return result;
+};
+
+export const getBaseDir = () => {
+  const envDir = process.env.BASE_DIR;
+  return envDir === undefined
+    ? path.resolve(__dirname, '..', '..', 'data')
+    : envDir;
 };

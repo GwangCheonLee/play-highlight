@@ -83,7 +83,7 @@ const Home = () => {
                                 key={video.id}
                                 videoId={video.uuid}
                                 alt={`Video by ${video.user.nickname}`}
-                                src={`/videos/${video.thumbnailPath}`}
+                                src={`/static/videos/${video.thumbnailPath}`}
                                 nickname={video.user.nickname}
                                 createdAt={new Date(video.createdAt)}
                                 email={video.user.email}

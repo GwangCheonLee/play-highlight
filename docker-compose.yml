@@ -18,8 +18,6 @@ services:
     volumes:
       - ./data/backend:/usr/src/app/data
     restart: unless-stopped
-    ports:
-      - "3002:3002"
     env_file:
       - .env
     depends_on:
@@ -29,7 +27,7 @@ services:
       context: frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:80"
+      - "80:80"
     volumes:
       - ./data/backend:/usr/share/nginx/html/static/videos
     restart: unless-stopped

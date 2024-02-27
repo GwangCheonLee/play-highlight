@@ -7,6 +7,7 @@ import * as fs from 'fs';
 
 import { Users } from '../authentication/entities/users.entity';
 import { FfmpegService } from '../ffmpeg/ffmpeg.service';
+import { getBaseDir } from '../common/common.constant';
 
 @Injectable()
 export class VideosService {
@@ -28,7 +29,7 @@ export class VideosService {
 
   async saveVideo(user: Users, file: Express.Multer.File) {
     const uuid = uuidv4();
-    const baseDir = path.resolve(__dirname, '..', '..', 'data');
+    const baseDir = getBaseDir();
     const userDir = path.join(baseDir, uuid);
     const originalFilePath = path.join(
       userDir,

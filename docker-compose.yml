@@ -19,7 +19,7 @@ services:
       - ./data/backend:/usr/src/app/data
     restart: unless-stopped
     ports:
-      - "3001:3001"
+      - "3002:3002"
     env_file:
       - .env
     depends_on:
@@ -31,7 +31,7 @@ services:
     ports:
       - "3000:80"
     volumes:
-      - ./data/backend:/usr/share/nginx/html/videos
+      - ./data/backend:/usr/share/nginx/html/static/videos
     restart: unless-stopped
     depends_on:
       - nestjs-app

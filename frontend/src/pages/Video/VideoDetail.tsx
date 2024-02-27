@@ -1,5 +1,5 @@
-// VideoDetail.tsx
 import React, {useEffect, useState} from 'react';
+import {Helmet} from 'react-helmet';
 import {useParams} from 'react-router-dom';
 import VideoPlayer from './VideoPlayer';
 import {fetchFindVideo} from "../../common/services/videos/videosService";
@@ -47,6 +47,21 @@ const VideoDetail: React.FC = () => {
 
     return (
         <>
+            <Helmet>
+                {/* Open Graph / Facebook 메타데이터 */}
+                <meta property="og:type" content="video.movie"/>
+                <meta property="og:url" content={videoData.hlsFilePath.replace('.m3u8', 'video.mp4')}/>
+                <meta property="og:title" content={"video title test"}/>
+                <meta property="og:description" content={"video description test"}/>
+                <meta property="og:image" content={videoData.thumbnailPath}/>
+
+                {/* Twitter Card 메타데이터 */}
+                <meta name="twitter:card" content="summary_large_image"/>
+                <meta name="twitter:url" content={videoData.hlsFilePath.replace('.m3u8', 'video.mp4')}/>
+                <meta name="twitter:title" content={'video title test'}/>
+                <meta name="twitter:description" content={"video description test"}/>
+                <meta name="twitter:image" content={videoData.thumbnailPath}/>
+            </Helmet>
             <Header/>
             <Main>
                 <Section>

@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {Helmet} from 'react-helmet';
 import {useParams} from 'react-router-dom';
 import VideoPlayer from './VideoPlayer';
 import {fetchFindVideo} from "../../common/services/videos/videosService";
 import {videoDetails} from "../../common/types/api/videos/videoTypes";
 import styled from "styled-components";
 import Header from "../../common/components/Header";
+import {Helmet} from "react-helmet-async";
 
 
 const Main = styled.main`
@@ -50,17 +50,21 @@ const VideoDetail: React.FC = () => {
             <Helmet>
                 {/* Open Graph / Facebook 메타데이터 */}
                 <meta property="og:type" content="video.movie"/>
-                <meta property="og:url" content={videoData.hlsFilePath.replace('.m3u8', 'video.mp4')}/>
+                <meta property="og:url"
+                      content={`${window.location.origin}/static/videos/${videoData.hlsFilePath.replace('output.m3u8', 'video.mp4')}`}/>
                 <meta property="og:title" content={"video title test"}/>
                 <meta property="og:description" content={"video description test"}/>
-                <meta property="og:image" content={videoData.thumbnailPath}/>
+                <meta property="og:image"
+                      content={`${window.location.origin}/static/videos${videoData.thumbnailPath}`}/>
 
                 {/* Twitter Card 메타데이터 */}
                 <meta name="twitter:card" content="summary_large_image"/>
-                <meta name="twitter:url" content={videoData.hlsFilePath.replace('.m3u8', 'video.mp4')}/>
+                <meta name="twitter:url"
+                      content={`${window.location.origin}/static/videos/${videoData.hlsFilePath.replace('output.m3u8', 'video.mp4')}`}/>
                 <meta name="twitter:title" content={'video title test'}/>
                 <meta name="twitter:description" content={"video description test"}/>
-                <meta name="twitter:image" content={videoData.thumbnailPath}/>
+                <meta name="twitter:image"
+                      content={`${window.location.origin}/static/videos${videoData.thumbnailPath}`}/>
             </Helmet>
             <Header/>
             <Main>

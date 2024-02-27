@@ -9,23 +9,26 @@ import {index} from "./store";
 import Upload from "./pages/Upload/Upload";
 import PrivateRoute from "./common/components/PrivateRoute";
 import VideoDetail from "./pages/Video/VideoDetail";
+import {HelmetProvider} from "react-helmet-async";
 
 
 function App() {
     return (
         <Provider store={index}>
-            <BrowserRouter>
-                <Routes>
-                    <Route path={rootPath} element={<Home/>}/>
-                    <Route path={signUpPath} element={<SignUp/>}></Route>
-                    <Route path={signInPath} element={<SignIn/>}></Route>
-                    <Route path='/video/:uuid' element={<VideoDetail/>}/>
-                    <Route element={<PrivateRoute/>}>
-                        <Route path={uploadPath} element={<Upload/>}></Route>
-                    </Route>
-                    <Route path="*" element={<Navigate to={rootPath} replace/>}/>
-                </Routes>
-            </BrowserRouter>
+            <HelmetProvider>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path={rootPath} element={<Home/>}/>
+                        <Route path={signUpPath} element={<SignUp/>}></Route>
+                        <Route path={signInPath} element={<SignIn/>}></Route>
+                        <Route path='/video/:uuid' element={<VideoDetail/>}/>
+                        <Route element={<PrivateRoute/>}>
+                            <Route path={uploadPath} element={<Upload/>}></Route>
+                        </Route>
+                        <Route path="*" element={<Navigate to={rootPath} replace/>}/>
+                    </Routes>
+                </BrowserRouter>
+            </HelmetProvider>
         </Provider>
     );
 }

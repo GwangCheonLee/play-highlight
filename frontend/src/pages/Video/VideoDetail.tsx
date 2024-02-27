@@ -49,22 +49,36 @@ const VideoDetail: React.FC = () => {
         <>
             <Helmet>
                 {/* Open Graph / Facebook 메타데이터 */}
-                <meta property="og:type" content="video.movie"/>
+
+                <meta property="og:type" content="video.other"/>
                 <meta property="og:url"
                       content={`${window.location.origin}/static/videos/${videoData.hlsFilePath.replace('output.m3u8', 'video.mp4')}`}/>
                 <meta property="og:title" content={"video title test"}/>
                 <meta property="og:description" content={"video description test"}/>
                 <meta property="og:image"
-                      content={`${window.location.origin}/static/videos${videoData.thumbnailPath}`}/>
+                      content={`${window.location.origin}/static/videos/${videoData.thumbnailPath}`}/>
+                <meta property="og:video"
+                      content={`${window.location.origin}/static/videos/${videoData.hlsFilePath.replace('output.m3u8', 'video.mp4')}`}/>
+                <meta property="og:video:width" content="640"/>
+                <meta property="og:video:height" content="360"/>
+                <meta property="og:video:type" content="video/mp4"/>
+
 
                 {/* Twitter Card 메타데이터 */}
-                <meta name="twitter:card" content="summary_large_image"/>
-                <meta name="twitter:url"
-                      content={`${window.location.origin}/static/videos/${videoData.hlsFilePath.replace('output.m3u8', 'video.mp4')}`}/>
+                <meta name="twitter:card" content="player"/>
                 <meta name="twitter:title" content={'video title test'}/>
                 <meta name="twitter:description" content={"video description test"}/>
                 <meta name="twitter:image"
-                      content={`${window.location.origin}/static/videos${videoData.thumbnailPath}`}/>
+                      content={`${window.location.origin}/static/videos/${videoData.thumbnailPath}`}/>
+                <meta name="twitter:player"
+                      content={`${window.location.origin}/static/videos/${videoData.hlsFilePath.replace('output.m3u8', 'video.mp4')}`}/>
+                <meta name="twitter:player:width" content="640"/>
+                <meta name="twitter:player:height" content="360"/>
+                <meta name="twitter:player:stream"
+                      content={`${window.location.origin}/static/videos/${videoData.hlsFilePath.replace('output.m3u8', 'video.mp4')}`}/>
+                <meta name="twitter:player:stream:content_type" content="video/mp4"/>
+
+
             </Helmet>
             <Header/>
             <Main>

@@ -6,11 +6,6 @@ export const parseJwt = (token: string): JwtTypes => {
     return JSON.parse(window.atob(base64));
 };
 
-export const logout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-}
-
 export const formatTimeAgo = (createdAt: Date): string => {
     const now = new Date();
     const diffInSeconds = (now.getTime() - createdAt.getTime()) / 1000;

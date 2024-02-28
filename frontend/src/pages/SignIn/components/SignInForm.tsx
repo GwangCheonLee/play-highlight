@@ -1,14 +1,14 @@
 import styled from "styled-components";
-import React from "react";
+import React, {useEffect} from "react";
 import {SignPageLogo} from "../../../common/components/Logo";
 import {useForm} from "react-hook-form";
 import SignInInput from "./SignInInput";
 import RememberMe from "./RememberMe";
 import {useNavigate} from "react-router-dom";
 import {fetchSignInBody} from "../../../common/types/api/authentication/authenticationTypes";
-import {fetchSignIn} from "../../../common/services/authentication/authenticationService";
+import {useAppDispatch, useAppSelector} from "../../../common/hooks/selectors";
+import {signInAsync} from "../../../features/auth/authSlice";
 import {extractAxiosErrorDetails} from "../../../common/utils/axiosUtils";
-import {useAppDispatch} from "../../../common/hooks/selectors";
 import {showModal} from "../../../features/modal/modalSlice";
 
 
@@ -42,6 +42,7 @@ const ErrorText = styled.p`
 
 const SignInForm = () => {
     const dispatch = useAppDispatch();
+    const {isAuthenticated, error} = useAppSelector(state => state.auth);
     const navigate = useNavigate();
     const {
         register,
@@ -50,14 +51,20 @@ const SignInForm = () => {
     } = useForm<fetchSignInBody>();
 
     const onSubmit = async (data: fetchSignInBody) => {
-        try {
-            await fetchSignIn(data);
-            navigate("/");
-        } catch (error: any) {
+        await dispatch(signInAsync(data));
+    };
+
+    useEffect(() => {
+        if (error) {
             const errorDetails = extractAxiosErrorDetails(error);
             dispatch(showModal({message: errorDetails.errorMessage}));
         }
-    };
+    }, [error])
+
+    useEffect(() => {
+        if (isAuthenticated) navigate("/");
+    }, [isAuthenticated])
+
 
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>

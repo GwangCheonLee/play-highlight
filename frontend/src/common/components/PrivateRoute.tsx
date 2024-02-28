@@ -1,53 +1,26 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {Navigate, Outlet} from 'react-router-dom';
-import {fetchAccessToken} from "../services/authentication/authenticationService";
+import {useAppDispatch, useAppSelector} from "../hooks/selectors";
+import {logout, refreshAccessTokenAsync} from "../../features/auth/authSlice";
 import {JwtTypes} from "../types/jwtTypes";
 import {parseJwt} from "../constatns";
 
 
 const PrivateRoute: React.FC = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+    const dispatch = useAppDispatch();
+    const {isAuthenticated, refreshToken, error} = useAppSelector(state => state.auth);
 
     useEffect(() => {
-        const verifyAccessToken = async () => {
-            const accessToken = localStorage.getItem("accessToken");
-            if (!accessToken) {
-                setIsAuthenticated(false);
-                return;
-            }
-
-            const accessTokenPayload: JwtTypes = parseJwt(accessToken);
-            if (Date.now() >= accessTokenPayload.exp * 1000) {
-                const refreshToken = localStorage.getItem("refreshToken");
-                if (!refreshToken) {
-                    setIsAuthenticated(false);
-                    return;
-                }
-
-                const refreshTokenPayload: JwtTypes = parseJwt(refreshToken);
-                if (Date.now() >= refreshTokenPayload.exp * 1000) {
-                    setIsAuthenticated(false);
-                    return;
-                }
-
-                try {
-                    await fetchAccessToken(refreshToken);
-                    setIsAuthenticated(true);
-                } catch (error) {
-                    console.error("Token refresh failed:", error);
-                    setIsAuthenticated(false);
-                }
+        if (refreshToken) {
+            const refreshTokenPayload: JwtTypes = parseJwt(refreshToken);
+            if (Date.now() < refreshTokenPayload.exp * 1000) {
+                dispatch(refreshAccessTokenAsync(refreshToken))
             } else {
-                setIsAuthenticated(true);
+                dispatch(logout())
             }
-        };
+        }
 
-        verifyAccessToken();
-    }, []);
-
-    if (isAuthenticated === null) {
-        return <div>Loading...</div>;
-    }
+    }, [dispatch]);
 
     return isAuthenticated ? <Outlet/> : <Navigate to="/"/>;
 };

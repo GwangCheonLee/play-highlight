@@ -29,6 +29,7 @@ services:
     ports:
       - "80:80"
     volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./data/backend:/usr/share/nginx/html/static/videos
     restart: unless-stopped
     depends_on:

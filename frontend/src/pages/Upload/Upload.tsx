@@ -5,6 +5,7 @@ import {useAppDispatch} from "../../common/hooks/selectors";
 import {showModal} from "../../features/modal/modalSlice";
 import {Modal} from "../../common/components/Modal";
 import {fetchUploadVideos} from "../../common/services/videos/videosService";
+import {useNavigate} from "react-router-dom";
 
 const Main = styled.main`
     padding: 0 15%;
@@ -69,9 +70,42 @@ const Button = styled.button`
     }
 `;
 
+const LoadingOverlay = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+    z-index: 10;
+`;
+
+const Spinner = styled.div`
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border-left-color: #09f;
+    animation: spin 1s ease infinite;
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+`;
+
 const Upload: React.FC = () => {
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const onDragOver = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -99,15 +133,22 @@ const Upload: React.FC = () => {
     const uploadFile = async () => {
         if (!selectedFile) return;
 
+        setIsLoading(true);
         const formData = new FormData();
         formData.append("video", selectedFile);
 
         try {
             await fetchUploadVideos(formData);
-            dispatch(showModal({message: 'File upload successful!'}));
+            dispatch(showModal({
+                message: 'File upload successful!', confirmCallback: () => {
+                    navigate("/");
+                }
+            }));
         } catch (error) {
             console.error('File upload failed', error);
             dispatch(showModal({message: 'File upload failed'}));
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -130,6 +171,11 @@ const Upload: React.FC = () => {
             <Header/>
             <Main>
                 <Section>
+                    {isLoading && ( // 로딩 상태가 true일 때 로딩 인디케이터 표시
+                        <LoadingOverlay>
+                            <Spinner/>
+                        </LoadingOverlay>
+                    )}
                     <Container onDragOver={onDragOver} onDrop={onDrop}>
                         {renderFileInfo()}
                         <ActionContainer>

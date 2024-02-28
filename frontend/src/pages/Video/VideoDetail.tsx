@@ -41,16 +41,16 @@ const VideoDetail: React.FC = () => {
         }
     }, [uuid]);
 
-    if (!videoData) return <div>Loading...</div>;
-
 
     return (
         <>
             <Header/>
             <Main>
                 <Section>
-                    <VideoPlayer url={`${window.location.origin}/static/videos/${videoData.hlsFilePath}`}
-                                 poster={`${window.location.origin}/static/videos/${videoData.thumbnailPath}`}/>
+                    {!videoData ? <div>Loading...</div> :
+                        <VideoPlayer url={`${window.location.origin}/static/videos/${videoData.hlsFilePath}`}
+                                     poster={`${window.location.origin}/static/videos/${videoData.thumbnailPath}`}/>}
+
                 </Section>
             </Main>
         </>

@@ -3,8 +3,12 @@ import {fetchFindVideoResponse, fetchFindVideosQuery, fetchFindVideosResponse} f
 import api from "../../utils/axios";
 
 export const fetchFindVideos = async (query: fetchFindVideosQuery) => {
-    const response: AxiosResponse<fetchFindVideosResponse, any> = await api.get(`/api/videos?cursor=${query.cursor}&limit=${query.limit}`,);
-    return response.data.data
+    const params = new URLSearchParams({
+        limit: query.limit.toString(),
+        ...(query.cursor && {cursor: query.cursor.toString()})
+    }).toString();
+    const response: AxiosResponse<fetchFindVideosResponse, any> = await api.get(`/api/videos?${params}`);
+    return response.data.data;
 };
 
 export const fetchFindVideo = async (uuid: string) => {

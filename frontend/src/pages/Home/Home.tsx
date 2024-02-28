@@ -1,10 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import Header from '../../common/components/Header';
 import styled from 'styled-components';
-import VideoCard from './components/VideoCard';
-import NoVideos from './NoVideos';
-import {videoDetails} from '../../common/types/api/videos/videoTypes';
-import {fetchFindVideos} from "../../common/services/videos/videosService";
+import {useAppDispatch, useAppSelector} from "../../common/hooks/selectors";
+import {fetchVideos} from "../../features/video/videoSlice";
+import VideoCard from "./components/VideoCard";
+import NoVideos from "./NoVideos";
 
 const Main = styled.main`
     padding: 0 15%;
@@ -30,17 +30,20 @@ const Section = styled.section`
 `;
 
 const Home = () => {
-    const [videos, setVideos] = useState<videoDetails[]>([]);
-    const [cursor, setCursor] = useState<number>(1);
-    const [limit, setLimit] = useState<number>(25);
-    const [nextCursor, setNextCursor] = useState<number | null>(null);
+    const dispatch = useAppDispatch();
+    const {videos, nextCursor, status} = useAppSelector(state => state.video);
     const sentinelRef = useRef<HTMLDivElement>(null);
 
+    useEffect(() => {
+        if (videos.length <= 0) {
+            dispatch(fetchVideos({cursor: null, limit: 25}));
+        }
+    }, [dispatch]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && nextCursor) {
-                setCursor(prevCursor => prevCursor !== nextCursor ? nextCursor : prevCursor);
+            if (entries[0].isIntersecting && nextCursor !== null) {
+                dispatch(fetchVideos({cursor: nextCursor, limit: 25}));
             }
         });
 
@@ -48,37 +51,16 @@ const Home = () => {
             observer.observe(sentinelRef.current);
         }
 
-        return () => {
-            if (sentinelRef.current) {
-                observer.disconnect();
-            }
-        };
-    }, [nextCursor]);
-
-    useEffect(() => {
-        const fetchVideos = async () => {
-            try {
-                const {videos: newVideos, nextCursor: newNextCursor} = await fetchFindVideos({cursor, limit});
-                if (newVideos.length > 0) {
-                    setVideos(prevVideos => [...prevVideos, ...newVideos]);
-                    setNextCursor(newNextCursor);
-                }
-            } catch (error) {
-                console.error('Failed to fetch videos', error);
-            }
-        };
-
-        fetchVideos();
-    }, [cursor, limit]);
-
+        return () => observer.disconnect();
+    }, [dispatch, nextCursor]);
 
     return (
         <>
             <Header/>
             <Main>
                 <Section>
-                    {videos.length > 0 ? (
-                        videos.map((video) => (
+                    {(videos.length > 0 ? (
+                        videos.map(video => (
                             <VideoCard
                                 key={video.id}
                                 videoId={video.uuid}
@@ -90,8 +72,9 @@ const Home = () => {
                             />
                         ))
                     ) : (
-                        <NoVideos/>
-                    )}
+                        status !== 'loading' && <NoVideos/>
+                    ))}
+                    {status === 'loading' && <p>Loading...</p>}
                     <div ref={sentinelRef}/>
                 </Section>
             </Main>

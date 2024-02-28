@@ -1,7 +1,7 @@
 import {User} from "../../jwtTypes";
 
 export type fetchFindVideosQuery = {
-    cursor: number;
+    cursor: number | null;
     limit: number;
 }
 

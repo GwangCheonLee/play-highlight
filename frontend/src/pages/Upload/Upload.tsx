@@ -5,6 +5,7 @@ import {useAppDispatch} from "../../common/hooks/selectors";
 import {showModal} from "../../features/modal/modalSlice";
 import {Modal} from "../../common/components/Modal";
 import {fetchUploadVideos} from "../../common/services/videos/videosService";
+import {useNavigate} from "react-router-dom";
 
 const Main = styled.main`
     padding: 0 15%;
@@ -101,6 +102,7 @@ const Spinner = styled.div`
 `;
 
 const Upload: React.FC = () => {
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -137,7 +139,11 @@ const Upload: React.FC = () => {
 
         try {
             await fetchUploadVideos(formData);
-            dispatch(showModal({message: 'File upload successful!'}));
+            dispatch(showModal({
+                message: 'File upload successful!', confirmCallback: () => {
+                    navigate("/");
+                }
+            }));
         } catch (error) {
             console.error('File upload failed', error);
             dispatch(showModal({message: 'File upload failed'}));

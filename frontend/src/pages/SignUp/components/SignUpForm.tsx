@@ -1,14 +1,14 @@
 import {useForm} from "react-hook-form";
 import styled from "styled-components";
 import {SignPageLogo} from "../../../common/components/Logo";
-import React from "react";
+import React, {useEffect} from "react";
 import SignUpInput from "./SignUpInput";
 import {useNavigate} from "react-router-dom";
 import {fetchSignUpBody} from "../../../common/types/api/authentication/authenticationTypes";
-import {fetchSignUp} from "../../../common/services/authentication/authenticationService";
 import {extractAxiosErrorDetails} from "../../../common/utils/axiosUtils";
 import {showModal} from "../../../features/modal/modalSlice";
-import {useAppDispatch} from "../../../common/hooks/selectors";
+import {useAppDispatch, useAppSelector} from "../../../common/hooks/selectors";
+import {signUpAsync} from "../../../features/auth/authSlice";
 
 const Form = styled.form`
     display: flex;
@@ -39,9 +39,11 @@ const ErrorText = styled.p`
 `;
 
 
-const SignInForm = () => {
+const SignUpForm = () => {
     const dispatch = useAppDispatch();
+    const {isAuthenticated, error} = useAppSelector(state => state.auth);
     const navigate = useNavigate();
+
     const {
         register,
         handleSubmit,
@@ -49,14 +51,19 @@ const SignInForm = () => {
     } = useForm<fetchSignUpBody>();
 
     const onSubmit = async (data: fetchSignUpBody) => {
-        try {
-            await fetchSignUp(data);
-            navigate("/");
-        } catch (error: any) {
+        await dispatch(signUpAsync(data));
+    };
+
+    useEffect(() => {
+        if (error) {
             const errorDetails = extractAxiosErrorDetails(error);
             dispatch(showModal({message: errorDetails.errorMessage}));
         }
-    };
+    }, [error])
+
+    useEffect(() => {
+        if (isAuthenticated) navigate("/");
+    }, [isAuthenticated])
 
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
@@ -99,4 +106,4 @@ const SignInForm = () => {
     );
 };
 
-export default SignInForm;
+export default SignUpForm;

@@ -10,7 +10,7 @@ export class VideosRepository extends Repository<Videos> {
   }
 
   async findVideos(
-    cursor: number = 1,
+    cursor: number,
     limit: number = 10,
   ): Promise<{ videos: Videos[]; nextCursor: number | null }> {
     const queryBuilder = this.createQueryBuilder('videos')
@@ -27,16 +27,21 @@ export class VideosRepository extends Repository<Videos> {
         'user.email',
         'user.nickname',
       ])
-      .where('videos.id >= :cursor', { cursor })
+
       .andWhere('videos.isDeleted = :isDeleted', { isDeleted: false })
       .orderBy('videos.id', 'DESC')
       .take(limit + 1);
+
+    if (cursor) {
+      queryBuilder.where('videos.id <= :cursor', { cursor });
+    }
 
     const videos = await queryBuilder.getMany();
 
     let nextCursor: number | null = null;
     if (videos.length > limit) {
-      nextCursor = videos.pop().id;
+      nextCursor = videos[videos.length - 1].id;
+      videos.pop();
     }
 
     return { videos, nextCursor };

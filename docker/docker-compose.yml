@@ -13,8 +13,8 @@ services:
       - ./data/database:/var/lib/postgresql/data
   nestjs-app:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: ../backend
+      dockerfile: ../backend/Dockerfile
     volumes:
       - ./data/backend:/usr/src/app/data
     restart: unless-stopped
@@ -24,8 +24,8 @@ services:
       - postgres
   react-app:
     build:
-      context: frontend
-      dockerfile: Dockerfile
+      context: ../frontend
+      dockerfile: ../frontend/Dockerfile
     ports:
       - "80:80"
     volumes:

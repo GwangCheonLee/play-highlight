@@ -1,0 +1,24 @@
+.profile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.signInButton {
+    font-size: 12px;
+    width: auto;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(48, 52, 55, 0.3);
+    color: #303437;
+    outline: none;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+}
+
+.signInButton:active {
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2);
+    transform: scale(0.98);
+}

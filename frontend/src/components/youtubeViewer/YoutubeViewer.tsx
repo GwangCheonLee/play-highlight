@@ -1,10 +1,10 @@
 "use client";
-import styles from "./youtube-viewer.module.css";
+import styles from "./youtubeViewer.module.scss";
 import YouTube from "react-youtube";
 import {
   youtubeViewerOnReady,
   youtubeViewerOptions,
-} from "@/common/config/youtube-viewer.config";
+} from "@/common/config/youtubeViewer.config";
 
 interface VideoViewProps {
   videoId: string;

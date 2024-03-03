@@ -1,6 +1,6 @@
 import styles from "./header.module.scss";
-import Logo from "@/components/layout/Logo";
-import Profile from "@/components/layout/Profile";
+import Logo from "@/components/common/Logo";
+import Profile from "@/components/common/Profile";
 
 export default function Header() {
   return (

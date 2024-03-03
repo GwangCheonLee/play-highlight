@@ -1,6 +1,6 @@
 import styled from "./profile.module.scss";
 import Link from "next/link";
-import { signInPath } from "@/common/routes/constants";
+import { signInPath } from "@/utils/routes/constants";
 
 export default function Profile() {
   return (

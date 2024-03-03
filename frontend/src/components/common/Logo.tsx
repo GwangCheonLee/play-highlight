@@ -1,7 +1,7 @@
 import Link from "next/link";
 import styles from "./logo.module.scss";
 import Image from "next/image";
-import { rootPath } from "@/common/routes/constants";
+import { rootPath } from "@/utils/routes/constants";
 
 export default function Logo() {
   return (

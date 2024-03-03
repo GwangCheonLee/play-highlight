@@ -4,7 +4,7 @@ import YouTube from "react-youtube";
 import {
   youtubeViewerOnReady,
   youtubeViewerOptions,
-} from "@/common/config/youtubeViewer.config";
+} from "@/utils/config/youtubeViewer.config";
 
 interface VideoViewProps {
   videoId: string;

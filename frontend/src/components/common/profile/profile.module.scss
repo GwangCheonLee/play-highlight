@@ -1,0 +1,47 @@
+.profileWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.profileImage {
+  border-radius: 50%;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-use-select: none;
+  user-select: none;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.profileArrowDown {
+  margin-left: 5px;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.profileContextMenu {
+  width: 12rem;
+  top: 100%;
+  margin-top: .8rem;
+  position: absolute;
+  right: 0;
+  z-index: 1;
+  background-color: #ffffff;
+  list-style: none;
+  box-shadow: 0 0 8px rgba(0, 0, 0, .1);
+
+  li {
+    padding: 0.75rem 1rem;
+    line-height: 1.5;
+    font-weight: 500;
+    cursor: pointer;
+
+  }
+}

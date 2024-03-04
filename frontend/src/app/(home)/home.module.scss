@@ -1,0 +1,22 @@
+.main {
+  padding: 0 15%;
+  height: calc(100vh - 69px);
+  overflow: auto;
+
+  @media (max-width: 640px) {
+    padding: 0;
+  }
+}
+
+.section {
+  display: flex;
+  overflow: hidden;
+  flex-wrap: wrap;
+  padding: 20px 0;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

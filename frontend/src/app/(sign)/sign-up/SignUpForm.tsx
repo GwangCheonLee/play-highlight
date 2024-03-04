@@ -1,23 +1,39 @@
 "use client";
-import React from "react";
 import styles from "@/app/(sign)/sign.module.scss";
 import { useForm } from "react-hook-form";
 import Logo from "@/components/common/Logo";
 import SignInput from "@/app/(sign)/SignInput";
+import { SignUpBody } from "@/types/auth/authTypes";
+import { useAppDispatch } from "@/store/selectors";
+import { parseJwt } from "@/utils/constants";
+import { signIn } from "@/store/features/auth/authSlice";
+import { useRouter } from "next/navigation";
+import { fetchSignUp } from "@/services/auth/authService";
+import { extractAxiosErrorDetails } from "@/utils/axiosError";
+import { useModal } from "@/contexts/ModalContext";
 
-const SignInForm = () => {
+const SignUpForm = () => {
+  const dispatch = useAppDispatch();
+  const { showModal } = useModal();
+  const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<{
-    email: string;
-    password: string;
-    rememberMe: boolean;
-  }>();
+  } = useForm<SignUpBody>();
 
-  const onSubmit = async (data: any) => {
-    console.log(data);
+  const onSubmit = async (formData: SignUpBody) => {
+    try {
+      const { accessToken } = await fetchSignUp(formData);
+      const { user } = parseJwt(accessToken);
+      sessionStorage.setItem("accessToken", accessToken);
+      dispatch(signIn({ user: user }));
+
+      router.push("/");
+    } catch (e) {
+      const errorDetails = extractAxiosErrorDetails(e);
+      showModal(null, errorDetails.errorMessage, false);
+    }
   };
 
   return (
@@ -66,4 +82,4 @@ const SignInForm = () => {
   );
 };
 
-export default SignInForm;
+export default SignUpForm;

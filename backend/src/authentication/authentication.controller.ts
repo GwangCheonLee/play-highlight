@@ -5,6 +5,8 @@ import {
   Get,
   HttpCode,
   Post,
+  Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
@@ -14,6 +16,7 @@ import { RequestByUser } from '../common/decorator/request-by-user.decorator';
 import { Users } from './entities/users.entity';
 import { SignUpDto } from './dto/signUp.dto';
 import { ConfigService } from '@nestjs/config';
+import { Request, Response } from 'express';
 
 @Controller('api/authentication')
 export class AuthenticationController {
@@ -23,39 +26,43 @@ export class AuthenticationController {
   ) {}
 
   @Post('/sign-up')
-  async signUp(@Body() signUpDto: SignUpDto) {
+  async signUp(@Body() signUpDto: SignUpDto, @Res() response: Response) {
     const signUpEnabled = this.configService.get<boolean>('SIGN_UP_ENABLED');
     if (!signUpEnabled) {
       throw new BadRequestException('Membership is not currently permitted.');
     }
 
     const user = await this.authenticationService.signUp(signUpDto);
+    const accessToken = this.authenticationService.generateAccessToken(user);
+    await this.authenticationService.generateRefreshToken(user, response);
 
-    return {
+    response.send({
       data: {
-        accessToken: this.authenticationService.generateAccessToken(user),
-        refreshToken:
-          await this.authenticationService.generateRefreshToken(user),
+        accessToken,
       },
-    };
+    });
   }
 
   @Post('/sign-in')
   @HttpCode(200)
   @UseGuards(AuthGuard(GuardTypeEnum.LOCAL))
-  async signIn(@RequestByUser() user: Users) {
-    return {
+  async signIn(@RequestByUser() user: Users, @Res() response: Response) {
+    const accessToken = this.authenticationService.generateAccessToken(user);
+    await this.authenticationService.generateRefreshToken(user, response);
+
+    return response.send({
       data: {
-        accessToken: this.authenticationService.generateAccessToken(user),
-        refreshToken:
-          await this.authenticationService.generateRefreshToken(user),
+        accessToken: accessToken,
       },
-    };
+    });
   }
 
   @Get('/access-token')
   @UseGuards(AuthGuard(GuardTypeEnum.JWT_REFRESH))
-  getAccessTokenByRefreshToken(@RequestByUser() user: Users) {
+  getAccessTokenByRefreshToken(
+    @RequestByUser() user: Users,
+    @Req() req: Request,
+  ) {
     return {
       data: {
         accessToken: this.authenticationService.generateAccessToken(user),

@@ -1,24 +1,39 @@
 "use client";
-import React from "react";
 import styles from "../sign.module.scss";
 import { useForm } from "react-hook-form";
 import SignInput from "../SignInput";
-import RememberMe from "./RememberMe";
 import Logo from "@/components/common/Logo";
+import { SignInBody } from "@/types/auth/authTypes";
+import { parseJwt } from "@/utils/constants";
+import { signIn } from "@/store/features/auth/authSlice";
+import { useAppDispatch } from "@/store/selectors";
+import { useRouter } from "next/navigation";
+import { useModal } from "@/contexts/ModalContext";
+import { fetchSignIn } from "@/services/auth/authService";
+import { extractAxiosErrorDetails } from "@/utils/axiosError";
 
 const SignInForm = () => {
+  const dispatch = useAppDispatch();
+  const { showModal } = useModal();
+
+  const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<{
-    email: string;
-    password: string;
-    rememberMe: boolean;
-  }>();
+  } = useForm<SignInBody>();
 
-  const onSubmit = async (data: any) => {
-    console.log(data);
+  const onSubmit = async (formData: SignInBody) => {
+    try {
+      const { accessToken } = await fetchSignIn(formData);
+      const { user } = parseJwt(accessToken);
+      sessionStorage.setItem("accessToken", accessToken);
+      dispatch(signIn({ user: user }));
+      router.push("/");
+    } catch (e) {
+      const errorDetails = extractAxiosErrorDetails(e);
+      showModal(null, errorDetails.errorMessage, false);
+    }
   };
 
   return (
@@ -49,7 +64,6 @@ const SignInForm = () => {
         placeholder="Enter your password"
         title="Password"
       />
-      <RememberMe register={register} name="rememberMe" />
       <button className={styles.signInButton} type="submit">
         Sign In
       </button>

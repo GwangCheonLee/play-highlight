@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "./sign.module.scss";
 import { UseFormRegister } from "react-hook-form";
 

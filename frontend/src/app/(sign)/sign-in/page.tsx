@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "../sign.module.scss";
 import { pickYoutubeVideoInformation } from "@/utils/config/youtubeViewer.config";
 import YoutubeViewer from "@/components/youtubeViewer/YoutubeViewer";

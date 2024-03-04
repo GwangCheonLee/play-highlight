@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "../sign.module.scss";
 import { signUpPath } from "@/utils/routes/constants";
 import Link from "next/link";

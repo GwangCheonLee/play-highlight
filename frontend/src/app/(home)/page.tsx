@@ -1,5 +1,4 @@
 import Header from "@/components/common/Header";
-import React from "react";
 import styles from "./home.module.scss";
 import VideoCard from "@/app/(home)/VideoCard";
 

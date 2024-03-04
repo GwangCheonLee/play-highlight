@@ -17,8 +17,8 @@ export default function Profile() {
         className={styles.profileImage}
         src={"/assets/images/logo.png"}
         alt={"image"}
-        width={40}
-        height={40}
+        width={36}
+        height={36}
       />
       <svg
         onClick={handleDropdownClick}

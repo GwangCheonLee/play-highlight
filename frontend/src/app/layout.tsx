@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../../public/assets/fonts/pretendard/pretendard.css";
 import "./globals.scss";
-import React from "react";
 import { ModalProvider } from "@/contexts/ModalContext";
 import Modal from "@/components/modal/Modal";
 import StoreProvider from "@/app/StoreProvider";

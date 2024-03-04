@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import styles from "./modal.module.scss";
 import { useModal } from "@/contexts/ModalContext";
 

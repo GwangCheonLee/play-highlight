@@ -60,7 +60,7 @@ const SignInForm = () => {
         title="Password"
       />
       <button className={styles.signUpButton} type="submit">
-        Sign up
+        Sign Up
       </button>
     </form>
   );

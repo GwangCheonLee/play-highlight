@@ -1,12 +1,12 @@
 import styles from "./header.module.scss";
 import Logo from "@/components/common/Logo";
-import Profile from "@/components/common/Profile";
+import ProfileContainer from "@/components/common/profile/ProfileContainer";
 
 export default function Header() {
   return (
     <header className={styles.header}>
       <Logo />
-      <Profile />
+      <ProfileContainer />
     </header>
   );
 }

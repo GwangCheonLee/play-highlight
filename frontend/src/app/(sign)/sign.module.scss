@@ -1,0 +1,133 @@
+.signInWrapper {
+  display: flex;
+  height: 100vh;
+
+  > div:first-child {
+    width: 25%;
+  }
+
+  > div:last-child {
+    width: 75%;
+  }
+
+  @media (max-width: 640px) {
+    div:first-child {
+      width: 100%;
+    }
+
+    div:last-child {
+      display: none;
+    }
+  }
+}
+
+.signInFormWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.signInput {
+  padding: 10px;
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+}
+
+.signInputTitle {
+  margin-top: 20px;
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #222222;
+}
+
+.signUpLinkDescription {
+  font-size: 12px;
+}
+
+.signUpHyperLink {
+  color: #4164e3;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.rememberMeWrapper {
+  display: flex;
+  align-items: center;
+  margin: 20px 0 10px;
+
+  label {
+    margin-left: 5px;
+    font-size: 12px;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  input[checkbox] {
+    cursor: pointer;
+  }
+}
+
+
+.signInForm {
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  padding: 20px;
+  border-radius: 8px;
+
+  h1 {
+    text-align: center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    padding-right: 20px;
+
+    img {
+      width: 36px;
+      height: 36px;
+    }
+
+    span {
+      font-size: 24px;
+
+    }
+  }
+
+
+}
+
+.signInButton {
+  padding: 13px 10px;
+  background-color: #4164e3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+}
+
+.signUpButton {
+  margin-top: 20px;
+  padding: 13px 10px;
+  background-color: #4164e3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+}
+
+.errorText {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: #A50016;
+}

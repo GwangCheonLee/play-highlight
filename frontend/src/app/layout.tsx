@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../../public/assets/fonts/pretendard/pretendard.css";
 import "./globals.scss";
-import Header from "@/components/common/Header";
 import React from "react";
 import { ModalProvider } from "@/contexts/ModalContext";
 import Modal from "@/components/modal/Modal";
+import StoreProvider from "@/app/StoreProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,14 +20,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ModalProvider>
-      <html lang="en">
-        <body className={inter.className}>
-          <Header />
-          {children}
-          <Modal />
-        </body>
-      </html>
-    </ModalProvider>
+    <StoreProvider>
+      <ModalProvider>
+        <html lang="en">
+          <body className={inter.className}>
+            {children}
+            <Modal />
+          </body>
+        </html>
+      </ModalProvider>
+    </StoreProvider>
   );
 }

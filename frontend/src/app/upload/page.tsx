@@ -1,11 +1,24 @@
 "use client";
-import React, { ChangeEvent, DragEvent, useState } from "react";
+import React, { ChangeEvent, DragEvent, useEffect, useState } from "react";
 import styles from "./upload.module.scss";
 import Header from "@/components/common/Header";
+import { fetchUploadVideos } from "@/services/videos/videosService";
+import { useModal } from "@/contexts/ModalContext";
+import { useRouter } from "next/navigation";
 
 const Upload: React.FC = () => {
+  const { showModal } = useModal();
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const accessToken = sessionStorage.getItem("accessToken");
+    if (!accessToken) return;
+
+    setAccessToken(accessToken);
+  }, [accessToken]);
 
   const onDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -19,7 +32,7 @@ const Upload: React.FC = () => {
       if (file.type.startsWith("video/")) {
         setSelectedFile(file);
       } else {
-        // dispatch(showModal({ message: "Only video files can be uploaded." }));
+        showModal(null, "Only video files can be uploaded.", false);
       }
     }
   };
@@ -38,20 +51,14 @@ const Upload: React.FC = () => {
     formData.append("video", selectedFile);
 
     try {
-      // await fetchUploadVideos(formData);
-      // dispatch(
-      //   showModal({
-      //     message: "File upload successful!",
-      //     confirmCallback: () => {
-      //       navigate("/");
-      //     },
-      //   }),
-      // );
-
-      console.log(formData);
+      if (!accessToken) return;
+      await fetchUploadVideos(formData, accessToken);
+      showModal(null, "File upload successful!", false, () => {
+        router.push("/");
+      });
     } catch (error) {
       console.error("File upload failed", error);
-      // dispatch(showModal({ message: "File upload failed" }));
+      showModal(null, "File upload failed", false);
     } finally {
       setIsLoading(false);
     }

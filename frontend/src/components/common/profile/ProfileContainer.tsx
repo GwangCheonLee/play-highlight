@@ -5,7 +5,7 @@ import React, { useEffect } from "react";
 import Profile from "@/components/common/profile/Profile";
 import { useAppDispatch, useAppSelector } from "@/store/selectors";
 import { parseJwt } from "@/utils/constants";
-import { signIn } from "@/store/features/auth/authSlice";
+import { signIn, signOut } from "@/store/features/auth/authSlice";
 import { isAxiosError } from "axios";
 import { fetchAccessToken } from "@/services/auth/authService";
 
@@ -30,7 +30,10 @@ export default function ProfileContainer() {
           dispatch(signIn({ user: user }));
         } catch (e) {
           if (isAxiosError(e)) {
-            if (e.response?.status === 401) return;
+            if (e.response?.status === 401) {
+              dispatch(signOut());
+              return;
+            }
           }
         }
       };

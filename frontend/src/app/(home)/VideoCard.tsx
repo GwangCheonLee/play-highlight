@@ -1,6 +1,7 @@
 import styles from "./home.module.scss";
 import { formatTimeAgo } from "@/utils/constants";
 import Link from "next/link";
+import Image from "next/image";
 
 type videoCardProps = {
   videoId: string;
@@ -20,7 +21,14 @@ const VideoCard = ({
 }: videoCardProps) => {
   return (
     <Link className={styles.videoCardLink} href={`video/${videoId}`}>
-      <img draggable="false" src={src} alt={alt} />
+      <Image
+        draggable="false"
+        src={src}
+        alt={alt}
+        width={100}
+        height={100}
+        unoptimized={true}
+      />
       <div className={styles.videoDescriptionWrapper}>
         <span>{email}</span>
         <br />

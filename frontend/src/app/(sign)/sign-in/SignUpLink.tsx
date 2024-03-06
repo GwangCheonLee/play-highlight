@@ -5,7 +5,7 @@ import Link from "next/link";
 const SignUpLink = () => {
   return (
     <p className={styles.signUpLinkDescription}>
-      Don't have an account?{" "}
+      {"Don't have an account? "}
       <Link className={styles.signUpHyperLink} href={signUpPath}>
         Sign up
       </Link>

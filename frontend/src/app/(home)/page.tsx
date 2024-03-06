@@ -16,7 +16,7 @@ export default function Home() {
     if (videos.length <= 0) {
       dispatch(fetchVideos({ cursor: null, limit: 25 }));
     }
-  }, [dispatch]);
+  }, [videos, dispatch]);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {

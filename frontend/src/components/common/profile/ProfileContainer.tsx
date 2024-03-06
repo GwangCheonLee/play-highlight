@@ -15,31 +15,35 @@ export default function ProfileContainer() {
 
   useEffect(() => {
     const accessToken = sessionStorage.getItem("accessToken");
-    if (!accessToken) return;
 
-    const jwtClaim = parseJwt(accessToken);
-    const currentTime = Date.now() / 1000;
-    if (jwtClaim.exp > currentTime) {
-      dispatch(signIn({ user: jwtClaim.user }));
-    } else {
-      const getAccessToken = async () => {
-        try {
-          const { accessToken } = await fetchAccessToken();
-          const { user } = parseJwt(accessToken);
-          sessionStorage.setItem("accessToken", accessToken);
-          dispatch(signIn({ user: user }));
-        } catch (e) {
-          if (isAxiosError(e)) {
-            if (e.response?.status === 401) {
-              dispatch(signOut());
-              return;
-            }
+    const getAccessToken = async () => {
+      try {
+        const { accessToken } = await fetchAccessToken();
+        const { user } = parseJwt(accessToken);
+        sessionStorage.setItem("accessToken", accessToken);
+        dispatch(signIn({ user: user }));
+      } catch (e) {
+        if (isAxiosError(e)) {
+          if (e.response?.status === 401) {
+            dispatch(signOut());
+            return;
           }
         }
-      };
+      }
+    };
+
+    if (accessToken) {
+      const jwtClaim = parseJwt(accessToken);
+      const currentTime = Date.now() / 1000;
+      if (jwtClaim.exp > currentTime) {
+        dispatch(signIn({ user: jwtClaim.user }));
+      } else {
+        getAccessToken();
+      }
+    } else {
       getAccessToken();
     }
-  }, []);
+  }, [dispatch]);
   return (
     <div className={styled.profile}>
       {isAuthenticated ? <Profile /> : <SignInButton />}

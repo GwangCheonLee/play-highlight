@@ -57,6 +57,19 @@ export class AuthenticationController {
     });
   }
 
+  @Post('/sign-out')
+  @HttpCode(200)
+  @UseGuards(AuthGuard(GuardTypeEnum.JWT_ACCESS))
+  async signOut(@RequestByUser() user: Users, @Res() response: Response) {
+    response.cookie('refreshToken', '', {
+      httpOnly: true,
+      path: '/',
+      maxAge: 0,
+      secure: this.configService.get<string>('NODE_ENV') === 'production',
+    });
+    return response.status(204).send();
+  }
+
   @Get('/access-token')
   @UseGuards(AuthGuard(GuardTypeEnum.JWT_REFRESH))
   getAccessTokenByRefreshToken(

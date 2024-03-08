@@ -12,7 +12,7 @@ interface VideosState {
 
 const initialState: VideosState = {
   videos: [],
-  nextCursor: null,
+  nextCursor: 0,
   status: "idle",
   error: null,
 };

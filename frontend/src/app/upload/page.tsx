@@ -81,7 +81,7 @@ const Upload: React.FC = () => {
   };
 
   return (
-    <>
+    <div>
       <Header />
       <main className={styles.main}>
         <section className={styles.section}>
@@ -117,7 +117,7 @@ const Upload: React.FC = () => {
           </div>
         </section>
       </main>
-    </>
+    </div>
   );
 };
 

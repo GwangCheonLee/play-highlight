@@ -13,10 +13,10 @@ export default function Home() {
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (videos.length <= 0) {
-      dispatch(fetchVideos({ cursor: null, limit: 25 }));
+    if (videos.length <= 0 && nextCursor !== null) {
+      dispatch(fetchVideos({ cursor: nextCursor, limit: 25 }));
     }
-  }, [videos, dispatch]);
+  }, [dispatch]);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -33,7 +33,7 @@ export default function Home() {
   }, [dispatch, nextCursor]);
 
   return (
-    <>
+    <div>
       <Header />
       <main className={styles.main}>
         <section className={styles.section}>
@@ -54,6 +54,6 @@ export default function Home() {
           <div ref={sentinelRef} />
         </section>
       </main>
-    </>
+    </div>
   );
 }

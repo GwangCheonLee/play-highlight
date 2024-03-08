@@ -1,5 +1,5 @@
 import React from "react";
-import Container from "@/app/video/[uuid]/container";
+import Container from "@/app/[locale]/video/[uuid]/container";
 import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
 

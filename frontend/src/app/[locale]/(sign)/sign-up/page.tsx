@@ -1,16 +1,14 @@
-import styles from "../sign.module.scss";
 import { pickYoutubeVideoInformation } from "@/utils/config/youtubeViewer.config";
+import styles from "@/app/[locale]/(sign)/sign.module.scss";
 import YoutubeViewer from "@/components/youtubeViewer/YoutubeViewer";
-import SignInForm from "@/app/(sign)/sign-in/SignInForm";
-import SignUpLink from "@/app/(sign)/sign-in/SignUpLink";
+import SignUpForm from "@/app/[locale]/(sign)/sign-up/SignUpForm";
 
-const SignIn = () => {
+export default function SignUp() {
   const youtubeVideoInformation = pickYoutubeVideoInformation();
   return (
     <div className={styles.signInWrapper}>
       <div className={styles.signInFormWrapper}>
-        <SignInForm />
-        <SignUpLink />
+        <SignUpForm />
       </div>
       <YoutubeViewer
         videoId={youtubeVideoInformation.id}
@@ -18,6 +16,4 @@ const SignIn = () => {
       />
     </div>
   );
-};
-
-export default SignIn;
+}

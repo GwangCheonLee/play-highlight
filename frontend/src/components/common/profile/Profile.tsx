@@ -12,16 +12,15 @@ export default function Profile() {
   };
 
   return (
-    <div className={styles.profileWrapper}>
+    <div className={styles.profileWrapper} onClick={handleDropdownClick}>
       <Image
         className={styles.profileImage}
-        src={"/assets/images/logo.png"}
+        src={"/assets/images/default_user_profile.png"}
         alt={"image"}
         width={36}
         height={36}
       />
       <svg
-        onClick={handleDropdownClick}
         className={styles.profileArrowDown}
         stroke="currentColor"
         fill="currentColor"

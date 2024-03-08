@@ -1,13 +1,17 @@
 "use client";
 import Header from "@/components/common/Header";
 import styles from "./home.module.scss";
-import VideoCard from "@/app/(home)/VideoCard";
+import VideoCard from "@/app/[locale]/VideoCard";
 import React, { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/selectors";
 import { fetchVideos } from "@/store/features/video/videoSlice";
-import NoVideos from "@/app/(home)/NoVideos";
+import NoVideos from "@/app/[locale]/NoVideos";
 
-export default function Home() {
+export default function Home({
+  params: { locale },
+}: Readonly<{
+  params: { locale: string };
+}>) {
   const dispatch = useAppDispatch();
   const { videos, nextCursor, status } = useAppSelector((state) => state.video);
   const sentinelRef = useRef<HTMLDivElement>(null);

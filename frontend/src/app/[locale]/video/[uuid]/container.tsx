@@ -1,7 +1,7 @@
 "use client";
 import styles from "./video.module.scss";
 import React, { useEffect, useState } from "react";
-import VideoPlayer from "@/app/video/VideoPlayer";
+import VideoPlayer from "@/app/[locale]/video/VideoPlayer";
 import Header from "@/components/common/Header";
 import { fetchFindVideo } from "@/services/videos/videosService";
 import { videoDetails } from "@/types/videoTypes";

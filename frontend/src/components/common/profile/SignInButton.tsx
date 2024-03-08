@@ -4,7 +4,7 @@ import { signInPath } from "@/utils/routes/constants";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function SignInButton() {
+export default function SignInButton(param: any) {
   const path = usePathname();
   return path !== signInPath ? (
     <Link className={styled.signInButton} href={signInPath}>

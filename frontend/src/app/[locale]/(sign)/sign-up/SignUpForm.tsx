@@ -1,8 +1,8 @@
 "use client";
-import styles from "@/app/(sign)/sign.module.scss";
+import styles from "@/app/[locale]/(sign)/sign.module.scss";
 import { useForm } from "react-hook-form";
 import Logo from "@/components/common/Logo";
-import SignInput from "@/app/(sign)/SignInput";
+import SignInput from "@/app/[locale]/(sign)/SignInput";
 import { SignUpBody } from "@/types/auth/authTypes";
 import { useAppDispatch } from "@/store/selectors";
 import { parseJwt } from "@/utils/constants";

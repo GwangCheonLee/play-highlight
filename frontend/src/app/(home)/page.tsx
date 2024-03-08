@@ -43,7 +43,7 @@ export default function Home() {
                   key={video.id}
                   videoId={video.uuid}
                   alt={`Video by ${video.user.nickname}`}
-                  src={`/static/videos/${video.thumbnailPath}`}
+                  src={`/static/videos/${video.uuid}/${video.thumbnailFileName}`}
                   nickname={video.user.nickname}
                   createdAt={new Date(video.createdAt)}
                   email={video.user.email}

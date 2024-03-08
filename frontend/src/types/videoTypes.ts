@@ -22,8 +22,9 @@ export type videoDetails = {
   id: number;
   uuid: string;
   baseDir: string;
-  thumbnailPath: string;
-  hlsFilePath: string;
+  thumbnailFileName: string;
+  hlsFileName: string;
+  videoFileName: string;
   createdAt: Date;
   updatedAt: Date;
   user: User;

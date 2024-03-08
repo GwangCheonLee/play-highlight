@@ -33,7 +33,7 @@ services:
     image: nginx:latest
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./data/backend:/usr/share/nginx/html/static/videos
+      - ./data/backend:/usr/share/nginx/html/static
     restart: unless-stopped
     ports:
       - "3000:80"

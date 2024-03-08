@@ -17,8 +17,7 @@ export class FfmpegService {
     });
   }
 
-  encodeToHls(videoPath: string, hlsOutputDir: string): Promise<void> {
-    const hlsOutputPath = path.join(hlsOutputDir, 'output.m3u8');
+  encodeToHls(videoPath: string, hlsOutputPath: string): Promise<void> {
     return new Promise((resolve, reject) => {
       ffmpeg(videoPath)
         .outputOptions([

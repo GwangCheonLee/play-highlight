@@ -29,27 +29,35 @@ export class VideosService {
 
   async saveVideo(user: Users, file: Express.Multer.File) {
     const uuid = uuidv4();
-    const baseDir = getBaseDir();
-    const userDir = path.join(baseDir, uuid);
-    const originalFilePath = path.join(
-      userDir,
-      `video${path.extname(file.originalname)}`,
-    );
-    const thumbnailFilePath = path.join(userDir, 'thumbnail.jpg');
-    const hlsOutputDir = userDir;
+    const baseDir = path.join(getBaseDir(), 'videos');
+    console.log(baseDir);
+    const videoDirPath = path.join(baseDir, uuid);
+    const fileExtension = path.extname(file.originalname);
 
-    if (!fs.existsSync(userDir)) {
-      fs.mkdirSync(userDir, { recursive: true });
-    }
+    const thumbnailFileName = 'thumbnail.jpg';
+    const hlsFileName = 'output.m3u8';
+    const videoFileName = `video${fileExtension}`;
 
-    fs.writeFileSync(originalFilePath, file.buffer);
+    const originalVideoPath = path.join(videoDirPath, videoFileName);
+    const thumbnailPath = path.join(videoDirPath, thumbnailFileName);
+    const hlsOutputPath = path.join(videoDirPath, hlsFileName);
+
+    fs.mkdirSync(videoDirPath, { recursive: true });
+    fs.writeFileSync(originalVideoPath, file.buffer);
 
     await this.ffmpegService.generateThumbnail(
-      originalFilePath,
-      thumbnailFilePath,
+      originalVideoPath,
+      thumbnailPath,
     );
-    await this.ffmpegService.encodeToHls(originalFilePath, hlsOutputDir);
+    await this.ffmpegService.encodeToHls(originalVideoPath, hlsOutputPath);
 
-    return this.videosRepository.saveVideo(user, uuid, baseDir);
+    return this.videosRepository.saveVideo(
+      user,
+      uuid,
+      baseDir,
+      thumbnailFileName,
+      hlsFileName,
+      videoFileName,
+    );
   }
 }

@@ -8,18 +8,18 @@ export async function generateMetadata(
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const headerList = headers();
-  const currentUrl = headerList.get("referer") || "";
-  const baseUrl = currentUrl.split("/video/")[0];
-  const segments = currentUrl.split("video/");
-  const videoUuid = segments[1];
+  const referer = headerList.get("referer") || "";
+  const url = new URL(referer);
+  const host = headerList.get("host");
+  const videoPath = `${url.protocol}//${host}/static/videos/${params.uuid}/video.mp4`;
 
   return {
     openGraph: {
       type: "video.other",
-      url: currentUrl,
+      url: videoPath,
       videos: [
         {
-          url: `${baseUrl}/static/videos/${videoUuid}/video.mp4`,
+          url: videoPath,
           width: 800,
           height: 600,
           type: "video/mp4",

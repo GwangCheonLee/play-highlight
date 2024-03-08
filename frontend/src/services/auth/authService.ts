@@ -28,3 +28,16 @@ export const fetchAccessToken = async () => {
   );
   return response.data.data;
 };
+
+export const fetchSignOut = async (accessToken: string) => {
+  const response: AxiosResponse<null, any> = await axios.post(
+    `${window.location.origin}/api/authentication/sign-out`,
+    null,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+  return response.data;
+};

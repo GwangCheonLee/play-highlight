@@ -22,11 +22,14 @@ export class Videos {
   @Column({ name: 'base_dir' })
   baseDir: string;
 
-  @Column({ name: 'thumbnail_path' })
-  thumbnailPath: string;
+  @Column({ name: 'thumbnail_file_name' })
+  thumbnailFileName: string;
 
-  @Column({ name: 'hls_file_path' })
-  hlsFilePath: string;
+  @Column({ name: 'hls_file_name' })
+  hlsFileName: string;
+
+  @Column({ name: 'video_file_name' })
+  videoFileName: string;
 
   @Column({ name: 'is_deleted', default: false })
   isDeleted: boolean;

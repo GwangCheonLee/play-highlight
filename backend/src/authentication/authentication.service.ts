@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { UsersRepository } from './repositories/users.repository';
 import { SignUpDto } from './dto/signUp.dto';
 import { cryptPlainText } from '../common/common.constant';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthenticationService {
@@ -43,14 +44,25 @@ export class AuthenticationService {
     );
   }
 
-  async generateRefreshToken(user: Users) {
-    return this.jwtService.sign(
+  async generateRefreshToken(user: Users, response: Response): Promise<void> {
+    const jwtRefreshTokenExpirationTime = this.configService.get<number>(
+      'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
+    );
+
+    const refreshToken = this.jwtService.sign(
       { user: this.extractPayloadFromUser(user) },
       {
-        secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
-        expiresIn: this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME'),
+        secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+        expiresIn: jwtRefreshTokenExpirationTime * 1000,
       },
     );
+
+    response.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      path: '/',
+      maxAge: jwtRefreshTokenExpirationTime * 1000,
+      secure: this.configService.get<string>('NODE_ENV') === 'production',
+    });
   }
 
   private extractPayloadFromUser(user: Users) {

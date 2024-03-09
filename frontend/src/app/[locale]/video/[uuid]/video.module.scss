@@ -1,0 +1,12 @@
+.main {
+  padding: 0 15%;
+  height: calc(100vh - 69px);
+  overflow: auto;
+  @media (max-width: 640px) {
+    padding: 0;
+  }
+}
+
+.section {
+  padding: 20px 0;
+}

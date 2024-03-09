@@ -1,0 +1,27 @@
+.localeSwitcher {
+  width: 100%;
+  display: inline-block;
+  position: relative;
+  margin: 0;
+
+  label {
+    display: block;
+
+  }
+
+  select {
+    padding: 0.5em 0.1em;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    outline: none;
+
+    &:disabled {
+      background-color: #eee;
+      cursor: not-allowed;
+    }
+  }
+
+}

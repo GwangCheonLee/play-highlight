@@ -19,8 +19,9 @@ export class VideosRepository extends Repository<Videos> {
         'videos.id',
         'videos.uuid',
         'videos.baseDir',
-        'videos.thumbnailPath',
-        'videos.hlsFilePath',
+        'videos.thumbnailFileName',
+        'videos.hlsFileName',
+        'videos.videoFileName',
         'videos.createdAt',
         'videos.updatedAt',
         'user.id',
@@ -47,13 +48,21 @@ export class VideosRepository extends Repository<Videos> {
     return { videos, nextCursor };
   }
 
-  async saveVideo(user: Users, uuid: string, baseDir: string) {
+  async saveVideo(
+    user: Users,
+    uuid: string,
+    baseDir: string,
+    thumbnailFileName: string,
+    hlsFileName: string,
+    videoFileName: string,
+  ) {
     const entity = this.create({
       user: user,
       uuid,
       baseDir,
-      thumbnailPath: `${uuid}/thumbnail.jpg`,
-      hlsFilePath: `${uuid}/output.m3u8`,
+      thumbnailFileName,
+      hlsFileName,
+      videoFileName,
     });
 
     return this.save(entity);

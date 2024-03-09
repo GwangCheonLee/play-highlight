@@ -1,0 +1,41 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "postgrespw"
+      POSTGRES_DB: "play_highlight"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/database:/var/store/postgresql/data
+  nestjs-app:
+    build:
+      context: ../backend
+      dockerfile: ../backend/Dockerfile
+    volumes:
+      - ./data/backend:/usr/src/app/data
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+  nextjs-app:
+    build:
+      context: ../frontend
+      dockerfile: ../frontend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - nestjs-app
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./data/backend:/usr/share/nginx/html/static
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - nestjs-app

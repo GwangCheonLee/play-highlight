@@ -23,6 +23,6 @@ COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/dist ./dist
 COPY package*.json ./
 
-EXPOSE 3001
+EXPOSE 3002
 
 CMD ["npm", "run", "start:prod"]

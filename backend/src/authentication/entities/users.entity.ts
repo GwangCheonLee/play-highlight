@@ -22,6 +22,9 @@ export class Users {
   @Column({ name: 'nickname' })
   nickname: string;
 
+  @Column({ name: 'profile_image', nullable: true })
+  profileImage: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 

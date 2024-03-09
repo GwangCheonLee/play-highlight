@@ -65,16 +65,12 @@ export class AuthenticationService {
     });
   }
 
-  async changeNickname(user: Users, nickname: string) {
-    await this.usersRepository.update(user.id, { nickname });
-    return this.usersRepository.findOneBy({ id: user.id });
-  }
-
   private extractPayloadFromUser(user: Users) {
     return {
       id: user.id,
       nickname: user.nickname,
       email: user.email,
+      profileImage: user.profileImage,
     };
   }
 }

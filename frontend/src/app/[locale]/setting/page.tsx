@@ -4,6 +4,7 @@ import React from "react";
 import SettingRaw from "@/app/[locale]/setting/SettingRaw";
 import LocaleSwitcher from "@/components/localeSwitcher/LocaleSwitcher";
 import Nickname from "@/app/[locale]/setting/Nickname";
+import ProfileImage from "@/app/[locale]/setting/ProfileImage";
 
 export default function Setting() {
   return (
@@ -12,6 +13,7 @@ export default function Setting() {
       <main className={styles.main}>
         <section className={styles.section}>
           <div className={styles.settingWrapper}>
+            <ProfileImage />
             <SettingRaw
               title={"nicknameTitle"}
               description={"nicknameDescription"}

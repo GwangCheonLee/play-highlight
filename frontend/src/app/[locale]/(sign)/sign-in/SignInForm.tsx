@@ -3,7 +3,7 @@ import styles from "../sign.module.scss";
 import { useForm } from "react-hook-form";
 import SignInput from "../SignInput";
 import Logo from "@/components/common/Logo";
-import { SignInBody } from "@/types/auth/authTypes";
+import { SignInBody } from "@/types/authTypes";
 import { parseJwt } from "@/utils/constants";
 import { signIn } from "@/store/features/auth/authSlice";
 import { useAppDispatch } from "@/store/selectors";

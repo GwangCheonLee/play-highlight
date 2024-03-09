@@ -3,22 +3,29 @@ import styles from "./profile.module.scss";
 import Image from "next/image";
 import { useState } from "react";
 import Dropdown from "@/components/common/profile/Dropdown";
+import { useAppSelector } from "@/store/selectors";
 
 export default function Profile() {
+  const { user } = useAppSelector((state) => state.auth);
   const [isOpened, setIsOpened] = useState(false);
 
   const handleDropdownClick = () => {
     setIsOpened((v) => !v);
   };
 
+  const userProfileImage = user?.profileImage
+    ? `/static/profiles/${user.id}/${user.profileImage}`
+    : "/assets/images/default_user_profile.png";
+
   return (
     <div className={styles.profileWrapper} onClick={handleDropdownClick}>
       <Image
         className={styles.profileImage}
-        src={"/assets/images/default_user_profile.png"}
+        src={userProfileImage}
         alt={"image"}
         width={36}
         height={36}
+        unoptimized={true}
       />
       <svg
         className={styles.profileArrowDown}

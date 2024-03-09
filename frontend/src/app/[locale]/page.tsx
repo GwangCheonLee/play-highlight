@@ -38,18 +38,23 @@ export default function Home() {
       <main className={styles.main}>
         <section className={styles.section}>
           {videos.length > 0
-            ? videos.map((video) => (
-                <VideoCard
-                  key={video.id}
-                  videoId={video.uuid}
-                  alt={`Video by ${video.user.nickname}`}
-                  src={`/static/videos/${video.uuid}/${video.thumbnailFileName}`}
-                  nickname={video.user.nickname}
-                  createdAt={new Date(video.createdAt)}
-                  email={video.user.email}
-                  userProfileImg={video.user.profileImage}
-                />
-              ))
+            ? videos.map((video) => {
+                const userProfileImage = video.user.profileImage
+                  ? `/static/profiles/${video.user.id}/${video.user.profileImage}`
+                  : "/assets/images/default_user_profile.png";
+                return (
+                  <VideoCard
+                    key={video.id}
+                    videoId={video.uuid}
+                    alt={`Video by ${video.user.nickname}`}
+                    src={`/static/videos/${video.uuid}/${video.thumbnailFileName}`}
+                    nickname={video.user.nickname}
+                    createdAt={new Date(video.createdAt)}
+                    email={video.user.email}
+                    userProfileImg={userProfileImage}
+                  />
+                );
+              })
             : status !== "loading" && <NoVideos />}
           {status === "loading" && <></>}
           <div ref={sentinelRef} />

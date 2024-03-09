@@ -27,6 +27,7 @@ export class VideosRepository extends Repository<Videos> {
         'user.id',
         'user.email',
         'user.nickname',
+        'user.profileImage',
       ])
 
       .andWhere('videos.isDeleted = :isDeleted', { isDeleted: false })

@@ -5,7 +5,7 @@ import {
   SignInResponse,
   SignUpBody,
   SignUpResponse,
-} from "@/types/auth/authTypes";
+} from "@/types/authTypes";
 
 export const fetchSignUp = async (data: SignUpBody) => {
   const response: AxiosResponse<SignUpResponse, any> = await axios.post(
@@ -49,7 +49,7 @@ export const fetchChangeNickname = async (
 ) => {
   const response: AxiosResponse<ChangeNicknameResponse, any> =
     await axios.patch(
-      `${window.location.origin}/api/authentication/me/nickname`,
+      `${window.location.origin}/api/users/me/nickname`,
       { nickname },
       {
         headers: {

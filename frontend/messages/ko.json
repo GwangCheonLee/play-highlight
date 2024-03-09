@@ -34,6 +34,8 @@
     "nicknameTitle": "닉네임",
     "nicknameDescription": "프로필 닉네임을 변경할 수 있습니다.",
     "editText": "수정",
-    "saveText": "저장"
+    "saveText": "저장",
+    "uploadImage": "이미지 업로드",
+    "deleteImage": "이미지 삭제"
   }
 }

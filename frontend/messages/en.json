@@ -34,6 +34,8 @@
     "nicknameTitle": "Nickname",
     "nicknameDescription": "You can change the nickname.",
     "editText": "Edit",
-    "saveText": "Save"
+    "saveText": "Save",
+    "uploadImage": "Upload image",
+    "deleteImage": "Delete image"
   }
 }

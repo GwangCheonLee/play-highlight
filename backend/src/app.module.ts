@@ -8,9 +8,11 @@ import { getEnvPath } from './common/common.constant';
 import { validationSchemaConfig } from './common/config/validation.config.service';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { VideosModule } from './videos/videos.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
+    UsersModule,
     VideosModule,
     AuthenticationModule,
     TypeOrmModule.forRootAsync({

@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import {
+  ChangeNicknameResponse,
   SignInBody,
   SignInResponse,
   SignUpBody,
@@ -40,4 +41,21 @@ export const fetchSignOut = async (accessToken: string) => {
     },
   );
   return response.data;
+};
+
+export const fetchChangeNickname = async (
+  accessToken: string,
+  nickname: string,
+) => {
+  const response: AxiosResponse<ChangeNicknameResponse, any> =
+    await axios.patch(
+      `${window.location.origin}/api/authentication/me/nickname`,
+      { nickname },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+  return response.data.data;
 };

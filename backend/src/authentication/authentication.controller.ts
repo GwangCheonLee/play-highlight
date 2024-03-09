@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  Patch,
   Post,
   Req,
   Res,
@@ -81,5 +82,32 @@ export class AuthenticationController {
         accessToken: this.authenticationService.generateAccessToken(user),
       },
     };
+  }
+
+  @Patch('/me/nickname')
+  @HttpCode(200)
+  @UseGuards(AuthGuard(GuardTypeEnum.JWT_ACCESS))
+  async changeNickname(
+    @RequestByUser() user: Users,
+    @Res() response: Response,
+    @Body('nickname') nickname: string,
+  ) {
+    const updatedUser = await this.authenticationService.changeNickname(
+      user,
+      nickname,
+    );
+
+    const accessToken =
+      this.authenticationService.generateAccessToken(updatedUser);
+    await this.authenticationService.generateRefreshToken(
+      updatedUser,
+      response,
+    );
+
+    return response.send({
+      data: {
+        accessToken: accessToken,
+      },
+    });
   }
 }

@@ -30,6 +30,10 @@
   },
   "Setting": {
     "languageTitle": "언어",
-    "languageDescription": "홈페이지 언어를 변경할 수 있습니다."
+    "languageDescription": "홈페이지 언어를 변경할 수 있습니다.",
+    "nicknameTitle": "닉네임",
+    "nicknameDescription": "프로필 닉네임을 변경할 수 있습니다.",
+    "editText": "수정",
+    "saveText": "저장"
   }
 }

@@ -30,7 +30,6 @@ export class VideosService {
   async saveVideo(user: Users, file: Express.Multer.File) {
     const uuid = uuidv4();
     const baseDir = path.join(getBaseDir(), 'videos');
-    console.log(baseDir);
     const videoDirPath = path.join(baseDir, uuid);
     const fileExtension = path.extname(file.originalname);
 

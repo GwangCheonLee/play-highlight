@@ -45,18 +45,16 @@ export class AuthenticationService {
   }
 
   async generateRefreshToken(user: Users, response: Response): Promise<void> {
+    const jwtRefreshTokenExpirationTime = this.configService.get<number>(
+      'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
+    );
+
     const refreshToken = this.jwtService.sign(
       { user: this.extractPayloadFromUser(user) },
       {
         secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
-        expiresIn: this.configService.get<string>(
-          'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
-        ),
+        expiresIn: jwtRefreshTokenExpirationTime * 1000,
       },
-    );
-
-    const jwtRefreshTokenExpirationTime = this.configService.get<number>(
-      'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
     );
 
     response.cookie('refreshToken', refreshToken, {

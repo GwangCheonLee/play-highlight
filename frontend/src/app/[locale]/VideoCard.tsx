@@ -1,7 +1,7 @@
 import styles from "./home.module.scss";
-import { formatTimeAgo } from "@/utils/constants";
 import Link from "next/link";
 import Image from "next/image";
+import { formatTimeAgo } from "@/utils/constants";
 
 type videoCardProps = {
   videoId: string;
@@ -10,6 +10,7 @@ type videoCardProps = {
   nickname: string;
   email: string;
   createdAt: Date;
+  userProfileImg: string | null;
 };
 const VideoCard = ({
   videoId,
@@ -18,6 +19,7 @@ const VideoCard = ({
   nickname,
   email,
   createdAt,
+  userProfileImg,
 }: videoCardProps) => {
   return (
     <Link className={styles.videoCardLink} href={`video/${videoId}`}>
@@ -30,10 +32,24 @@ const VideoCard = ({
         unoptimized={true}
       />
       <div className={styles.videoDescriptionWrapper}>
-        <span>{email}</span>
-        <br />
-        <span>{nickname}</span> <span>•</span>{" "}
-        <span>{formatTimeAgo(createdAt)}</span>
+        <div className={styles.videoUploadUserWrapper}>
+          <Image
+            className={styles.videoCardProfileImg}
+            src={userProfileImg || "/assets/images/default_user_profile.png"}
+            alt="logo image"
+            width={36}
+            height={36}
+          />
+          <div className={styles.videoInfoWrapper}>
+            <div>
+              <span>{email}</span>
+              <br />
+              <span>
+                {nickname} • {formatTimeAgo(createdAt)}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </Link>
   );

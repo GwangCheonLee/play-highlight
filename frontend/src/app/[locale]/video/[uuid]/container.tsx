@@ -33,7 +33,7 @@ const Container: React.FC = () => {
       <main className={styles.main}>
         <section className={styles.section}>
           {!videoData ? (
-            <div>Loading...</div>
+            <></>
           ) : (
             <VideoPlayer
               url={`${window.location.origin}/static/videos/${videoData.uuid}/${videoData.hlsFileName}`}

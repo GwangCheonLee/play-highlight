@@ -4,10 +4,13 @@ import { isAxiosError } from "axios";
 import { useAppDispatch } from "@/store/selectors";
 import { signOut } from "@/store/features/auth/authSlice";
 import Link from "next/link";
-import { uploadPath } from "@/utils/routes/constants";
+import { settingPath, uploadPath } from "@/utils/routes/constants";
+import { useTranslations } from "next-intl";
+import React from "react";
 
 export default function Dropdown({ isOpened }: { isOpened: boolean }) {
   const dispatch = useAppDispatch();
+  const t = useTranslations("Menu");
 
   const handleSignOut = async () => {
     try {
@@ -30,11 +33,13 @@ export default function Dropdown({ isOpened }: { isOpened: boolean }) {
       className={styles.profileContextMenu}
       style={{ display: dropDownDisplay }}
     >
-      <li>
-        <Link href={uploadPath}>비디오 업로드</Link>
-      </li>
-      <li>설정</li>
-      <li onClick={handleSignOut}>로그아웃</li>
+      <Link href={uploadPath}>
+        <li>{t("videoUpload")}</li>
+      </Link>
+      <Link href={settingPath}>
+        <li>{t("setting")}</li>
+      </Link>
+      <li onClick={handleSignOut}>{t("signOut")}</li>
     </ul>
   );
 }

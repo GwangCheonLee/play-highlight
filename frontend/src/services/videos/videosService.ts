@@ -3,6 +3,7 @@ import {
   fetchFindVideoResponse,
   fetchFindVideosQuery,
   fetchFindVideosResponse,
+  fetchVideoUploadResponse,
 } from "@/types/videoTypes";
 
 export const fetchFindVideos = async (query: fetchFindVideosQuery) => {
@@ -27,15 +28,12 @@ export const fetchUploadVideos = async (
   formData: FormData,
   accessToken: string,
 ) => {
-  const response: AxiosResponse<any, any> = await axios.post(
-    `/api/videos`,
-    formData,
-    {
+  const response: AxiosResponse<fetchVideoUploadResponse, any> =
+    await axios.post(`/api/videos`, formData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "multipart/form-data",
       },
-    },
-  );
+    });
   return response.data.data;
 };

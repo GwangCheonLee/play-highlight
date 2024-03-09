@@ -7,11 +7,7 @@ import { useAppDispatch, useAppSelector } from "@/store/selectors";
 import { fetchVideos } from "@/store/features/video/videoSlice";
 import NoVideos from "@/app/[locale]/NoVideos";
 
-export default function Home({
-  params: { locale },
-}: Readonly<{
-  params: { locale: string };
-}>) {
+export default function Home() {
   const dispatch = useAppDispatch();
   const { videos, nextCursor, status } = useAppSelector((state) => state.video);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -51,10 +47,11 @@ export default function Home({
                   nickname={video.user.nickname}
                   createdAt={new Date(video.createdAt)}
                   email={video.user.email}
+                  userProfileImg={video.user.profileImage}
                 />
               ))
             : status !== "loading" && <NoVideos />}
-          {status === "loading" && <p>Loading...</p>}
+          {status === "loading" && <></>}
           <div ref={sentinelRef} />
         </section>
       </main>

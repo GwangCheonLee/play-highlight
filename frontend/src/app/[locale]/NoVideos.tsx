@@ -2,8 +2,11 @@ import styles from "./NoVideo.module.scss";
 import Link from "next/link";
 import { uploadPath } from "@/utils/routes/constants";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 const NoVideos = () => {
+  const t = useTranslations("Video");
+
   return (
     <div className={styles.noVideosWrapper}>
       <div className={styles.iconWrapper}>
@@ -18,9 +21,9 @@ const NoVideos = () => {
           unoptimized={true}
         />
       </div>
-      <p className={styles.message}>No videos to display.</p>
+      <p className={styles.message}>{t("noVideo")}</p>
       <Link className={styles.uploadButton} href={uploadPath}>
-        Upload
+        {t("uploadButton")}
       </Link>
     </div>
   );

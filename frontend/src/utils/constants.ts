@@ -1,4 +1,5 @@
 import { JwtClaim } from "@/types/jwtClaim";
+import { useTranslations } from "next-intl";
 
 export const parseJwt = (token: string): JwtClaim => {
   const base64Url = token.split(".")[1];
@@ -7,33 +8,36 @@ export const parseJwt = (token: string): JwtClaim => {
 };
 
 export const formatTimeAgo = (createdAt: Date): string => {
+  const t = useTranslations("Video");
   const now = new Date();
   const diffInSeconds = (now.getTime() - createdAt.getTime()) / 1000;
 
   if (diffInSeconds < 60) {
-    return "just now";
+    return t("justNow");
   }
+
+  console.log(t("justNow"));
 
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   if (diffInMinutes < 60) {
-    return `${diffInMinutes} minutes ago`;
+    return t("minutesAgo", { count: diffInMinutes });
   }
 
   const diffInHours = Math.floor(diffInMinutes / 60);
   if (diffInHours < 24) {
-    return `${diffInHours} hours ago`;
+    return t("hoursAgo", { count: diffInHours });
   }
 
   const diffInDays = Math.floor(diffInHours / 24);
   if (diffInDays < 30) {
-    return `${diffInDays} days ago`;
+    return t("daysAgo", { count: diffInDays });
   }
 
   const diffInMonths = Math.floor(diffInDays / 30);
   if (diffInDays < 365) {
-    return `${diffInMonths} months ago`;
+    return t("monthsAgo", { count: diffInMonths });
   }
 
   const diffInYears = Math.floor(diffInDays / 365);
-  return `${diffInYears} years ago`;
+  return t("yearsAgo", { count: diffInYears });
 };

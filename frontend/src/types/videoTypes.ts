@@ -18,6 +18,12 @@ export type fetchFindVideosResponse = {
   };
 };
 
+export type fetchVideoUploadResponse = {
+  data: {
+    video: videoDetails;
+  };
+};
+
 export type videoDetails = {
   id: number;
   uuid: string;

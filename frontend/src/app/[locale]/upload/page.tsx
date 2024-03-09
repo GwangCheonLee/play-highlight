@@ -5,9 +5,14 @@ import Header from "@/components/common/Header";
 import { fetchUploadVideos } from "@/services/videos/videosService";
 import { useModal } from "@/contexts/ModalContext";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useAppDispatch } from "@/store/selectors";
+import { addVideoItem } from "@/store/features/video/videoSlice";
 
 const Upload: React.FC = () => {
   const { showModal } = useModal();
+  const dispatch = useAppDispatch();
+  const t = useTranslations("Upload");
   const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +37,7 @@ const Upload: React.FC = () => {
       if (file.type.startsWith("video/")) {
         setSelectedFile(file);
       } else {
-        showModal(null, "Only video files can be uploaded.", false);
+        showModal(null, t("videoFilesOnly"), false);
       }
     }
   };
@@ -52,13 +57,14 @@ const Upload: React.FC = () => {
 
     try {
       if (!accessToken) return;
-      await fetchUploadVideos(formData, accessToken);
-      showModal(null, "File upload successful!", false, () => {
+      const { video } = await fetchUploadVideos(formData, accessToken);
+      dispatch(addVideoItem({ videos: [video] }));
+      showModal(null, t("uploadSuccess"), false, () => {
         router.push("/");
       });
     } catch (error) {
       console.error("File upload failed", error);
-      showModal(null, "File upload failed", false);
+      showModal(null, t("uploadFail"), false);
     } finally {
       setIsLoading(false);
     }
@@ -66,16 +72,23 @@ const Upload: React.FC = () => {
 
   const renderFileInfo = () => {
     if (!selectedFile) {
-      return (
-        <p>Drag and drop a file here or click the button to select a file.</p>
-      );
+      return <p>{t("dragDrop")}</p>;
     }
 
     return (
       <div className={styles.fileDetails}>
-        <p>File name: {selectedFile.name}</p>
-        <p>File size: {selectedFile.size} bytes</p>
-        <p>File type: {selectedFile.type}</p>
+        <p>
+          {t("fileName")}
+          {selectedFile.name}
+        </p>
+        <p>
+          {t("fileSize")}
+          {selectedFile.size} bytes
+        </p>
+        <p>
+          {t("fileType")}
+          {selectedFile.type}
+        </p>
       </div>
     );
   };
@@ -101,10 +114,10 @@ const Upload: React.FC = () => {
                 className={styles.button}
                 onClick={() => document.getElementById("file-upload")?.click()}
               >
-                Select File
+                {t("selectFile")}
               </button>
               <button className={styles.button} onClick={uploadFile}>
-                Upload
+                {t("uploadFile")}
               </button>
               <input
                 className={styles.uploadInput}

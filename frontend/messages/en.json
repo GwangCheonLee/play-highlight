@@ -1,4 +1,35 @@
 {
-  "Index": {
+  "Menu": {
+    "videoUpload": "Video upload",
+    "setting": "Setting",
+    "signOut": "Sign out"
+  },
+  "Video": {
+    "noVideo": "No videos to display.",
+    "uploadButton": "Upload",
+    "justNow": "just now",
+    "minutesAgo": "{count} minute ago",
+    "hoursAgo": "{count} hour ago",
+    "daysAgo": "{count} day ago",
+    "monthsAgo": "{count} month ago",
+    "yearsAgo": "{count} year ago"
+  },
+  "Upload": {
+    "dragDrop": "Drag and drop a file here or click the button to select a file.",
+    "fileName": "File name: ",
+    "fileSize": "File size: ",
+    "fileType": "File type: ",
+    "selectFile": "Select File",
+    "uploadFile": "Upload",
+    "uploadSuccess": "File upload successful!",
+    "uploadFail": "File upload failed",
+    "videoFilesOnly": "Only video files can be uploaded."
+  },
+  "LocaleSwitcher": {
+    "locale": "{locale, select, ko {한국어} en {English} other {Unknown}}"
+  },
+  "Setting": {
+    "languageTitle": "Language",
+    "languageDescription": "You can change the homepage language."
   }
 }

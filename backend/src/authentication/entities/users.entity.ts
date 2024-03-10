@@ -29,6 +29,9 @@ export class Users {
   @Column({ name: 'profile_image', nullable: true })
   profileImage: string | null;
 
+  @Column('boolean', { name: 'is_disabled', default: false })
+  isDisabled: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 

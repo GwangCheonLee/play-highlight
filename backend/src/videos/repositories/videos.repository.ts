@@ -25,6 +25,7 @@ export class VideosRepository extends Repository<Videos> {
         'videos.createdAt',
         'videos.updatedAt',
         'user.id',
+        'user.role',
         'user.email',
         'user.nickname',
         'user.profileImage',

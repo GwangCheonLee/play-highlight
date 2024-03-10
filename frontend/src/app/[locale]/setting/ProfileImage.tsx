@@ -3,7 +3,10 @@ import styles from "@/app/[locale]/setting/setting.module.scss";
 import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/store/selectors";
 import React, { ChangeEvent } from "react";
-import { fetchUploadProfileImage } from "@/services/profile/profileService";
+import {
+  fetchDeleteProfileImage,
+  fetchUploadProfileImage,
+} from "@/services/profile/profileService";
 import { parseJwt } from "@/utils/constants";
 import { signIn } from "@/store/features/auth/authSlice";
 
@@ -38,6 +41,22 @@ export default function ProfileImage() {
     }
   };
 
+  const handleDeleteProfileImage = async () => {
+    try {
+      const accessToken = sessionStorage.getItem("accessToken");
+      if (!accessToken) return;
+
+      const { accessToken: responseAccessToken } =
+        await fetchDeleteProfileImage(accessToken);
+
+      const { user } = parseJwt(responseAccessToken);
+      sessionStorage.setItem("accessToken", responseAccessToken);
+      dispatch(signIn({ user: user }));
+    } catch (error) {
+      console.error("File upload failed", error);
+    }
+  };
+
   return (
     <div className={styles.settingProfileWrapper}>
       <div>
@@ -60,7 +79,7 @@ export default function ProfileImage() {
         >
           {t("uploadImage")}
         </button>
-        <button>{t("deleteImage")}</button>
+        <button onClick={handleDeleteProfileImage}>{t("deleteImage")}</button>
       </div>
     </div>
   );

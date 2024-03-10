@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   HttpCode,
   Patch,
   Res,
@@ -61,6 +62,28 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     const updatedUser = await this.usersService.saveProfileImage(user, file);
+    const accessToken =
+      this.authenticationService.generateAccessToken(updatedUser);
+    await this.authenticationService.generateRefreshToken(
+      updatedUser,
+      response,
+    );
+
+    return response.send({
+      data: {
+        accessToken: accessToken,
+      },
+    });
+  }
+
+  @Delete('/me/profile/image')
+  @HttpCode(200)
+  @UseGuards(AuthGuard(GuardTypeEnum.JWT_ACCESS))
+  async deleteProfileImage(
+    @RequestByUser() user: Users,
+    @Res() response: Response,
+  ) {
+    const updatedUser = await this.usersService.deleteProfileImage(user);
     const accessToken =
       this.authenticationService.generateAccessToken(updatedUser);
     await this.authenticationService.generateRefreshToken(

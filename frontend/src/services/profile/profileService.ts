@@ -17,3 +17,13 @@ export const fetchUploadProfileImage = async (
   );
   return response.data.data;
 };
+
+export const fetchDeleteProfileImage = async (accessToken: string) => {
+  const response: AxiosResponse<UploadProfileResponse, any> =
+    await axios.delete(`/api/users/me/profile/image`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  return response.data.data;
+};

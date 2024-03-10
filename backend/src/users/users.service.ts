@@ -10,6 +10,17 @@ import { getBaseDir } from '../common/common.constant';
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
+  async deleteProfileImage(user: Users) {
+    const baseDir = path.join(getBaseDir(), 'profiles');
+    const profileDirPath = path.join(baseDir, `${user.id}`);
+
+    if (user.profileImage) {
+      fs.unlink(`${profileDirPath}/${user.profileImage}`, () => {});
+    }
+    await this.usersRepository.update(user.id, { profileImage: null });
+    return this.usersRepository.getUserById(user.id);
+  }
+
   async saveProfileImage(user: Users, file: Express.Multer.File) {
     const uuid = uuidv4();
     const baseDir = path.join(getBaseDir(), 'profiles');

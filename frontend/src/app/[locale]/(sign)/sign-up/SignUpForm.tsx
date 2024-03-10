@@ -3,7 +3,7 @@ import styles from "@/app/[locale]/(sign)/sign.module.scss";
 import { useForm } from "react-hook-form";
 import Logo from "@/components/common/Logo";
 import SignInput from "@/app/[locale]/(sign)/SignInput";
-import { SignUpBody } from "@/types/auth/authTypes";
+import { SignUpBody } from "@/types/authTypes";
 import { useAppDispatch } from "@/store/selectors";
 import { parseJwt } from "@/utils/constants";
 import { signIn } from "@/store/features/auth/authSlice";
@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { fetchSignUp } from "@/services/auth/authService";
 import { extractAxiosErrorDetails } from "@/utils/axiosError";
 import { useModal } from "@/contexts/ModalContext";
+import { rootPath } from "@/utils/routes/constants";
 
 const SignUpForm = () => {
   const dispatch = useAppDispatch();
@@ -29,7 +30,7 @@ const SignUpForm = () => {
       sessionStorage.setItem("accessToken", accessToken);
       dispatch(signIn({ user: user }));
 
-      router.push("/");
+      router.push(rootPath);
     } catch (e) {
       const errorDetails = extractAxiosErrorDetails(e);
       showModal(null, errorDetails.errorMessage, false);

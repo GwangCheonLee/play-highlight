@@ -7,11 +7,15 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Videos } from '../../videos/entities/videos.entity';
+import { USER_ROLE } from '../../common/enums/role.enum';
 
 @Entity()
 export class Users {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ name: 'role', enum: USER_ROLE, default: USER_ROLE.USER })
+  role: USER_ROLE;
 
   @Column({ name: 'email', unique: true })
   email: string;
@@ -24,6 +28,9 @@ export class Users {
 
   @Column({ name: 'profile_image', nullable: true })
   profileImage: string | null;
+
+  @Column('boolean', { name: 'is_disabled', default: false })
+  isDisabled: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

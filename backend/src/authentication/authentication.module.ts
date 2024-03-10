@@ -17,5 +17,12 @@ import { UsersRepository } from './repositories/users.repository';
     UsersRepository,
     AuthenticationService,
   ],
+  exports: [
+    LocalStrategy,
+    JwtAccessStrategy,
+    JwtRefreshStrategy,
+    UsersRepository,
+    AuthenticationService,
+  ],
 })
 export class AuthenticationModule {}

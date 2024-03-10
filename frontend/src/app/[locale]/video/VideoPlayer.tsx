@@ -2,10 +2,9 @@ import ReactPlayer from "react-player";
 
 interface VideoPlayerProps {
   url: string;
-  poster?: string;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, poster }) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ url }) => {
   return (
     <div className="player-wrapper">
       <ReactPlayer

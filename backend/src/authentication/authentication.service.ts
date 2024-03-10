@@ -68,8 +68,10 @@ export class AuthenticationService {
   private extractPayloadFromUser(user: Users) {
     return {
       id: user.id,
+      role: user.role,
       nickname: user.nickname,
       email: user.email,
+      profileImage: user.profileImage,
     };
   }
 }

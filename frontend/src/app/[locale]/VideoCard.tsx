@@ -10,7 +10,7 @@ type videoCardProps = {
   nickname: string;
   email: string;
   createdAt: Date;
-  userProfileImg: string | null;
+  userProfileImg: string;
 };
 const VideoCard = ({
   videoId,
@@ -35,10 +35,11 @@ const VideoCard = ({
         <div className={styles.videoUploadUserWrapper}>
           <Image
             className={styles.videoCardProfileImg}
-            src={userProfileImg || "/assets/images/default_user_profile.png"}
-            alt="logo image"
+            src={userProfileImg}
+            alt="profile image"
             width={36}
             height={36}
+            unoptimized={true}
           />
           <div className={styles.videoInfoWrapper}>
             <div>

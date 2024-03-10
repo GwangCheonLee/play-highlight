@@ -4,7 +4,17 @@ import { useTranslations } from "next-intl";
 export const parseJwt = (token: string): JwtClaim => {
   const base64Url = token.split(".")[1];
   const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-  return JSON.parse(window.atob(base64));
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+
+  const decoder = new TextDecoder("utf-8");
+  const jsonStr = decoder.decode(outputArray);
+
+  return JSON.parse(jsonStr);
 };
 
 export const formatTimeAgo = (createdAt: Date): string => {
@@ -15,8 +25,6 @@ export const formatTimeAgo = (createdAt: Date): string => {
   if (diffInSeconds < 60) {
     return t("justNow");
   }
-
-  console.log(t("justNow"));
 
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   if (diffInMinutes < 60) {

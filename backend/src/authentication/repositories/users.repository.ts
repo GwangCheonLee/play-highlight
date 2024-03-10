@@ -1,11 +1,12 @@
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Users } from '../entities/users.entity';
-import { decryptPlainText } from '../../common/common.constant';
+import { cryptPlainText, decryptPlainText } from '../../common/common.constant';
+import { USER_ROLE } from '../../common/enums/role.enum';
 
 @Injectable()
 export class UsersRepository extends Repository<Users> {
@@ -26,10 +27,9 @@ export class UsersRepository extends Repository<Users> {
   }
 
   async verifyUserByEmailAndPassword(email: string, plainPassword: string) {
-    const queryBuilder = this.createQueryBuilder('users').where(
-      'users.email = :email',
-      { email },
-    );
+    const queryBuilder = this.createQueryBuilder('user')
+      .where('user.email = :email', { email })
+      .andWhere('user.isDisabled = :isDisabled', { isDisabled: false });
 
     const user = await queryBuilder.getOne();
 
@@ -44,10 +44,9 @@ export class UsersRepository extends Repository<Users> {
   }
 
   async getUserById(userId: number) {
-    const queryBuilder = this.createQueryBuilder('user').where(
-      'user.id = :userId',
-      { userId },
-    );
+    const queryBuilder = this.createQueryBuilder('user')
+      .where('user.id = :userId', { userId })
+      .andWhere('user.isDisabled = :isDisabled', { isDisabled: false });
 
     const user = await queryBuilder.getOne();
 
@@ -56,5 +55,38 @@ export class UsersRepository extends Repository<Users> {
     }
 
     return user;
+  }
+
+  async createDefaultUser(
+    nickname: string,
+    email: string,
+    plainPassword: string,
+    manager: EntityManager,
+  ) {
+    const exisingDefaultUser = await manager.findOne(Users, {
+      where: { role: USER_ROLE.ADMIN },
+    });
+
+    if (exisingDefaultUser) return exisingDefaultUser;
+
+    let counter = 1;
+    const originalEmail = email;
+    while (await this.checkEmailExists(email)) {
+      const emailParts = originalEmail.split('@');
+      email = `${emailParts[0]}${counter}@${emailParts[1]}`;
+      counter++;
+    }
+
+    const hashedPassword = await cryptPlainText(plainPassword);
+
+    const entity = manager.create(Users, {
+      role: USER_ROLE.ADMIN,
+      email,
+      password: hashedPassword,
+      nickname,
+      profileImage: null,
+    });
+
+    return await manager.save(entity);
   }
 }

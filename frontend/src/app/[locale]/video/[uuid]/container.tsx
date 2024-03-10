@@ -37,7 +37,6 @@ const Container: React.FC = () => {
           ) : (
             <VideoPlayer
               url={`${window.location.origin}/static/videos/${videoData.uuid}/${videoData.hlsFileName}`}
-              poster={`${window.location.origin}/static/videos/${videoData.uuid}/${videoData.thumbnailFileName}`}
             />
           )}
         </section>

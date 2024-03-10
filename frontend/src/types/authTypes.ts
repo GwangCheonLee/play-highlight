@@ -21,3 +21,9 @@ export type SignInResponse = {
     accessToken: string;
   };
 };
+
+export type ChangeNicknameResponse = {
+  data: {
+    accessToken: string;
+  };
+};

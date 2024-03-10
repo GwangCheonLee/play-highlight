@@ -30,6 +30,12 @@
   },
   "Setting": {
     "languageTitle": "Language",
-    "languageDescription": "You can change the homepage language."
+    "languageDescription": "You can change the homepage language.",
+    "nicknameTitle": "Nickname",
+    "nicknameDescription": "You can change the nickname.",
+    "editText": "Edit",
+    "saveText": "Save",
+    "uploadImage": "Upload image",
+    "deleteImage": "Delete image"
   }
 }

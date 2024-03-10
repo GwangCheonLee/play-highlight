@@ -1,12 +1,29 @@
+"use client";
 import Header from "@/components/common/Header";
 import styles from "@/app/[locale]/setting/setting.module.scss";
-import React from "react";
+import React, { useEffect } from "react";
 import SettingRaw from "@/app/[locale]/setting/SettingRaw";
 import LocaleSwitcher from "@/components/localeSwitcher/LocaleSwitcher";
 import Nickname from "@/app/[locale]/setting/Nickname";
 import ProfileImage from "@/app/[locale]/setting/ProfileImage";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/store/selectors";
+import { rootPath } from "@/utils/routes/constants";
 
-export default function Setting() {
+const Setting = () => {
+  const router = useRouter();
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push(rootPath);
+    }
+  }, [router, isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return <></>;
+  }
+
   return (
     <div>
       <Header />
@@ -29,4 +46,6 @@ export default function Setting() {
       </main>
     </div>
   );
-}
+};
+
+export default Setting;

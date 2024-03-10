@@ -6,16 +6,27 @@ import { fetchUploadVideos } from "@/services/videos/videosService";
 import { useModal } from "@/contexts/ModalContext";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useAppDispatch } from "@/store/selectors";
+import { useAppSelector } from "@/store/selectors";
+import { rootPath } from "@/utils/routes/constants";
 
 const Upload: React.FC = () => {
   const { showModal } = useModal();
-  const dispatch = useAppDispatch();
   const t = useTranslations("Upload");
   const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push(rootPath);
+    }
+  }, [router, isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return <></>;
+  }
 
   useEffect(() => {
     const accessToken = sessionStorage.getItem("accessToken");
@@ -58,7 +69,7 @@ const Upload: React.FC = () => {
       if (!accessToken) return;
       await fetchUploadVideos(formData, accessToken);
       showModal(null, t("uploadSuccess"), false, () => {
-        router.push("/");
+        router.push(rootPath);
       });
     } catch (error) {
       console.error("File upload failed", error);

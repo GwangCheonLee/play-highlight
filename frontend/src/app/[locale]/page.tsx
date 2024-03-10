@@ -2,26 +2,44 @@
 import Header from "@/components/common/Header";
 import styles from "./home.module.scss";
 import VideoCard from "@/app/[locale]/VideoCard";
-import React, { useEffect, useRef } from "react";
-import { useAppDispatch, useAppSelector } from "@/store/selectors";
-import { fetchVideos } from "@/store/features/video/videoSlice";
+import React, { useEffect, useRef, useState } from "react";
+import { useAppDispatch } from "@/store/selectors";
 import NoVideos from "@/app/[locale]/NoVideos";
+import { videoDetails } from "@/types/videoTypes";
+import { fetchFindVideos } from "@/services/videos/videosService";
 
 export default function Home() {
   const dispatch = useAppDispatch();
-  const { videos, nextCursor, status } = useAppSelector((state) => state.video);
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  const [videos, setVideos] = useState<videoDetails[]>([]);
+  const [nextCursor, setNextCursor] = useState<number | null>(0);
+
+  const findVideos = async () => {
+    const response = await fetchFindVideos({ cursor: nextCursor, limit: 25 });
+    setNextCursor(response.nextCursor);
+
+    setVideos((currentVideos) => {
+      const newVideos = response.videos.filter(
+        (newVideo) =>
+          !currentVideos.some(
+            (currentVideo) => currentVideo.id === newVideo.id,
+          ),
+      );
+      return [...currentVideos, ...newVideos];
+    });
+  };
 
   useEffect(() => {
     if (videos.length <= 0 && nextCursor !== null) {
-      dispatch(fetchVideos({ cursor: nextCursor, limit: 25 }));
+      findVideos();
     }
   }, [dispatch]);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && nextCursor !== null) {
-        dispatch(fetchVideos({ cursor: nextCursor, limit: 25 }));
+        findVideos();
       }
     });
 
@@ -37,26 +55,27 @@ export default function Home() {
       <Header />
       <main className={styles.main}>
         <section className={styles.section}>
-          {videos.length > 0
-            ? videos.map((video) => {
-                const userProfileImage = video.user.profileImage
-                  ? `/static/profiles/${video.user.id}/${video.user.profileImage}`
-                  : "/assets/images/default_user_profile.png";
-                return (
-                  <VideoCard
-                    key={video.id}
-                    videoId={video.uuid}
-                    alt={`Video by ${video.user.nickname}`}
-                    src={`/static/videos/${video.uuid}/${video.thumbnailFileName}`}
-                    nickname={video.user.nickname}
-                    createdAt={new Date(video.createdAt)}
-                    email={video.user.email}
-                    userProfileImg={userProfileImage}
-                  />
-                );
-              })
-            : status !== "loading" && <NoVideos />}
-          {status === "loading" && <></>}
+          {videos.length > 0 ? (
+            videos.map((video) => {
+              const userProfileImage = video.user.profileImage
+                ? `/static/profiles/${video.user.id}/${video.user.profileImage}`
+                : "/assets/images/default_user_profile.png";
+              return (
+                <VideoCard
+                  key={video.id}
+                  videoId={video.uuid}
+                  alt={`Video by ${video.user.nickname}`}
+                  src={`/static/videos/${video.uuid}/${video.thumbnailFileName}`}
+                  nickname={video.user.nickname}
+                  createdAt={new Date(video.createdAt)}
+                  email={video.user.email}
+                  userProfileImg={userProfileImage}
+                />
+              );
+            })
+          ) : (
+            <NoVideos />
+          )}
           <div ref={sentinelRef} />
         </section>
       </main>

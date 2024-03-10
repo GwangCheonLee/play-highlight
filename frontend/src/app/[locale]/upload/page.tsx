@@ -7,7 +7,6 @@ import { useModal } from "@/contexts/ModalContext";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useAppDispatch } from "@/store/selectors";
-import { addVideoItem } from "@/store/features/video/videoSlice";
 
 const Upload: React.FC = () => {
   const { showModal } = useModal();
@@ -57,8 +56,7 @@ const Upload: React.FC = () => {
 
     try {
       if (!accessToken) return;
-      const { video } = await fetchUploadVideos(formData, accessToken);
-      dispatch(addVideoItem({ videos: [video] }));
+      await fetchUploadVideos(formData, accessToken);
       showModal(null, t("uploadSuccess"), false, () => {
         router.push("/");
       });

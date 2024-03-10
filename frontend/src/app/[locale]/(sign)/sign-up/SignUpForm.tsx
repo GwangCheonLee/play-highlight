@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { fetchSignUp } from "@/services/auth/authService";
 import { extractAxiosErrorDetails } from "@/utils/axiosError";
 import { useModal } from "@/contexts/ModalContext";
+import { rootPath } from "@/utils/routes/constants";
 
 const SignUpForm = () => {
   const dispatch = useAppDispatch();
@@ -29,7 +30,7 @@ const SignUpForm = () => {
       sessionStorage.setItem("accessToken", accessToken);
       dispatch(signIn({ user: user }));
 
-      router.push("/");
+      router.push(rootPath);
     } catch (e) {
       const errorDetails = extractAxiosErrorDetails(e);
       showModal(null, errorDetails.errorMessage, false);

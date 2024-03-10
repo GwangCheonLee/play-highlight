@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useModal } from "@/contexts/ModalContext";
 import { fetchSignIn } from "@/services/auth/authService";
 import { extractAxiosErrorDetails } from "@/utils/axiosError";
+import { rootPath } from "@/utils/routes/constants";
 
 const SignInForm = () => {
   const dispatch = useAppDispatch();
@@ -29,7 +30,7 @@ const SignInForm = () => {
       const { user } = parseJwt(accessToken);
       sessionStorage.setItem("accessToken", accessToken);
       dispatch(signIn({ user: user }));
-      router.push("/");
+      router.push(rootPath);
     } catch (e) {
       const errorDetails = extractAxiosErrorDetails(e);
       showModal(null, errorDetails.errorMessage, false);

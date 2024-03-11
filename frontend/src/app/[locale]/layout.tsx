@@ -28,16 +28,10 @@ export default function RootLayout({
       <ModalProvider>
         <html lang={locale}>
           <body className={inter.className}>
-            <NextIntlClientProvider
-              locale={locale}
-              messages={messages}
-              children={
-                <>
-                  {children}
-                  <Modal />
-                </>
-              }
-            />
+            <NextIntlClientProvider locale={locale} messages={messages}>
+              {children}
+              <Modal />
+            </NextIntlClientProvider>
           </body>
         </html>
       </ModalProvider>

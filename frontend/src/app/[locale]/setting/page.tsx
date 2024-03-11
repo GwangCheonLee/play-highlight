@@ -7,22 +7,20 @@ import LocaleSwitcher from "@/components/localeSwitcher/LocaleSwitcher";
 import Nickname from "@/app/[locale]/setting/Nickname";
 import ProfileImage from "@/app/[locale]/setting/ProfileImage";
 import { useRouter } from "next/navigation";
-import { useAppSelector } from "@/store/selectors";
+import { isValidToken } from "@/utils/constants";
 import { rootPath } from "@/utils/routes/constants";
 
 const Setting = () => {
   const router = useRouter();
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
+    const accessToken = sessionStorage.getItem("accessToken");
+    const isAuthenticated = accessToken && isValidToken(accessToken);
+
     if (!isAuthenticated) {
       router.push(rootPath);
     }
-  }, [router, isAuthenticated]);
-
-  if (!isAuthenticated) {
-    return <></>;
-  }
+  }, [router]);
 
   return (
     <div>
@@ -34,13 +32,15 @@ const Setting = () => {
             <SettingRaw
               title={"nicknameTitle"}
               description={"nicknameDescription"}
-              children={<Nickname />}
-            />
+            >
+              <Nickname />
+            </SettingRaw>
             <SettingRaw
               title={"languageTitle"}
               description={"languageDescription"}
-              children={<LocaleSwitcher />}
-            />
+            >
+              <LocaleSwitcher />
+            </SettingRaw>
           </div>
         </section>
       </main>

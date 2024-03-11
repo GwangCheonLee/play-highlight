@@ -9,6 +9,7 @@ import {
 } from "@/services/profile/profileService";
 import { parseJwt } from "@/utils/constants";
 import { signIn } from "@/store/features/auth/authSlice";
+import Image from "next/image";
 
 export default function ProfileImage() {
   const dispatch = useAppDispatch();
@@ -60,10 +61,12 @@ export default function ProfileImage() {
   return (
     <div className={styles.settingProfileWrapper}>
       <div>
-        <img
+        <Image
           className={styles.settingProfileImage}
           alt="profile"
           src={profileImage}
+          width={100}
+          height={100}
         />
         <input
           className={styles.settingUploadInput}

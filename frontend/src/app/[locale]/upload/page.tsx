@@ -6,8 +6,8 @@ import { fetchUploadVideos } from "@/services/videos/videosService";
 import { useModal } from "@/contexts/ModalContext";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useAppSelector } from "@/store/selectors";
 import { rootPath } from "@/utils/routes/constants";
+import { isValidToken } from "@/utils/constants";
 
 const Upload: React.FC = () => {
   const { showModal } = useModal();
@@ -16,24 +16,17 @@ const Upload: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push(rootPath);
-    }
-  }, [router, isAuthenticated]);
-
-  if (!isAuthenticated) {
-    return <></>;
-  }
 
   useEffect(() => {
     const accessToken = sessionStorage.getItem("accessToken");
-    if (!accessToken) return;
+    const isAuthenticated = accessToken && isValidToken(accessToken);
 
-    setAccessToken(accessToken);
-  }, [accessToken]);
+    if (!isAuthenticated) {
+      router.push(rootPath);
+    }
+
+    accessToken && setAccessToken(accessToken);
+  }, [router]);
 
   const onDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();

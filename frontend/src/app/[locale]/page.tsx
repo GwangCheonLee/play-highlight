@@ -2,23 +2,20 @@
 import Header from "@/components/common/Header";
 import styles from "./home.module.scss";
 import VideoCard from "@/app/[locale]/VideoCard";
-import React, { useEffect, useRef, useState } from "react";
-import { useAppDispatch } from "@/store/selectors";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import NoVideos from "@/app/[locale]/NoVideos";
 import { videoDetails } from "@/types/videoTypes";
 import { fetchFindVideos } from "@/services/videos/videosService";
 
 export default function Home() {
-  const dispatch = useAppDispatch();
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const [videos, setVideos] = useState<videoDetails[]>([]);
   const [nextCursor, setNextCursor] = useState<number | null>(0);
 
-  const findVideos = async () => {
+  const findVideos = useCallback(async () => {
     const response = await fetchFindVideos({ cursor: nextCursor, limit: 25 });
     setNextCursor(response.nextCursor);
-
     setVideos((currentVideos) => {
       const newVideos = response.videos.filter(
         (newVideo) =>
@@ -28,13 +25,13 @@ export default function Home() {
       );
       return [...currentVideos, ...newVideos];
     });
-  };
+  }, [nextCursor]);
 
   useEffect(() => {
     if (videos.length <= 0 && nextCursor !== null) {
       findVideos();
     }
-  }, [dispatch]);
+  }, [findVideos, videos, nextCursor]);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -48,7 +45,7 @@ export default function Home() {
     }
 
     return () => observer.disconnect();
-  }, [dispatch, nextCursor]);
+  }, [findVideos, videos, nextCursor]);
 
   return (
     <div>

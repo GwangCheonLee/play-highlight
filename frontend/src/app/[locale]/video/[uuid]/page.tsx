@@ -8,10 +8,10 @@ export async function generateMetadata(
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const headerList = headers();
-  const referer = headerList.get("referer") || "";
-  const url = new URL(referer);
+  const xForwardedProto = headerList.get("x-forwarded-proto") || "";
+  const xForwardedPort = headerList.get("x-forwarded-port") || "";
   const host = headerList.get("host");
-  const videoPath = `${url.protocol}//${host}/static/videos/${params.uuid}/video.mp4`;
+  const videoPath = `${xForwardedProto}//${host}:${xForwardedPort}/static/videos/${params.uuid}/video.mp4`;
 
   return {
     openGraph: {

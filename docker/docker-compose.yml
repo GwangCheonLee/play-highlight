@@ -4,13 +4,14 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "postgrespw"
-      POSTGRES_DB: "play_highlight"
+      POSTGRES_USER: "${DB_USER_NAME}"
+      POSTGRES_PASSWORD: "${DB_USER_PASSWORD}"
+      POSTGRES_DB: "${DB_NAME}"
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
     volumes:
       - ./data/database:/var/store/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
   nestjs-app:
     build:
       context: ../backend
@@ -36,6 +37,6 @@ services:
       - ./data/backend:/usr/share/nginx/html/static
     restart: unless-stopped
     ports:
-      - "3000:80"
+      - "80:80"
     depends_on:
       - nestjs-app

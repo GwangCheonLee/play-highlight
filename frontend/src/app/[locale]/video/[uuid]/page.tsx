@@ -9,9 +9,8 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const headerList = headers();
   const xForwardedProto = headerList.get("x-forwarded-proto") || "";
-  const xForwardedPort = headerList.get("x-forwarded-port") || "";
   const host = headerList.get("host");
-  const videoPath = `${xForwardedProto}//${host}:${xForwardedPort}/static/videos/${params.uuid}/video.mp4`;
+  const videoPath = `${xForwardedProto}//${host}/static/videos/${params.uuid}/video.mp4`;
 
   return {
     openGraph: {

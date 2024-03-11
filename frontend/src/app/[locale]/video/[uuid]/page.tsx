@@ -10,7 +10,7 @@ export async function generateMetadata(
   const headerList = headers();
   const xForwardedProto = headerList.get("x-forwarded-proto") || "";
   const host = headerList.get("host");
-  const videoPath = `${xForwardedProto}//${host}/static/videos/${params.uuid}/video.mp4`;
+  const videoPath = `${xForwardedProto}://${host}/static/videos/${params.uuid}/video.mp4`;
 
   return {
     openGraph: {

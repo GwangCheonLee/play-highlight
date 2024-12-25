@@ -1,5 +1,3 @@
-// decorators/get-user-email.decorator.ts
-
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 export const RequestByUser = createParamDecorator(

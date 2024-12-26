@@ -69,13 +69,9 @@ export class UsersRepository extends Repository<Users> {
 
     if (exisingDefaultUser) return exisingDefaultUser;
 
-    let counter = 1;
     const originalEmail = email;
-    while (await this.checkEmailExists(email)) {
-      const emailParts = originalEmail.split('@');
-      email = `${emailParts[0]}${counter}@${emailParts[1]}`;
-      counter++;
-    }
+    const emailParts = originalEmail.split('@');
+    email = `${emailParts}@${emailParts[1]}`;
 
     const hashedPassword = await cryptPlainText(plainPassword);
 

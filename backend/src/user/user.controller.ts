@@ -12,17 +12,17 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { RequestByUser } from '../common/decorator/request-by-user.decorator';
 import { Response } from 'express';
-import { UsersService } from './users.service';
+import { UserService } from './user.service';
 import { AuthenticationService } from '../authentication/authentication.service';
 import { GuardTypeEnum } from '../authentication/strategy/guard-type.enum';
-import { Users } from '../authentication/entities/users.entity';
+import { User } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 
 @Controller('api/users')
-export class UsersController {
+export class UserController {
   constructor(
-    private readonly usersService: UsersService,
+    private readonly usersService: UserService,
     private readonly authenticationService: AuthenticationService,
   ) {}
 
@@ -30,7 +30,7 @@ export class UsersController {
   @HttpCode(200)
   @UseGuards(AuthGuard(GuardTypeEnum.JWT_ACCESS))
   async changeNickname(
-    @RequestByUser() user: Users,
+    @RequestByUser() user: User,
     @Res() response: Response,
     @Body('nickname') nickname: string,
   ) {
@@ -57,7 +57,7 @@ export class UsersController {
     FileInterceptor('profileImage', { storage: multer.memoryStorage() }),
   )
   async changeProfileImage(
-    @RequestByUser() user: Users,
+    @RequestByUser() user: User,
     @Res() response: Response,
     @UploadedFile() file: Express.Multer.File,
   ) {
@@ -80,7 +80,7 @@ export class UsersController {
   @HttpCode(200)
   @UseGuards(AuthGuard(GuardTypeEnum.JWT_ACCESS))
   async deleteProfileImage(
-    @RequestByUser() user: Users,
+    @RequestByUser() user: User,
     @Res() response: Response,
   ) {
     const updatedUser = await this.usersService.deleteProfileImage(user);

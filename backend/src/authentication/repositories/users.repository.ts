@@ -4,14 +4,14 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Users } from '../entities/users.entity';
 import { cryptPlainText, decryptPlainText } from '../../common/common.constant';
 import { USER_ROLE } from '../../common/enums/role.enum';
+import { User } from '../../user/entities/user.entity';
 
 @Injectable()
-export class UsersRepository extends Repository<Users> {
+export class UsersRepository extends Repository<User> {
   constructor(private dataSource: DataSource) {
-    super(Users, dataSource.createEntityManager());
+    super(User, dataSource.createEntityManager());
   }
 
   async checkEmailExists(email: string) {
@@ -63,7 +63,7 @@ export class UsersRepository extends Repository<Users> {
     plainPassword: string,
     manager: EntityManager,
   ) {
-    const exisingDefaultUser = await manager.findOne(Users, {
+    const exisingDefaultUser = await manager.findOne(User, {
       where: { role: USER_ROLE.ADMIN },
     });
 
@@ -75,7 +75,7 @@ export class UsersRepository extends Repository<Users> {
 
     const hashedPassword = await cryptPlainText(plainPassword);
 
-    const entity = manager.create(Users, {
+    const entity = manager.create(User, {
       role: USER_ROLE.ADMIN,
       email,
       password: hashedPassword,

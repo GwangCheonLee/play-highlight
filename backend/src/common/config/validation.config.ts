@@ -5,7 +5,7 @@ import * as Joi from 'joi';
  * Generates a ValidationPipe configuration
  * @return {ValidationPipe} Configured instance of ValidationPipe
  */
-export const validationPipeConfig = () => {
+export const validationPipeConfig = (): ValidationPipe => {
   return new ValidationPipe({
     whitelist: true,
     transform: true,
@@ -17,9 +17,10 @@ export const validationPipeConfig = () => {
  * Defines a Joi validation schema for environment variables
  * @return {Joi.ObjectSchema} Joi object schema for env variables
  */
-export const validationSchemaConfig = () => {
+export const validationSchemaConfig = (): Joi.ObjectSchema => {
   return Joi.object({
     TZ: Joi.string().default('UTC'),
+    NODE_ENV: Joi.string().default('production'),
     SERVER_PORT: Joi.number().default(3000),
     API_PREFIX: Joi.string().default('api'),
     LIMIT_CONCURRENT_LOGIN: Joi.boolean().default(false),
@@ -43,6 +44,5 @@ export const validationSchemaConfig = () => {
     TWO_FACTOR_AUTHENTICATION_APP_NAME: Joi.string().required(),
     SIGN_UP_ENABLED: Joi.boolean().required(),
     BASE_DIR: Joi.string().optional(),
-    NODE_ENV: Joi.string().default('production'),
   });
 };

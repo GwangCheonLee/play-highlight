@@ -6,15 +6,15 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Users } from '../../authentication/entities/users.entity';
+import { User } from '../../user/entities/user.entity';
 
 @Entity()
 export class Videos {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Users, (user) => user.videos)
-  user: Users;
+  @ManyToOne(() => User, (user) => user.videos)
+  user: User;
 
   @Column({ name: 'uuid' })
   uuid: string;

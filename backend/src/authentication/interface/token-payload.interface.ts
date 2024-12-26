@@ -1,7 +1,7 @@
-import { Users } from '../entities/users.entity';
+import { User } from '../../user/entities/user.entity';
 
 export interface TokenPayloadInterface {
-  user: Partial<Users>;
+  user: Partial<User>;
   iat: number;
   exp: number;
 }

@@ -1,11 +1,11 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { Users } from './entities/users.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersRepository } from './repositories/users.repository';
 import { SignUpDto } from './dto/signUp.dto';
 import { cryptPlainText } from '../common/common.constant';
 import { Response } from 'express';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class AuthenticationService {
@@ -34,7 +34,7 @@ export class AuthenticationService {
     });
   }
 
-  generateAccessToken(user: Users) {
+  generateAccessToken(user: User) {
     return this.jwtService.sign(
       { user: this.extractPayloadFromUser(user) },
       {
@@ -44,7 +44,7 @@ export class AuthenticationService {
     );
   }
 
-  async generateRefreshToken(user: Users, response: Response): Promise<void> {
+  async generateRefreshToken(user: User, response: Response): Promise<void> {
     const jwtRefreshTokenExpirationTime = this.configService.get<number>(
       'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
     );
@@ -65,7 +65,7 @@ export class AuthenticationService {
     });
   }
 
-  private extractPayloadFromUser(user: Users) {
+  private extractPayloadFromUser(user: User) {
     return {
       id: user.id,
       role: user.role,

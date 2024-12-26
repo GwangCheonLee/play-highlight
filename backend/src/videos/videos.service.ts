@@ -5,9 +5,9 @@ import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { Users } from '../authentication/entities/users.entity';
 import { FfmpegService } from '../ffmpeg/ffmpeg.service';
 import { getBaseDir } from '../common/common.constant';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class VideosService {
@@ -27,7 +27,7 @@ export class VideosService {
     return this.videosRepository.findOne({ where: { uuid } });
   }
 
-  async saveVideo(user: Users, file: Express.Multer.File) {
+  async saveVideo(user: User, file: Express.Multer.File) {
     const uuid = uuidv4();
     const baseDir = path.join(getBaseDir(), 'videos');
     const videoDirPath = path.join(baseDir, uuid);

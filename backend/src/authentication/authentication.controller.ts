@@ -13,10 +13,10 @@ import { AuthenticationService } from './authentication.service';
 import { AuthGuard } from '@nestjs/passport';
 import { GuardTypeEnum } from './strategy/guard-type.enum';
 import { RequestByUser } from '../common/decorator/request-by-user.decorator';
-import { Users } from './entities/users.entity';
 import { SignUpDto } from './dto/signUp.dto';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
+import { User } from '../user/entities/user.entity';
 
 @Controller('api/authentication')
 export class AuthenticationController {
@@ -46,7 +46,7 @@ export class AuthenticationController {
   @Post('/sign-in')
   @HttpCode(200)
   @UseGuards(AuthGuard(GuardTypeEnum.LOCAL))
-  async signIn(@RequestByUser() user: Users, @Res() response: Response) {
+  async signIn(@RequestByUser() user: User, @Res() response: Response) {
     const accessToken = this.authenticationService.generateAccessToken(user);
     await this.authenticationService.generateRefreshToken(user, response);
 
@@ -60,7 +60,7 @@ export class AuthenticationController {
   @Post('/sign-out')
   @HttpCode(200)
   @UseGuards(AuthGuard(GuardTypeEnum.JWT_ACCESS))
-  async signOut(@RequestByUser() user: Users, @Res() response: Response) {
+  async signOut(@RequestByUser() user: User, @Res() response: Response) {
     response.cookie('refreshToken', '', {
       httpOnly: true,
       path: '/',
@@ -73,7 +73,7 @@ export class AuthenticationController {
   @Get('/access-token')
   @UseGuards(AuthGuard(GuardTypeEnum.JWT_REFRESH))
   getAccessTokenByRefreshToken(
-    @RequestByUser() user: Users,
+    @RequestByUser() user: User,
     @Req() req: Request,
   ) {
     return {

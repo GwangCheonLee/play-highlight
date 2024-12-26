@@ -9,8 +9,8 @@ import {
 import { Videos } from '../../videos/entities/videos.entity';
 import { USER_ROLE } from '../../common/enums/role.enum';
 
-@Entity()
-export class Users {
+@Entity('users')
+export class User {
   @PrimaryGeneratedColumn()
   id: number;
 

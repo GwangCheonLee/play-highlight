@@ -1,7 +1,7 @@
 import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { Videos } from '../entities/videos.entity';
-import { Users } from '../../authentication/entities/users.entity';
+import { User } from '../../user/entities/user.entity';
 
 @Injectable()
 export class VideosRepository extends Repository<Videos> {
@@ -51,7 +51,7 @@ export class VideosRepository extends Repository<Videos> {
   }
 
   async saveVideo(
-    user: Users,
+    user: User,
     uuid: string,
     baseDir: string,
     thumbnailFileName: string,

@@ -15,7 +15,7 @@ import { GuardTypeEnum } from '../authentication/strategy/guard-type.enum';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { RequestByUser } from '../common/decorator/request-by-user.decorator';
-import { Users } from '../authentication/entities/users.entity';
+import { User } from '../user/entities/user.entity';
 
 @Controller('api/videos')
 export class VideosController {
@@ -49,7 +49,7 @@ export class VideosController {
     FileInterceptor('video', { storage: multer.memoryStorage() }),
   )
   async uploadVideo(
-    @RequestByUser() user: Users,
+    @RequestByUser() user: User,
     @UploadedFile() file: Express.Multer.File,
   ) {
     return {

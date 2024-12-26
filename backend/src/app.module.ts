@@ -9,7 +9,7 @@ import { validationSchemaConfig } from './common/config/validation.config';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { VideosModule } from './videos/videos.module';
 import { UsersModule } from './users/users.module';
-import { AppInitService } from './app-init.service';
+import { AppInitializationService } from './app-initialization.service';
 
 @Module({
   imports: [
@@ -26,6 +26,6 @@ import { AppInitService } from './app-init.service';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, AppInitService],
+  providers: [AppService, AppInitializationService],
 })
 export class AppModule {}

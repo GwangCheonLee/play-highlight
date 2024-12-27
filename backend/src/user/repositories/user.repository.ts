@@ -4,14 +4,17 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Users } from '../entities/users.entity';
-import { cryptPlainText, decryptPlainText } from '../../common/common.constant';
-import { USER_ROLE } from '../../common/enums/role.enum';
+import {
+  cryptPlainText,
+  decryptPlainText,
+} from '../../common/constant/common.constant';
+import { USER_ROLE } from '../../common/enum/role.enum';
+import { User } from '../entities/user.entity';
 
 @Injectable()
-export class UsersRepository extends Repository<Users> {
+export class UserRepository extends Repository<User> {
   constructor(private dataSource: DataSource) {
-    super(Users, dataSource.createEntityManager());
+    super(User, dataSource.createEntityManager());
   }
 
   async checkEmailExists(email: string) {
@@ -63,23 +66,19 @@ export class UsersRepository extends Repository<Users> {
     plainPassword: string,
     manager: EntityManager,
   ) {
-    const exisingDefaultUser = await manager.findOne(Users, {
+    const exisingDefaultUser = await manager.findOne(User, {
       where: { role: USER_ROLE.ADMIN },
     });
 
     if (exisingDefaultUser) return exisingDefaultUser;
 
-    let counter = 1;
     const originalEmail = email;
-    while (await this.checkEmailExists(email)) {
-      const emailParts = originalEmail.split('@');
-      email = `${emailParts[0]}${counter}@${emailParts[1]}`;
-      counter++;
-    }
+    const emailParts = originalEmail.split('@');
+    email = `${emailParts}@${emailParts[1]}`;
 
     const hashedPassword = await cryptPlainText(plainPassword);
 
-    const entity = manager.create(Users, {
+    const entity = manager.create(User, {
       role: USER_ROLE.ADMIN,
       email,
       password: hashedPassword,

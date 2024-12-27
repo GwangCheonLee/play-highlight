@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
-import { LocalStrategy } from './strategy/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtAccessStrategy } from './strategy/jwt-access.strategy';
-import { JwtRefreshStrategy } from './strategy/jwt-refresh.strategy';
-import { UsersRepository } from './repositories/users.repository';
+import { LocalStrategy } from './strategies/local.strategy';
+import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { UserRepository } from '../user/repositories/user.repository';
 
 @Module({
   imports: [JwtModule],
@@ -14,14 +14,14 @@ import { UsersRepository } from './repositories/users.repository';
     LocalStrategy,
     JwtAccessStrategy,
     JwtRefreshStrategy,
-    UsersRepository,
+    UserRepository,
     AuthenticationService,
   ],
   exports: [
     LocalStrategy,
     JwtAccessStrategy,
     JwtRefreshStrategy,
-    UsersRepository,
+    UserRepository,
     AuthenticationService,
   ],
 })

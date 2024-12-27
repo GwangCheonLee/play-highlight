@@ -1,22 +1,22 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { Users } from './entities/users.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { UsersRepository } from './repositories/users.repository';
-import { SignUpDto } from './dto/signUp.dto';
-import { cryptPlainText } from '../common/common.constant';
+import { SignUpDto } from './dto/sign-up.dto';
+import { cryptPlainText } from '../common/constant/common.constant';
 import { Response } from 'express';
+import { UserRepository } from '../user/repositories/user.repository';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly usersRepository: UsersRepository,
+    private readonly userRepository: UserRepository,
   ) {}
 
   async signUp(signUpDto: SignUpDto) {
-    const emailExists = await this.usersRepository.checkEmailExists(
+    const emailExists = await this.userRepository.checkEmailExists(
       signUpDto.email,
     );
 
@@ -28,13 +28,13 @@ export class AuthenticationService {
 
     const hashedPassword = await cryptPlainText(signUpDto.password);
 
-    return await this.usersRepository.save({
+    return await this.userRepository.save({
       ...signUpDto,
       password: hashedPassword,
     });
   }
 
-  generateAccessToken(user: Users) {
+  generateAccessToken(user: User) {
     return this.jwtService.sign(
       { user: this.extractPayloadFromUser(user) },
       {
@@ -44,7 +44,7 @@ export class AuthenticationService {
     );
   }
 
-  async generateRefreshToken(user: Users, response: Response): Promise<void> {
+  async generateRefreshToken(user: User, response: Response): Promise<void> {
     const jwtRefreshTokenExpirationTime = this.configService.get<number>(
       'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
     );
@@ -65,7 +65,7 @@ export class AuthenticationService {
     });
   }
 
-  private extractPayloadFromUser(user: Users) {
+  private extractPayloadFromUser(user: User) {
     return {
       id: user.id,
       role: user.role,

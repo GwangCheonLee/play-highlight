@@ -1,18 +1,18 @@
 import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { Videos } from '../entities/videos.entity';
-import { Users } from '../../authentication/entities/users.entity';
+import { User } from '../../user/entities/user.entity';
+import { Video } from '../entities/video.entity';
 
 @Injectable()
-export class VideosRepository extends Repository<Videos> {
+export class VideoRepository extends Repository<Video> {
   constructor(private dataSource: DataSource) {
-    super(Videos, dataSource.createEntityManager());
+    super(Video, dataSource.createEntityManager());
   }
 
   async findVideos(
     cursor: number,
     limit: number = 10,
-  ): Promise<{ videos: Videos[]; nextCursor: number | null }> {
+  ): Promise<{ videos: Video[]; nextCursor: number | null }> {
     const queryBuilder = this.createQueryBuilder('videos')
       .leftJoinAndSelect('videos.user', 'user')
       .select([
@@ -51,7 +51,7 @@ export class VideosRepository extends Repository<Videos> {
   }
 
   async saveVideo(
-    user: Users,
+    user: User,
     uuid: string,
     baseDir: string,
     thumbnailFileName: string,

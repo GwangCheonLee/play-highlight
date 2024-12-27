@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { GuardTypeEnum } from './guard-type.enum';
-import { UsersRepository } from '../repositories/users.repository';
+import { UserRepository } from '../../user/repositories/user.repository';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(
   Strategy,
   GuardTypeEnum.LOCAL,
 ) {
-  constructor(private readonly usersRepository: UsersRepository) {
+  constructor(private readonly usersRepository: UserRepository) {
     super({ usernameField: 'email' });
   }
 

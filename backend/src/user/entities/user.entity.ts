@@ -6,11 +6,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Videos } from '../../videos/entities/videos.entity';
-import { USER_ROLE } from '../../common/enums/role.enum';
+import { USER_ROLE } from '../../common/enum/role.enum';
+import { Video } from '../../video/entities/video.entity';
 
-@Entity()
-export class Users {
+@Entity('users')
+export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -38,6 +38,6 @@ export class Users {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Videos, (video) => video.user)
-  videos: Videos[];
+  @OneToMany(() => Video, (video) => video.user)
+  videos: Video[];
 }

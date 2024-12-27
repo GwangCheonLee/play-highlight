@@ -3,8 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { GuardTypeEnum } from './guard-type.enum';
-import { TokenPayloadInterface } from '../interface/token-payload.interface';
-import { UsersRepository } from '../repositories/users.repository';
+import { UserRepository } from '../../user/repositories/user.repository';
+import { TokenPayloadInterface } from '../interfaces/token-payload.interface';
 
 @Injectable()
 export class JwtAccessStrategy extends PassportStrategy(
@@ -13,7 +13,7 @@ export class JwtAccessStrategy extends PassportStrategy(
 ) {
   constructor(
     private readonly configService: ConfigService,
-    private readonly usersRepository: UsersRepository,
+    private readonly userRepository: UserRepository,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -22,6 +22,6 @@ export class JwtAccessStrategy extends PassportStrategy(
   }
 
   async validate(payload: TokenPayloadInterface) {
-    return await this.usersRepository.getUserById(payload.user.id);
+    return await this.userRepository.getUserById(payload.user.id);
   }
 }

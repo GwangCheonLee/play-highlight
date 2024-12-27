@@ -12,17 +12,17 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { RequestByUser } from '../common/decorator/request-by-user.decorator';
 import { Response } from 'express';
-import { UsersService } from './users.service';
+import { UserService } from './user.service';
 import { AuthenticationService } from '../authentication/authentication.service';
-import { GuardTypeEnum } from '../authentication/strategy/guard-type.enum';
-import { Users } from '../authentication/entities/users.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
+import { GuardTypeEnum } from '../authentication/strategies/guard-type.enum';
+import { User } from './entities/user.entity';
 
 @Controller('api/users')
-export class UsersController {
+export class UserController {
   constructor(
-    private readonly usersService: UsersService,
+    private readonly userService: UserService,
     private readonly authenticationService: AuthenticationService,
   ) {}
 
@@ -30,11 +30,11 @@ export class UsersController {
   @HttpCode(200)
   @UseGuards(AuthGuard(GuardTypeEnum.JWT_ACCESS))
   async changeNickname(
-    @RequestByUser() user: Users,
+    @RequestByUser() user: User,
     @Res() response: Response,
     @Body('nickname') nickname: string,
   ) {
-    const updatedUser = await this.usersService.changeNickname(user, nickname);
+    const updatedUser = await this.userService.changeNickname(user, nickname);
 
     const accessToken =
       this.authenticationService.generateAccessToken(updatedUser);
@@ -57,11 +57,11 @@ export class UsersController {
     FileInterceptor('profileImage', { storage: multer.memoryStorage() }),
   )
   async changeProfileImage(
-    @RequestByUser() user: Users,
+    @RequestByUser() user: User,
     @Res() response: Response,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const updatedUser = await this.usersService.saveProfileImage(user, file);
+    const updatedUser = await this.userService.saveProfileImage(user, file);
     const accessToken =
       this.authenticationService.generateAccessToken(updatedUser);
     await this.authenticationService.generateRefreshToken(
@@ -80,10 +80,10 @@ export class UsersController {
   @HttpCode(200)
   @UseGuards(AuthGuard(GuardTypeEnum.JWT_ACCESS))
   async deleteProfileImage(
-    @RequestByUser() user: Users,
+    @RequestByUser() user: User,
     @Res() response: Response,
   ) {
-    const updatedUser = await this.usersService.deleteProfileImage(user);
+    const updatedUser = await this.userService.deleteProfileImage(user);
     const accessToken =
       this.authenticationService.generateAccessToken(updatedUser);
     await this.authenticationService.generateRefreshToken(

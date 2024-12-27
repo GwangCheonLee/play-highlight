@@ -1,33 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { VideosRepository } from './repositories/videos.repository';
-import { FindVideosDto } from './dto/findVideos.dto';
+import { FindVideosDto } from './dto/find-videos.dto';
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
-
-import { Users } from '../authentication/entities/users.entity';
 import { FfmpegService } from '../ffmpeg/ffmpeg.service';
-import { getBaseDir } from '../common/common.constant';
+import { getBaseDir } from '../common/constant/common.constant';
+import { VideoRepository } from './repositories/video.repository';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
-export class VideosService {
+export class VideoService {
   constructor(
-    private readonly videosRepository: VideosRepository,
     private readonly ffmpegService: FfmpegService,
+    private readonly videoRepository: VideoRepository,
   ) {}
 
   findVideos(findVideosDto: FindVideosDto) {
-    return this.videosRepository.findVideos(
+    return this.videoRepository.findVideos(
       findVideosDto.cursor,
       findVideosDto.limit,
     );
   }
 
   findVideo(uuid: string) {
-    return this.videosRepository.findOne({ where: { uuid } });
+    return this.videoRepository.findOne({ where: { uuid } });
   }
 
-  async saveVideo(user: Users, file: Express.Multer.File) {
+  async saveVideo(user: User, file: Express.Multer.File) {
     const uuid = uuidv4();
     const baseDir = path.join(getBaseDir(), 'videos');
     const videoDirPath = path.join(baseDir, uuid);
@@ -50,7 +49,7 @@ export class VideosService {
     );
     await this.ffmpegService.encodeToHls(originalVideoPath, hlsOutputPath);
 
-    return this.videosRepository.saveVideo(
+    return this.videoRepository.saveVideo(
       user,
       uuid,
       baseDir,

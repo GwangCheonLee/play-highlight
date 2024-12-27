@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { UsersRepository } from './authentication/repositories/users.repository';
+import { UserRepository } from './user/repositories/user.repository';
 
 @Injectable()
 export class AppInitializationService implements OnModuleInit {
@@ -8,7 +8,7 @@ export class AppInitializationService implements OnModuleInit {
 
   constructor(
     private readonly dataSource: DataSource,
-    private readonly usersRepository: UsersRepository,
+    private readonly userRepository: UserRepository,
   ) {}
 
   /**
@@ -38,14 +38,14 @@ export class AppInitializationService implements OnModuleInit {
     const manager = queryRunner.manager;
 
     try {
-      const userExists = await this.usersRepository.findOneBy({ email });
+      const userExists = await this.userRepository.findOneBy({ email });
       if (userExists) {
         this.logger.log('Default admin user already exists.');
         return;
       }
 
       this.logger.log(`Creating default admin user: ${email}`);
-      await this.usersRepository.createDefaultUser(
+      await this.userRepository.createDefaultUser(
         name,
         email,
         plainPassword,

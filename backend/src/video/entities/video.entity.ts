@@ -8,8 +8,8 @@ import {
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 
-@Entity()
-export class Videos {
+@Entity('videos')
+export class Video {
   @PrimaryGeneratedColumn()
   id: number;
 

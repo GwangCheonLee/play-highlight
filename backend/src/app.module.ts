@@ -4,17 +4,17 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeormConfig } from './common/config/typeorm.config';
 import { ConfigModule } from '@nestjs/config';
-import { getEnvPath } from './common/common.constant';
+import { getEnvPath } from './common/constant/common.constant';
 import { validationSchemaConfig } from './common/config/validation.config';
 import { AuthenticationModule } from './authentication/authentication.module';
-import { VideosModule } from './videos/videos.module';
 import { AppInitializationService } from './app-initialization.service';
 import { UserModule } from './user/user.module';
+import { VideoModule } from './video/video.module';
 
 @Module({
   imports: [
     UserModule,
-    VideosModule,
+    VideoModule,
     AuthenticationModule,
     TypeOrmModule.forRootAsync({
       useClass: TypeormConfig,

@@ -11,11 +11,11 @@ import {
 } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { AuthGuard } from '@nestjs/passport';
-import { GuardTypeEnum } from './strategy/guard-type.enum';
 import { RequestByUser } from '../common/decorator/request-by-user.decorator';
-import { SignUpDto } from './dto/signUp.dto';
+import { SignUpDto } from './dto/sign-up.dto';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
+import { GuardTypeEnum } from './strategies/guard-type.enum';
 import { User } from '../user/entities/user.entity';
 
 @Controller('api/authentication')

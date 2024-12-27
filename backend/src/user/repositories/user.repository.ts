@@ -4,12 +4,15 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { cryptPlainText, decryptPlainText } from '../../common/common.constant';
-import { USER_ROLE } from '../../common/enums/role.enum';
-import { User } from '../../user/entities/user.entity';
+import {
+  cryptPlainText,
+  decryptPlainText,
+} from '../../common/constant/common.constant';
+import { USER_ROLE } from '../../common/enum/role.enum';
+import { User } from '../entities/user.entity';
 
 @Injectable()
-export class UsersRepository extends Repository<User> {
+export class UserRepository extends Repository<User> {
   constructor(private dataSource: DataSource) {
     super(User, dataSource.createEntityManager());
   }

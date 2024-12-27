@@ -4,8 +4,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { GuardTypeEnum } from './guard-type.enum';
-import { TokenPayloadInterface } from '../interface/token-payload.interface';
-import { UsersRepository } from '../repositories/users.repository';
+import { UserRepository } from '../../user/repositories/user.repository';
+import { TokenPayloadInterface } from '../interfaces/token-payload.interface';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -14,7 +14,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
 ) {
   constructor(
     private readonly configService: ConfigService,
-    private readonly usersRepository: UsersRepository,
+    private readonly userRepository: UserRepository,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -27,6 +27,6 @@ export class JwtRefreshStrategy extends PassportStrategy(
   }
 
   async validate(payload: TokenPayloadInterface) {
-    return await this.usersRepository.getUserById(payload.user.id);
+    return await this.userRepository.getUserById(payload.user.id);
   }
 }

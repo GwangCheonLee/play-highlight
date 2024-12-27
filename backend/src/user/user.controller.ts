@@ -14,15 +14,15 @@ import { RequestByUser } from '../common/decorator/request-by-user.decorator';
 import { Response } from 'express';
 import { UserService } from './user.service';
 import { AuthenticationService } from '../authentication/authentication.service';
-import { GuardTypeEnum } from '../authentication/strategy/guard-type.enum';
-import { User } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
+import { GuardTypeEnum } from '../authentication/strategies/guard-type.enum';
+import { User } from './entities/user.entity';
 
 @Controller('api/users')
 export class UserController {
   constructor(
-    private readonly usersService: UserService,
+    private readonly userService: UserService,
     private readonly authenticationService: AuthenticationService,
   ) {}
 
@@ -34,7 +34,7 @@ export class UserController {
     @Res() response: Response,
     @Body('nickname') nickname: string,
   ) {
-    const updatedUser = await this.usersService.changeNickname(user, nickname);
+    const updatedUser = await this.userService.changeNickname(user, nickname);
 
     const accessToken =
       this.authenticationService.generateAccessToken(updatedUser);
@@ -61,7 +61,7 @@ export class UserController {
     @Res() response: Response,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const updatedUser = await this.usersService.saveProfileImage(user, file);
+    const updatedUser = await this.userService.saveProfileImage(user, file);
     const accessToken =
       this.authenticationService.generateAccessToken(updatedUser);
     await this.authenticationService.generateRefreshToken(
@@ -83,7 +83,7 @@ export class UserController {
     @RequestByUser() user: User,
     @Res() response: Response,
   ) {
-    const updatedUser = await this.usersService.deleteProfileImage(user);
+    const updatedUser = await this.userService.deleteProfileImage(user);
     const accessToken =
       this.authenticationService.generateAccessToken(updatedUser);
     await this.authenticationService.generateRefreshToken(

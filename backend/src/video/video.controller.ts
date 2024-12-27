@@ -8,23 +8,23 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { VideosService } from './videos.service';
-import { FindVideosDto } from './dto/findVideos.dto';
+import { VideoService } from './video.service';
+import { FindVideosDto } from './dto/find-videos.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { GuardTypeEnum } from '../authentication/strategy/guard-type.enum';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { RequestByUser } from '../common/decorator/request-by-user.decorator';
+import { GuardTypeEnum } from '../authentication/strategies/guard-type.enum';
 import { User } from '../user/entities/user.entity';
 
 @Controller('api/videos')
-export class VideosController {
-  constructor(private readonly videosService: VideosService) {}
+export class VideoController {
+  constructor(private readonly videoService: VideoService) {}
 
   @Get()
   async findVideos(@Query() findVideosDto: FindVideosDto) {
     const { videos, nextCursor } =
-      await this.videosService.findVideos(findVideosDto);
+      await this.videoService.findVideos(findVideosDto);
 
     return {
       data: {
@@ -38,7 +38,7 @@ export class VideosController {
   async findVideo(@Param('uuid') uuid: string) {
     return {
       data: {
-        video: await this.videosService.findVideo(uuid),
+        video: await this.videoService.findVideo(uuid),
       },
     };
   }
@@ -53,7 +53,7 @@ export class VideosController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     return {
-      data: { video: await this.videosService.saveVideo(user, file) },
+      data: { video: await this.videoService.saveVideo(user, file) },
     };
   }
 }

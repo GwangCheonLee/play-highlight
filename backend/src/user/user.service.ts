@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from '../authentication/repositories/users.repository';
-import { User } from './entities/user.entity';
 import * as path from 'path';
 import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-import { getBaseDir } from '../common/common.constant';
+import { getBaseDir } from '../common/constant/common.constant';
+import { User } from './entities/user.entity';
+import { UserRepository } from './repositories/user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async deleteProfileImage(user: User) {
     const baseDir = path.join(getBaseDir(), 'profiles');
@@ -17,8 +17,8 @@ export class UserService {
     if (user.profileImage) {
       fs.unlink(`${profileDirPath}/${user.profileImage}`, () => {});
     }
-    await this.usersRepository.update(user.id, { profileImage: null });
-    return this.usersRepository.getUserById(user.id);
+    await this.userRepository.update(user.id, { profileImage: null });
+    return this.userRepository.getUserById(user.id);
   }
 
   async saveProfileImage(user: User, file: Express.Multer.File) {
@@ -35,13 +35,13 @@ export class UserService {
     fs.mkdirSync(profileDirPath, { recursive: true });
     fs.writeFileSync(`${profileDirPath}/${fileName}`, file.buffer);
 
-    await this.usersRepository.update(user.id, { profileImage: fileName });
+    await this.userRepository.update(user.id, { profileImage: fileName });
 
-    return this.usersRepository.getUserById(user.id);
+    return this.userRepository.getUserById(user.id);
   }
 
   async changeNickname(user: User, nickname: string) {
-    await this.usersRepository.update(user.id, { nickname });
-    return this.usersRepository.findOneBy({ id: user.id });
+    await this.userRepository.update(user.id, { nickname });
+    return this.userRepository.findOneBy({ id: user.id });
   }
 }

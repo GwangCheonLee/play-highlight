@@ -12,8 +12,10 @@ export class FfmpegService {
           filename: 'thumbnail.jpg',
           folder: path.dirname(thumbnailPath),
         })
-        .on('end', resolve)
-        .on('error', reject);
+        .on('end', (stdout: string | null, stderr: string | null) => {
+          resolve();
+        })
+        .on('error', (err) => reject(err));
     });
   }
 
@@ -28,7 +30,9 @@ export class FfmpegService {
           '-f hls',
         ])
         .output(hlsOutputPath)
-        .on('end', () => resolve())
+        .on('end', (stdout: string | null, stderr: string | null) => {
+          resolve();
+        })
         .on('error', (err) => reject(err))
         .run();
     });

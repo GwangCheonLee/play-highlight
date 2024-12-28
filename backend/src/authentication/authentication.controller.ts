@@ -5,18 +5,18 @@ import {
   Get,
   HttpCode,
   Post,
-  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
-import { AuthGuard } from '@nestjs/passport';
 import { RequestByUser } from '../common/decorator/request-by-user.decorator';
 import { SignUpDto } from './dto/sign-up.dto';
 import { ConfigService } from '@nestjs/config';
-import { Request, Response } from 'express';
-import { GuardTypeEnum } from './strategies/guard-type.enum';
+import { Response } from 'express';
 import { User } from '../user/entities/user.entity';
+import { LocalGuard } from './guards/local.guard';
+import { JwtAccessGuard } from './guards/jwt-access.guard';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 
 @Controller('api/authentication')
 export class AuthenticationController {
@@ -45,7 +45,7 @@ export class AuthenticationController {
 
   @Post('/sign-in')
   @HttpCode(200)
-  @UseGuards(AuthGuard(GuardTypeEnum.LOCAL))
+  @UseGuards(LocalGuard)
   async signIn(@RequestByUser() user: User, @Res() response: Response) {
     const accessToken = this.authenticationService.generateAccessToken(user);
     await this.authenticationService.generateRefreshToken(user, response);
@@ -59,7 +59,7 @@ export class AuthenticationController {
 
   @Post('/sign-out')
   @HttpCode(200)
-  @UseGuards(AuthGuard(GuardTypeEnum.JWT_ACCESS))
+  @UseGuards(JwtAccessGuard)
   async signOut(@RequestByUser() user: User, @Res() response: Response) {
     response.cookie('refreshToken', '', {
       httpOnly: true,
@@ -71,11 +71,8 @@ export class AuthenticationController {
   }
 
   @Get('/access-token')
-  @UseGuards(AuthGuard(GuardTypeEnum.JWT_REFRESH))
-  getAccessTokenByRefreshToken(
-    @RequestByUser() user: User,
-    @Req() req: Request,
-  ) {
+  @UseGuards(JwtRefreshGuard)
+  getAccessTokenByRefreshToken(@RequestByUser() user: User) {
     return {
       data: {
         accessToken: this.authenticationService.generateAccessToken(user),

@@ -14,7 +14,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { RequestByUser } from '../common/decorator/request-by-user.decorator';
-import { GuardTypeEnum } from '../authentication/strategies/guard-type.enum';
+import { GuardTypeEnum } from '../authentication/enums/guard-type.enum';
 import { User } from '../user/entities/user.entity';
 
 @Controller('api/videos')

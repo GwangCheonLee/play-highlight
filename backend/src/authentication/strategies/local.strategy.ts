@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { GuardTypeEnum } from './guard-type.enum';
+import { GuardTypeEnum } from '../enums/guard-type.enum';
 import { UserRepository } from '../../user/repositories/user.repository';
 
 @Injectable()

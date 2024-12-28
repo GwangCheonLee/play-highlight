@@ -2,7 +2,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
-import { GuardTypeEnum } from './guard-type.enum';
+import { GuardTypeEnum } from '../enums/guard-type.enum';
 import { UserRepository } from '../../user/repositories/user.repository';
 import { TokenPayloadInterface } from '../interfaces/token-payload.interface';
 

@@ -10,8 +10,8 @@ import { User } from '../../user/entities/user.entity';
 
 @Entity('videos')
 export class Video {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => User, (user) => user.videos)
   user: User;

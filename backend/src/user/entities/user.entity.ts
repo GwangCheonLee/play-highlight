@@ -11,8 +11,8 @@ import { Video } from '../../video/entities/video.entity';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ name: 'role', enum: USER_ROLE, default: USER_ROLE.USER })
   role: USER_ROLE;

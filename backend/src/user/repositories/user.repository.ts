@@ -1,14 +1,10 @@
-import { DataSource, EntityManager, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import {
-  cryptPlainText,
-  decryptPlainText,
-} from '../../common/constant/common.constant';
-import { USER_ROLE } from '../../common/enum/role.enum';
+import { decryptPlainText } from '../../common/constant/common.constant';
 import { User } from '../entities/user.entity';
 
 @Injectable()
@@ -46,7 +42,7 @@ export class UserRepository extends Repository<User> {
     return user;
   }
 
-  async getUserById(userId: number) {
+  async getUserById(userId: string) {
     const queryBuilder = this.createQueryBuilder('user')
       .where('user.id = :userId', { userId })
       .andWhere('user.isDisabled = :isDisabled', { isDisabled: false });
@@ -58,34 +54,5 @@ export class UserRepository extends Repository<User> {
     }
 
     return user;
-  }
-
-  async createDefaultUser(
-    nickname: string,
-    email: string,
-    plainPassword: string,
-    manager: EntityManager,
-  ) {
-    const exisingDefaultUser = await manager.findOne(User, {
-      where: { role: USER_ROLE.ADMIN },
-    });
-
-    if (exisingDefaultUser) return exisingDefaultUser;
-
-    const originalEmail = email;
-    const emailParts = originalEmail.split('@');
-    email = `${emailParts}@${emailParts[1]}`;
-
-    const hashedPassword = await cryptPlainText(plainPassword);
-
-    const entity = manager.create(User, {
-      role: USER_ROLE.ADMIN,
-      email,
-      password: hashedPassword,
-      nickname,
-      profileImage: null,
-    });
-
-    return await manager.save(entity);
   }
 }

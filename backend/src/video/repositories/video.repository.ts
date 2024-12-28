@@ -10,9 +10,9 @@ export class VideoRepository extends Repository<Video> {
   }
 
   async findVideos(
-    cursor: number,
+    cursor: string | null,
     limit: number = 10,
-  ): Promise<{ videos: Video[]; nextCursor: number | null }> {
+  ): Promise<{ videos: Video[]; nextCursor: string | null }> {
     const queryBuilder = this.createQueryBuilder('videos')
       .leftJoinAndSelect('videos.user', 'user')
       .select([
@@ -30,18 +30,17 @@ export class VideoRepository extends Repository<Video> {
         'user.nickname',
         'user.profileImage',
       ])
-
       .andWhere('videos.isDeleted = :isDeleted', { isDeleted: false })
       .orderBy('videos.id', 'DESC')
       .take(limit + 1);
 
     if (cursor) {
-      queryBuilder.where('videos.id <= :cursor', { cursor });
+      queryBuilder.andWhere('videos.id < :cursor', { cursor });
     }
 
     const videos = await queryBuilder.getMany();
 
-    let nextCursor: number | null = null;
+    let nextCursor: string | null = null;
     if (videos.length > limit) {
       nextCursor = videos[videos.length - 1].id;
       videos.pop();

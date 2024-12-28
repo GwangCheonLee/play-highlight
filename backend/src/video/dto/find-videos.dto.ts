@@ -5,7 +5,7 @@ export class FindVideosDto {
   @IsOptional()
   @IsNumber()
   @Transform(({ value }) => +value)
-  cursor?: number;
+  cursor?: string;
 
   @IsOptional()
   @IsNumber()

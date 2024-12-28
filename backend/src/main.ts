@@ -33,11 +33,6 @@ async function bootstrap(): Promise<void> {
   // URI 기반의 API 버전 관리 활성화
   app.enableVersioning({ type: VersioningType.URI });
 
-  // 글로벌 프리픽스 설정 (API_PREFIX 환경 변수로부터)
-  app.setGlobalPrefix(configService.get('API_PREFIX'), {
-    exclude: ['', 'ping'],
-  });
-
   const port = configService.get('SERVER_PORT') || 3000;
   await app.listen(port);
 }

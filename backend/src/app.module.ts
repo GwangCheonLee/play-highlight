@@ -7,7 +7,6 @@ import { ConfigModule } from '@nestjs/config';
 import { getEnvPath } from './common/constant/common.constant';
 import { validationSchemaConfig } from './common/config/validation.config';
 import { AuthenticationModule } from './authentication/authentication.module';
-import { AppInitializationService } from './app-initialization.service';
 import { UserModule } from './user/user.module';
 import { VideoModule } from './video/video.module';
 
@@ -26,6 +25,6 @@ import { VideoModule } from './video/video.module';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, AppInitializationService],
+  providers: [AppService],
 })
 export class AppModule {}

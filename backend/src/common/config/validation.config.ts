@@ -22,6 +22,7 @@ export const validationSchemaConfig = (): Joi.ObjectSchema => {
     TZ: Joi.string().default('UTC'),
     NODE_ENV: Joi.string().default('production'),
     SERVER_PORT: Joi.number().default(3000),
+    API_PREFIX: Joi.string().default('api'),
     DB_HOST: Joi.string().required(),
     DB_PORT: Joi.string().required(),
     DB_NAME: Joi.string().required(),

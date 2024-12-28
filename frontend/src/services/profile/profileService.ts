@@ -6,7 +6,7 @@ export const fetchUploadProfileImage = async (
   accessToken: string,
 ) => {
   const response: AxiosResponse<UploadProfileResponse, any> = await axios.patch(
-    `/api/users/me/profile/image`,
+    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/users/me/profile/image`,
     formData,
     {
       headers: {
@@ -20,10 +20,13 @@ export const fetchUploadProfileImage = async (
 
 export const fetchDeleteProfileImage = async (accessToken: string) => {
   const response: AxiosResponse<UploadProfileResponse, any> =
-    await axios.delete(`/api/users/me/profile/image`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
+    await axios.delete(
+      `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/users/me/profile/image`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       },
-    });
+    );
   return response.data.data;
 };

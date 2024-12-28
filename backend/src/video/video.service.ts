@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
 import { FfmpegService } from '../ffmpeg/ffmpeg.service';
-import { getBaseDir } from '../common/constant/common.constant';
+import { getBaseDir } from '../common/constants/common.constant';
 import { VideoRepository } from './repositories/video.repository';
 import { User } from '../user/entities/user.entity';
 

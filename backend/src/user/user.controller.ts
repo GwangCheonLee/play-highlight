@@ -2,50 +2,52 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
+  Logger,
   Patch,
   Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { RequestByUser } from '../common/decorator/request-by-user.decorator';
 import { Response } from 'express';
 import { UserService } from './user.service';
-import { AuthenticationService } from '../authentication/authentication.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { User } from './entities/user.entity';
 import { JwtAccessGuard } from '../authentication/guards/jwt-access.guard';
+import { GetUser } from './decorators/get-user';
 
-@Controller('api/users')
+@Controller({ version: '1', path: 'users' })
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly authenticationService: AuthenticationService,
-  ) {}
+  private readonly logger = new Logger(UserController.name);
+
+  constructor(private readonly userService: UserService) {}
+
+  /**
+   * 현재 로그인한 사용자의 정보를 반환합니다.
+   * @param {User} user 현재 로그인한 사용자
+   * @return {Promise<User>} 현재 로그인한 사용자의 정보
+   */
+  @Get('/me')
+  @UseGuards(JwtAccessGuard)
+  async getMe(@GetUser() user: User): Promise<User> {
+    return user;
+  }
 
   @Patch('/me/nickname')
   @HttpCode(200)
   @UseGuards(JwtAccessGuard)
   async changeNickname(
-    @RequestByUser() user: User,
+    @GetUser() user: User,
     @Res() response: Response,
     @Body('nickname') nickname: string,
   ) {
     const updatedUser = await this.userService.changeNickname(user, nickname);
 
-    const accessToken =
-      this.authenticationService.generateAccessToken(updatedUser);
-    await this.authenticationService.generateRefreshToken(
-      updatedUser,
-      response,
-    );
-
     return response.send({
-      data: {
-        accessToken: accessToken,
-      },
+      data: {},
     });
   }
 
@@ -56,44 +58,25 @@ export class UserController {
     FileInterceptor('profileImage', { storage: multer.memoryStorage() }),
   )
   async changeProfileImage(
-    @RequestByUser() user: User,
+    @GetUser() user: User,
     @Res() response: Response,
     @UploadedFile() file: Express.Multer.File,
   ) {
     const updatedUser = await this.userService.saveProfileImage(user, file);
-    const accessToken =
-      this.authenticationService.generateAccessToken(updatedUser);
-    await this.authenticationService.generateRefreshToken(
-      updatedUser,
-      response,
-    );
 
     return response.send({
-      data: {
-        accessToken: accessToken,
-      },
+      data: {},
     });
   }
 
   @Delete('/me/profile/image')
   @HttpCode(200)
   @UseGuards(JwtAccessGuard)
-  async deleteProfileImage(
-    @RequestByUser() user: User,
-    @Res() response: Response,
-  ) {
+  async deleteProfileImage(@GetUser() user: User, @Res() response: Response) {
     const updatedUser = await this.userService.deleteProfileImage(user);
-    const accessToken =
-      this.authenticationService.generateAccessToken(updatedUser);
-    await this.authenticationService.generateRefreshToken(
-      updatedUser,
-      response,
-    );
 
     return response.send({
-      data: {
-        accessToken: accessToken,
-      },
+      data: {},
     });
   }
 }

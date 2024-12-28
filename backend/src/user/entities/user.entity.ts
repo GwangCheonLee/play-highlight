@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Video } from '../../video/entities/video.entity';
 import { UserRole } from '../enums/role.enum';
+import { Exclude } from 'class-transformer';
 
 /**
  * User 엔티티 클래스입니다.
@@ -21,6 +22,14 @@ export class User {
    */
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  /**
+   * OAuth 인증 공급자의 이름입니다.
+   * 선택 사항으로, 값이 없을 경우 `null`로 저장됩니다.
+   * @type {string | null}
+   */
+  @Column({ name: 'oauth_provider', nullable: true })
+  oauthProvider?: string | null;
 
   /**
    * 사용자의 역할 목록입니다.
@@ -46,10 +55,11 @@ export class User {
   /**
    * 사용자의 비밀번호입니다.
    * 보안상의 이유로 반드시 암호화된 형태로 저장되어야 합니다.
-   * @type {string}
+   * @type {string | null}
    */
-  @Column({ name: 'password' })
-  password: string;
+  @Exclude()
+  @Column({ name: 'password', nullable: true })
+  password: string | null;
 
   /**
    * 사용자의 닉네임입니다.
@@ -69,11 +79,19 @@ export class User {
 
   /**
    * 사용자의 활성 상태를 나타냅니다.
-   * `true`이면 비활성화 상태, 기본값은 `false`입니다.
+   * 기본값은 `true`입니다.
    * @type {boolean}
    */
-  @Column('boolean', { name: 'is_disabled', default: false })
-  isDisabled: boolean;
+  @Column({ name: 'is_active', default: true })
+  isActive: boolean;
+
+  /**
+   * 사용자의 2단계 인증 비밀키입니다.
+   * 선택 사항으로, 값이 없을 경우 `null`로 저장됩니다.
+   * @type {string | null}
+   */
+  @Column({ name: 'two_factor_authentication_secret', nullable: true })
+  twoFactorAuthenticationSecret?: string | null;
 
   /**
    * 사용자가 생성된 날짜 및 시간입니다.

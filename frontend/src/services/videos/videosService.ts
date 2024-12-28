@@ -12,14 +12,14 @@ export const fetchFindVideos = async (query: fetchFindVideosQuery) => {
     ...(query.cursor && { cursor: query.cursor.toString() }),
   }).toString();
   const response: AxiosResponse<fetchFindVideosResponse, any> = await axios.get(
-    `/api/videos?${params}`,
+    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/videos?${params}`,
   );
   return response.data.data;
 };
 
 export const fetchFindVideo = async (uuid: string) => {
   const response: AxiosResponse<fetchFindVideoResponse, any> = await axios.get(
-    `/api/videos/${uuid}`,
+    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/videos/${uuid}`,
   );
   return response.data.data;
 };
@@ -29,11 +29,15 @@ export const fetchUploadVideos = async (
   accessToken: string,
 ) => {
   const response: AxiosResponse<fetchVideoUploadResponse, any> =
-    await axios.post(`/api/videos`, formData, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "multipart/form-data",
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/videos`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
       },
-    });
+    );
   return response.data.data;
 };

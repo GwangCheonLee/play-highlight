@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
-import { getBaseDir } from '../common/constant/common.constant';
 import { User } from './entities/user.entity';
 import { UserRepository } from './repositories/user.repository';
+import { getBaseDir } from '../common/constants/common.constant';
 
 @Injectable()
 export class UserService {
@@ -18,7 +18,7 @@ export class UserService {
       fs.unlink(`${profileDirPath}/${user.profileImage}`, () => {});
     }
     await this.userRepository.update(user.id, { profileImage: null });
-    return this.userRepository.getUserById(user.id);
+    return this.userRepository.findOneUserById(user.id);
   }
 
   async saveProfileImage(user: User, file: Express.Multer.File) {
@@ -37,7 +37,7 @@ export class UserService {
 
     await this.userRepository.update(user.id, { profileImage: fileName });
 
-    return this.userRepository.getUserById(user.id);
+    return this.userRepository.findOneUserById(user.id);
   }
 
   async changeNickname(user: User, nickname: string) {

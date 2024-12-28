@@ -3,10 +3,11 @@ import Redis from 'ioredis';
 import { RedisRepository } from './redis.repository';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisService } from './redis.service';
+import { ApplicationSettingModule } from '../application-setting/application-setting.module';
 
 @Global()
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, ApplicationSettingModule],
   providers: [
     {
       provide: 'REDIS_CLIENT',

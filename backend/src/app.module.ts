@@ -4,12 +4,16 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeormConfig } from './common/config/typeorm.config';
 import { ConfigModule } from '@nestjs/config';
-import { getEnvPath } from './common/constant/common.constant';
 import { validationSchemaConfig } from './common/config/validation.config';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { UserModule } from './user/user.module';
 import { VideoModule } from './video/video.module';
 import { RedisModule } from './redis/redis.module';
+import { getEnvPath } from './common/constants/common.constant';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { AppInitializationService } from './app-initialization.service';
+import { ApplicationSettingModule } from './application-setting/application-setting.module';
 
 @Module({
   imports: [
@@ -17,6 +21,7 @@ import { RedisModule } from './redis/redis.module';
     VideoModule,
     RedisModule,
     AuthenticationModule,
+    ApplicationSettingModule,
     TypeOrmModule.forRootAsync({
       useClass: TypeormConfig,
     }),
@@ -27,6 +32,13 @@ import { RedisModule } from './redis/redis.module';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    AppInitializationService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+  ],
 })
 export class AppModule {}

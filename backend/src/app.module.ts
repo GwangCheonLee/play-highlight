@@ -9,11 +9,13 @@ import { validationSchemaConfig } from './common/config/validation.config';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { UserModule } from './user/user.module';
 import { VideoModule } from './video/video.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
     UserModule,
     VideoModule,
+    RedisModule,
     AuthenticationModule,
     TypeOrmModule.forRootAsync({
       useClass: TypeormConfig,

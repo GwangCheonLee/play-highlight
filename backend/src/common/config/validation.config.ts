@@ -22,8 +22,6 @@ export const validationSchemaConfig = (): Joi.ObjectSchema => {
     TZ: Joi.string().default('UTC'),
     NODE_ENV: Joi.string().default('production'),
     SERVER_PORT: Joi.number().default(3000),
-    API_PREFIX: Joi.string().default('api'),
-    LIMIT_CONCURRENT_LOGIN: Joi.boolean().default(false),
     DB_HOST: Joi.string().required(),
     DB_PORT: Joi.string().required(),
     DB_NAME: Joi.string().required(),
@@ -42,7 +40,5 @@ export const validationSchemaConfig = (): Joi.ObjectSchema => {
     GOOGLE_AUTH_CALLBACK_URL: Joi.string().required(),
     GOOGLE_AUTH_BASE_REDIRECT_URL: Joi.string().required(),
     TWO_FACTOR_AUTHENTICATION_APP_NAME: Joi.string().required(),
-    SIGN_UP_ENABLED: Joi.boolean().required(),
-    BASE_DIR: Joi.string().optional(),
   });
 };

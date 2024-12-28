@@ -1,6 +1,9 @@
 import { IsEmail, IsString } from 'class-validator';
 
-export class SignUpDto {
+/**
+ * 회원가입 요청에 사용되는 DTO입니다.
+ */
+export class SignUpRequestBodyDto {
   @IsString()
   nickname: string;
 

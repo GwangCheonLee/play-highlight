@@ -1,18 +1,21 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { User } from '../user/entities/user.entity';
-import { USER_ROLE } from '../common/enum/role.enum';
 import { ApplicationSetting } from '../application-setting/entities/application-setting.entity';
 import { ApplicationSettingKeyEnum } from '../application-setting/enums/application-setting-key.enum';
 import { hashPlainText } from '../common/constant/encryption.constant';
+import { UserRole } from '../user/enums/role.enum';
 
 export class CreateTable1735365893457 implements MigrationInterface {
   name = 'CreateTable1735365893457';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `CREATE TYPE "public"."users_roles_enum" AS ENUM('USER', 'ADMIN')`,
+    );
     await queryRunner.query(`CREATE TABLE "users"
                              (
                                  "id"            uuid              NOT NULL DEFAULT uuid_generate_v4(),
-                                 "role"          character varying NOT NULL DEFAULT 'USER',
+                                 "roles"         "public"."users_roles_enum" array NOT NULL DEFAULT '{USER}',
                                  "email"         character varying NOT NULL,
                                  "password"      character varying NOT NULL,
                                  "nickname"      character varying NOT NULL,
@@ -41,11 +44,11 @@ export class CreateTable1735365893457 implements MigrationInterface {
                              (
                                  "id"            uuid              NOT NULL DEFAULT uuid_generate_v4(),
                                  "setting_key"   character varying NOT NULL,
-                                 "setting_value" text              NOT NULL,
                                  "value_type"    character varying NOT NULL,
                                  "description"   text,
                                  "created_at"    TIMESTAMP         NOT NULL DEFAULT now(),
                                  "updated_at"    TIMESTAMP         NOT NULL DEFAULT now(),
+                                 "setting_value" text              NOT NULL,
                                  CONSTRAINT "UQ_6dd5c58b55fb3134ddf94f835aa" UNIQUE ("setting_key"),
                                  CONSTRAINT "PK_84c911c1d401de2adbc8060b6d2" PRIMARY KEY ("id")
                              )`);
@@ -59,7 +62,7 @@ export class CreateTable1735365893457 implements MigrationInterface {
       nickname: 'admin',
       email: 'admin@example.com',
       password: hashedPassword,
-      role: USER_ROLE.ADMIN,
+      roles: [UserRole.USER, UserRole.ADMIN],
       profileImage: null,
       isDisabled: false,
     });
@@ -86,5 +89,6 @@ export class CreateTable1735365893457 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "application_settings"`);
     await queryRunner.query(`DROP TABLE "videos"`);
     await queryRunner.query(`DROP TABLE "users"`);
+    await queryRunner.query(`DROP TYPE "public"."users_roles_enum"`);
   }
 }

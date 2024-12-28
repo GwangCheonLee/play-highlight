@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { SignUpDto } from './dto/sign-up.dto';
+import { SignUpRequestBodyDto } from './dto/sign-up-request-body.dto';
 import { Response } from 'express';
 import { UserRepository } from '../user/repositories/user.repository';
 import { User } from '../user/entities/user.entity';
@@ -15,9 +15,9 @@ export class AuthenticationService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async signUp(signUpDto: SignUpDto) {
+  async signUp(signUpRequestBodyDto: SignUpRequestBodyDto) {
     const emailExists = await this.userRepository.checkEmailExists(
-      signUpDto.email,
+      signUpRequestBodyDto.email,
     );
 
     if (emailExists) {
@@ -26,10 +26,10 @@ export class AuthenticationService {
       );
     }
 
-    const hashedPassword = await hashPlainText(signUpDto.password);
+    const hashedPassword = await hashPlainText(signUpRequestBodyDto.password);
 
     return await this.userRepository.save({
-      ...signUpDto,
+      ...signUpRequestBodyDto,
       password: hashedPassword,
     });
   }
@@ -68,7 +68,7 @@ export class AuthenticationService {
   private extractPayloadFromUser(user: User) {
     return {
       id: user.id,
-      role: user.role,
+      roles: user.roles,
       nickname: user.nickname,
       email: user.email,
       profileImage: user.profileImage,

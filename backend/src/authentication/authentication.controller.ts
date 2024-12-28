@@ -9,13 +9,13 @@ import {
 } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { RequestByUser } from '../common/decorator/request-by-user.decorator';
-import { SignUpDto } from './dto/sign-up.dto';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { User } from '../user/entities/user.entity';
 import { LocalGuard } from './guards/local.guard';
 import { JwtAccessGuard } from './guards/jwt-access.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import { SignUpRequestBodyDto } from './dto/sign-up-request-body.dto';
 
 @Controller('api/authentication')
 export class AuthenticationController {
@@ -25,8 +25,11 @@ export class AuthenticationController {
   ) {}
 
   @Post('/sign-up')
-  async signUp(@Body() signUpDto: SignUpDto, @Res() response: Response) {
-    const user = await this.authenticationService.signUp(signUpDto);
+  async signUp(
+    @Body() signUpRequestBodyDto: SignUpRequestBodyDto,
+    @Res() response: Response,
+  ) {
+    const user = await this.authenticationService.signUp(signUpRequestBodyDto);
     const accessToken = this.authenticationService.generateAccessToken(user);
     await this.authenticationService.generateRefreshToken(user, response);
 

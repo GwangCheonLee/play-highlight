@@ -41,6 +41,9 @@ importers:
       cookie-parser:
         specifier: ^1.4.6
         version: 1.4.7
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.4.7
       fluent-ffmpeg:
         specifier: ^2.1.2
         version: 2.1.3

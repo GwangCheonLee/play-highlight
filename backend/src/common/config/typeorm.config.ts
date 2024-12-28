@@ -18,7 +18,7 @@ export class TypeormConfig implements TypeOrmOptionsFactory {
       logging: false,
       migrationsRun: true,
       migrations: [__dirname + '/../../migrations/*.js'],
-      entities: [__dirname + '/../../**/*.entity.js'],
+      entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
     };
   }
 }

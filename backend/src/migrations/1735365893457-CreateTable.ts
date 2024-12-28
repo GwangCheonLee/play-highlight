@@ -1,9 +1,9 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { cryptPlainText } from '../common/constant/common.constant';
 import { User } from '../user/entities/user.entity';
 import { USER_ROLE } from '../common/enum/role.enum';
 import { ApplicationSetting } from '../application-setting/entities/application-setting.entity';
 import { ApplicationSettingKeyEnum } from '../application-setting/enums/application-setting-key.enum';
+import { hashPlainText } from '../common/constant/encryption.constant';
 
 export class CreateTable1735365893457 implements MigrationInterface {
   name = 'CreateTable1735365893457';
@@ -53,7 +53,7 @@ export class CreateTable1735365893457 implements MigrationInterface {
         ADD CONSTRAINT "FK_9003d36fcc646f797c42074d82b" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
 
     const manager = queryRunner.manager;
-    const hashedPassword = await cryptPlainText('changeme');
+    const hashedPassword = await hashPlainText('changeme');
 
     await manager.save(User, {
       nickname: 'admin',

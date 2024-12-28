@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -27,11 +26,6 @@ export class AuthenticationController {
 
   @Post('/sign-up')
   async signUp(@Body() signUpDto: SignUpDto, @Res() response: Response) {
-    const signUpEnabled = this.configService.get<boolean>('SIGN_UP_ENABLED');
-    if (!signUpEnabled) {
-      throw new BadRequestException('Membership is not currently permitted.');
-    }
-
     const user = await this.authenticationService.signUp(signUpDto);
     const accessToken = this.authenticationService.generateAccessToken(user);
     await this.authenticationService.generateRefreshToken(user, response);

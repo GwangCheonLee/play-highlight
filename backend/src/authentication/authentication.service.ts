@@ -2,10 +2,10 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SignUpDto } from './dto/sign-up.dto';
-import { cryptPlainText } from '../common/constant/common.constant';
 import { Response } from 'express';
 import { UserRepository } from '../user/repositories/user.repository';
 import { User } from '../user/entities/user.entity';
+import { hashPlainText } from '../common/constant/encryption.constant';
 
 @Injectable()
 export class AuthenticationService {
@@ -26,7 +26,7 @@ export class AuthenticationService {
       );
     }
 
-    const hashedPassword = await cryptPlainText(signUpDto.password);
+    const hashedPassword = await hashPlainText(signUpDto.password);
 
     return await this.userRepository.save({
       ...signUpDto,

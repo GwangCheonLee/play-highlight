@@ -4,8 +4,8 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { decryptPlainText } from '../../common/constant/common.constant';
 import { User } from '../entities/user.entity';
+import { compareWithHash } from '../../common/constant/encryption.constant';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -33,7 +33,7 @@ export class UserRepository extends Repository<User> {
     const user = await queryBuilder.getOne();
 
     const isPasswordValid =
-      user && (await decryptPlainText(plainPassword, user.password));
+      user && (await compareWithHash(plainPassword, user.password));
 
     if (!user || !isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password.');

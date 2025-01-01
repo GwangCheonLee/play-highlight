@@ -2,13 +2,17 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { RedisService } from './redis/redis.service';
 import { ApplicationSettingRepository } from './application-setting/repositories/application-setting.repository';
 import { ApplicationSetting } from './application-setting/entities/application-setting.entity';
+import { S3Service } from './s3/s3.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AppInitializationService implements OnApplicationBootstrap {
   private readonly logger = new Logger(AppInitializationService.name);
 
   constructor(
+    private readonly s3Service: S3Service,
     private readonly redisService: RedisService,
+    private readonly configService: ConfigService,
     private readonly applicationSettingRepository: ApplicationSettingRepository,
   ) {}
 
@@ -20,7 +24,9 @@ export class AppInitializationService implements OnApplicationBootstrap {
     this.logger.log('Starting application initialization...');
     try {
       await this.initializeDefaultApplicationSettings();
-      this.logger.log('Application settings initialized successfully.');
+      this.logger.debug('Application settings initialized successfully.');
+      await this.initializeS3Bucket();
+      this.logger.debug('Application initialization complete.');
     } catch (error) {
       this.logger.error(
         'Failed to initialize application settings',
@@ -32,9 +38,11 @@ export class AppInitializationService implements OnApplicationBootstrap {
   /**
    * 기본 애플리케이션 설정을 Redis에 저장하는 함수입니다.
    * 데이터베이스에서 설정값을 가져와 Redis에 병렬로 저장합니다.
+   *
+   * @return {Promise<void>}
    */
   async initializeDefaultApplicationSettings(): Promise<void> {
-    this.logger.log('Fetching application settings from database...');
+    this.logger.debug('Fetching application settings from database...');
     const applicationSettings: ApplicationSetting[] =
       await this.applicationSettingRepository.find();
 
@@ -43,11 +51,10 @@ export class AppInitializationService implements OnApplicationBootstrap {
       return;
     }
 
-    this.logger.log(
+    this.logger.debug(
       `Found ${applicationSettings.length} application settings. Saving to Redis...`,
     );
 
-    // 병렬로 Redis에 설정값 저장
     const redisPromises: Promise<void>[] = applicationSettings.map((setting) =>
       this.redisService.setApplicationSetting(
         setting.settingKey,
@@ -57,8 +64,29 @@ export class AppInitializationService implements OnApplicationBootstrap {
 
     await Promise.all(redisPromises);
 
-    this.logger.log(
+    this.logger.debug(
       `Successfully saved ${applicationSettings.length} application settings to Redis.`,
     );
+  }
+
+  /**
+   * S3 Bucket이 존재하는지 확인하고 없으면 생성하는 함수입니다.
+   *
+   * @return {Promise<void>}
+   * @throws {Error} Bucket 생성 중 에러 발생 시
+   *
+   */
+  async initializeS3Bucket(): Promise<void> {
+    const bucketName = this.configService.get<string>('AWS_S3_BUCKET_NAME');
+
+    const exists = await this.s3Service.isBucketExists(bucketName);
+
+    if (!exists) {
+      this.logger.debug(`Bucket ${bucketName} does not exist. Creating...`);
+      await this.s3Service.createNewBucket(bucketName);
+      this.logger.debug(`Bucket ${bucketName} created successfully.`);
+    } else {
+      this.logger.debug(`Bucket ${bucketName} already exists.`);
+    }
   }
 }

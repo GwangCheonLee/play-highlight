@@ -14,9 +14,11 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { AppInitializationService } from './app-initialization.service';
 import { ApplicationSettingModule } from './application-setting/application-setting.module';
+import { S3Module } from './s3/s3.module';
 
 @Module({
   imports: [
+    S3Module,
     UserModule,
     VideoModule,
     RedisModule,

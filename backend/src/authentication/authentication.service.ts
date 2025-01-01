@@ -15,6 +15,9 @@ import { UserWithoutPassword } from '../user/types/user.type';
 import { toFileStream } from 'qrcode';
 import { ApplicationSettingKeyEnum } from '../application-setting/enums/application-setting-key.enum';
 
+/**
+ * 사용자 인증과 관련된 모든 기능을 담당하는 서비스 클래스입니다.
+ */
 @Injectable()
 export class AuthenticationService {
   constructor(

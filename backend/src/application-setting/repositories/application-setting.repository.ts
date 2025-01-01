@@ -3,6 +3,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ApplicationSetting } from '../entities/application-setting.entity';
 import { ApplicationSettingKeyEnum } from '../enums/application-setting-key.enum';
 
+/*
+ * ApplicationSettingRepository는 ApplicationSetting 엔티티에 대한 데이터베이스 작업을 수행합니다.
+ */
 @Injectable()
 export class ApplicationSettingRepository extends Repository<ApplicationSetting> {
   constructor(dataSource: DataSource) {

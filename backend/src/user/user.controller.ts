@@ -20,6 +20,9 @@ import { JwtAccessGuard } from '../authentication/guards/jwt-access.guard';
 import { GetUser } from './decorators/get-user';
 import { ChangeNicknameRequestBodyDto } from './dto/change-nickname-request-body.dto';
 
+/**
+ * 사용자 정보를 처리하는 컨트롤러입니다.
+ */
 @Controller({ version: '1', path: 'users' })
 export class UserController {
   private readonly logger = new Logger(UserController.name);
@@ -37,6 +40,13 @@ export class UserController {
     return user;
   }
 
+  /**
+   * 현재 로그인한 사용자의 닉네임을 변경합니다.
+   *
+   * @param {User} user 현재 로그인한 사용자
+   * @param {ChangeNicknameRequestBodyDto} dto 변경할 닉네임
+   * @return {Promise<User>} 변경된 사용자 정보
+   */
   @Patch('/me/nickname')
   @HttpCode(200)
   @UseGuards(JwtAccessGuard)
@@ -47,6 +57,13 @@ export class UserController {
     return this.userService.changeNickname(user, dto.nickname);
   }
 
+  /**
+   * 현재 로그인한 사용자의 프로필 이미지를 변경합니다.
+   *
+   * @param {User} user 현재 로그인한 사용자
+   * @param {Response} response 응답 객체
+   * @param {Express.Multer.File} file 변경할 프로필 이미지 파일
+   */
   @Patch('/me/profile/image')
   @HttpCode(200)
   @UseGuards(JwtAccessGuard)
@@ -65,6 +82,12 @@ export class UserController {
     });
   }
 
+  /**
+   * 현재 로그인한 사용자의 프로필 이미지를 삭제합니다.
+   *
+   * @param {User} user 현재 로그인한 사용자
+   * @param {Response} response 응답 객체
+   */
   @Delete('/me/profile/image')
   @HttpCode(200)
   @UseGuards(JwtAccessGuard)

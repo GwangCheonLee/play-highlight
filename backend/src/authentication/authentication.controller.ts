@@ -24,6 +24,9 @@ import { GetUser } from '../user/decorators/get-user';
 import { User } from '../user/entities/user.entity';
 import RequestWithUser from '../user/interfaces/request-with-user.interface';
 
+/**
+ * 인증과 관련된 엔드포인트를 처리하는 컨트롤러입니다.
+ */
 @Controller({ version: '1', path: 'authentication' })
 export class AuthenticationController {
   constructor(

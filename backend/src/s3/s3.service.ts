@@ -3,8 +3,11 @@ import {
   Bucket,
   CreateBucketCommand,
   GetObjectCommand,
+  GetObjectCommandOutput,
   ListBucketsCommand,
+  PutBucketPolicyCommand,
   PutObjectCommand,
+  PutObjectCommandOutput,
   S3Client,
 } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
@@ -59,21 +62,69 @@ export class S3Service {
   }
 
   /**
-   * 새로운 S3 버킷을 생성합니다.
+   * S3에 Private 버킷을 생성합니다.
    *
    * @param {string} bucketName 생성할 버킷 이름
-   * @throws {Error} 생성 중 오류가 발생하면 에러를 던집니다.
+   * @return {Promise<void>}
    */
-  async createNewBucket(bucketName: string): Promise<void> {
-    const command = new CreateBucketCommand({
-      Bucket: bucketName,
-    });
-
+  async createPrivateBucket(bucketName: string): Promise<void> {
     try {
-      await this.s3Client.send(command);
-      this.logger.log(`Bucket created successfully: ${bucketName}`);
+      await this.s3Client.send(
+        new CreateBucketCommand({
+          Bucket: bucketName,
+        }),
+      );
+
+      this.logger.log(`Private bucket created: ${bucketName}`);
     } catch (error) {
-      this.logger.error('Error creating bucket:', error);
+      if (error.name === 'MalformedXML') {
+        this.logger.error(
+          'Malformed XML in request. Check the request body or headers.',
+        );
+      }
+      this.logger.error(`Error creating private bucket ${bucketName}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * S3에 Public 버킷을 생성합니다.
+   *
+   * @param {string} bucketName 생성할 버킷 이름
+   * @return {Promise<void>}
+   */
+  async createPublicBucket(bucketName: string): Promise<void> {
+    try {
+      // 1. 버킷 생성
+      await this.s3Client.send(
+        new CreateBucketCommand({
+          Bucket: bucketName,
+        }),
+      );
+
+      // 2. 퍼블릭 읽기 버킷 정책 설정
+      const publicReadPolicy = {
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Effect: 'Allow',
+            Principal: '*',
+            Action: 's3:GetObject',
+            Resource: `arn:aws:s3:::${bucketName}/*`,
+          },
+        ],
+      };
+
+      await this.s3Client.send(
+        new PutBucketPolicyCommand({
+          Bucket: bucketName,
+          Policy: JSON.stringify(publicReadPolicy),
+        }),
+      );
+
+      this.logger.log(`Public bucket created: ${bucketName}`);
+    } catch (error) {
+      this.logger.error(`Error creating public bucket ${bucketName}:`, error);
       throw error;
     }
   }
@@ -85,6 +136,7 @@ export class S3Service {
    * @param {string} key 파일의 키(이름)
    * @param {Buffer | Readable | string} body 업로드할 파일의 내용
    * @param {string} contentType 파일의 MIME 타입
+   * @return {Promise<string>} 업로드한 파일의 ETag
    * @throws {Error} 업로드 중 오류가 발생하면 에러를 던집니다.
    */
   async upload(
@@ -92,7 +144,7 @@ export class S3Service {
     key: string,
     body: Buffer | Readable | string,
     contentType: string,
-  ): Promise<void> {
+  ): Promise<string> {
     const command = new PutObjectCommand({
       Bucket: bucketName,
       Key: key,
@@ -101,8 +153,11 @@ export class S3Service {
     });
 
     try {
-      await this.s3Client.send(command);
+      const response: PutObjectCommandOutput =
+        await this.s3Client.send(command);
       this.logger.log(`File uploaded successfully to ${bucketName}/${key}`);
+
+      return response.ETag;
     } catch (error) {
       this.logger.error('Error uploading file:', error);
       throw error;
@@ -124,7 +179,8 @@ export class S3Service {
     });
 
     try {
-      const response = await this.s3Client.send(command);
+      const response: GetObjectCommandOutput =
+        await this.s3Client.send(command);
       const stream = response.Body as Readable;
       const chunks: any[] = [];
       for await (const chunk of stream) {

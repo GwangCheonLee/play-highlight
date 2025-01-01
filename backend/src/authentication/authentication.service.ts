@@ -107,6 +107,17 @@ export class AuthenticationService {
   async signUp(
     signUpRequestBodyDto: SignUpRequestBodyDto,
   ): Promise<UserWithoutPassword> {
+    const isSignUpRestriction: boolean =
+      await this.redisService.getApplicationSetting(
+        ApplicationSettingKeyEnum.SIGN_UP_RESTRICTION,
+      );
+
+    if (isSignUpRestriction) {
+      throw new ConflictException(
+        'Sign up is restricted. Please try again later.',
+      );
+    }
+
     const emailExists = await this.userRepository.isEmailRegistered(
       signUpRequestBodyDto.email,
     );
@@ -141,6 +152,17 @@ export class AuthenticationService {
     );
 
     if (!registeredUser) {
+      const isSignUpRestriction: boolean =
+        await this.redisService.getApplicationSetting(
+          ApplicationSettingKeyEnum.SIGN_UP_RESTRICTION,
+        );
+
+      if (isSignUpRestriction) {
+        throw new ConflictException(
+          'Sign up is restricted. Please try again later.',
+        );
+      }
+
       // 새 사용자 등록 후 반환
       return this.userRepository.save({
         oauthProvider: user.oauthProvider,

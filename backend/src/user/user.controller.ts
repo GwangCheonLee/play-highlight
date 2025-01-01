@@ -18,6 +18,7 @@ import * as multer from 'multer';
 import { User } from './entities/user.entity';
 import { JwtAccessGuard } from '../authentication/guards/jwt-access.guard';
 import { GetUser } from './decorators/get-user';
+import { ChangeNicknameRequestBodyDto } from './dto/change-nickname-request-body.dto';
 
 @Controller({ version: '1', path: 'users' })
 export class UserController {
@@ -39,16 +40,11 @@ export class UserController {
   @Patch('/me/nickname')
   @HttpCode(200)
   @UseGuards(JwtAccessGuard)
-  async changeNickname(
+  changeNickname(
     @GetUser() user: User,
-    @Res() response: Response,
-    @Body('nickname') nickname: string,
+    @Body() dto: ChangeNicknameRequestBodyDto,
   ) {
-    const updatedUser = await this.userService.changeNickname(user, nickname);
-
-    return response.send({
-      data: {},
-    });
+    return this.userService.changeNickname(user, dto.nickname);
   }
 
   @Patch('/me/profile/image')

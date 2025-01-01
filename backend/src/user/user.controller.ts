@@ -11,7 +11,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Express, Response } from 'express';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
@@ -43,7 +43,7 @@ export class UserController {
   changeNickname(
     @GetUser() user: User,
     @Body() dto: ChangeNicknameRequestBodyDto,
-  ) {
+  ): Promise<User> {
     return this.userService.changeNickname(user, dto.nickname);
   }
 

@@ -131,7 +131,7 @@ export class RedisService {
     settingKey: ApplicationSettingKeyEnum,
     settingValue: string,
   ): Promise<void> {
-    this.logger.log(
+    this.logger.debug(
       `Saving application setting for key: ${settingKey} to Redis...`,
     );
 
@@ -141,7 +141,7 @@ export class RedisService {
       3600,
     );
 
-    this.logger.log(
+    this.logger.debug(
       `Application setting for key: ${settingKey} saved to Redis with TTL of 3600 seconds.`,
     );
   }

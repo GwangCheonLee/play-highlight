@@ -47,7 +47,7 @@ export class UserController {
    * @param {ChangeNicknameRequestBodyDto} dto 변경할 닉네임
    * @return {Promise<User>} 변경된 사용자 정보
    */
-  @Patch('/me/nickname')
+  @Patch('/me/profile/nickname')
   @HttpCode(200)
   @UseGuards(JwtAccessGuard)
   changeNickname(
@@ -61,7 +61,6 @@ export class UserController {
    * 현재 로그인한 사용자의 프로필 이미지를 변경합니다.
    *
    * @param {User} user 현재 로그인한 사용자
-   * @param {Response} response 응답 객체
    * @param {Express.Multer.File} file 변경할 프로필 이미지 파일
    */
   @Patch('/me/profile/image')
@@ -70,16 +69,13 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor('profileImage', { storage: multer.memoryStorage() }),
   )
-  async changeProfileImage(
+  async updateProfileImage(
     @GetUser() user: User,
-    @Res() response: Response,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const updatedUser = await this.userService.saveProfileImage(user, file);
+    const updatedUser = await this.userService.updateProfileImage(user, file);
 
-    return response.send({
-      data: {},
-    });
+    return 'true';
   }
 
   /**
@@ -91,8 +87,8 @@ export class UserController {
   @Delete('/me/profile/image')
   @HttpCode(200)
   @UseGuards(JwtAccessGuard)
-  async deleteProfileImage(@GetUser() user: User, @Res() response: Response) {
-    const updatedUser = await this.userService.deleteProfileImage(user);
+  async removeProfileImage(@GetUser() user: User, @Res() response: Response) {
+    const updatedUser = await this.userService.removeProfileImage(user);
 
     return response.send({
       data: {},

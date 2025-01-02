@@ -9,6 +9,7 @@ import {
 import { Video } from '../../video/entities/video.entity';
 import { UserRole } from '../enums/role.enum';
 import { Exclude } from 'class-transformer';
+import { FileMetadata } from '../../file-metadata/entities/file-metadata.entity';
 
 /**
  * User 엔티티 클래스입니다.
@@ -94,6 +95,20 @@ export class User {
   twoFactorAuthenticationSecret?: string | null;
 
   /**
+   * 사용자가 업로드한 비디오 목록입니다.
+   * @type {Video[]}
+   */
+  @OneToMany(() => Video, (video) => video.user)
+  videos: Video[];
+
+  /**
+   * 사용자가 소유한 파일 목록.
+   * OneToMany로 FileMetadata와 연결.
+   */
+  @OneToMany(() => FileMetadata, (file) => file.owner)
+  files: FileMetadata[];
+
+  /**
    * 사용자가 생성된 날짜 및 시간입니다.
    * 자동으로 설정됩니다.
    * @type {Date}
@@ -108,11 +123,4 @@ export class User {
    */
   @UpdateDateColumn()
   updatedAt: Date;
-
-  /**
-   * 사용자가 업로드한 비디오 목록입니다.
-   * @type {Video[]}
-   */
-  @OneToMany(() => Video, (video) => video.user)
-  videos: Video[];
 }

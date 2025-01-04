@@ -6,12 +6,11 @@ import {
   HttpCode,
   Logger,
   Patch,
-  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Express, Response } from 'express';
+import { Express } from 'express';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
@@ -106,16 +105,12 @@ export class UserController {
    * 현재 로그인한 사용자의 프로필 이미지를 삭제합니다.
    *
    * @param {User} user 현재 로그인한 사용자
-   * @param {Response} response 응답 객체
+   * @return {Promise<User>} 변경된 사용자 정보
    */
   @Delete('/me/profile/image')
   @HttpCode(200)
   @UseGuards(JwtAccessGuard)
-  async removeProfileImage(@GetUser() user: User, @Res() response: Response) {
-    const updatedUser = await this.userService.removeProfileImage(user);
-
-    return response.send({
-      data: {},
-    });
+  removeProfileImage(@GetUser() user: User): Promise<User> {
+    return this.userService.removeProfileImage(user);
   }
 }

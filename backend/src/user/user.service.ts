@@ -1,9 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import * as path from 'path';
-import * as fs from 'fs';
 import { User } from './entities/user.entity';
 import { UserRepository } from './repositories/user.repository';
-import { getBaseDir } from '../common/constants/common.constant';
 import { Express } from 'express';
 import { UserRole } from './enums/role.enum';
 import { hashPlainText } from '../common/constants/encryption.constant';
@@ -73,48 +70,66 @@ export class UserService {
     return this.userRepository.findOneBy({ id: user.id });
   }
 
-  async removeProfileImage(user: User) {
-    const baseDir = path.join(getBaseDir(), 'profiles');
-    const profileDirPath = path.join(baseDir, `${user.id}`);
-
-    if (user.profileImage) {
-      fs.unlink(`${profileDirPath}/${user.profileImage}`, () => {});
-    }
-    await this.userRepository.update(user.id, { profileImage: null });
-    return this.userRepository.findOneUserById(user.id);
-  }
-
   /**
    * 사용자의 프로필 이미지를 변경합니다.
    *
    * @param {User} user 현재 로그인한 사용자
-   * @param {Express.Multer.File} file 변경할 프로필 이미지 파일
+   * @param {Express.Multer.File} uploadedFile 변경할 프로필 이미지 파일
    */
-  async updateProfileImage(user: User, file: Express.Multer.File) {
+  async updateProfileImage(user: User, uploadedFile: Express.Multer.File) {
     if (user.profileImage) {
-      const beforeFileMetadata =
+      const previousProfileImageMetadata =
         await this.fileMetadataService.getOneFileMetadata(
           this.publicBucketName,
           user.profileImage,
           user.id,
         );
 
-      if (beforeFileMetadata) {
+      if (previousProfileImageMetadata) {
         await this.fileMetadataService.softDeleteFileMetadata(
-          beforeFileMetadata.key,
+          previousProfileImageMetadata.key,
         );
       }
     }
 
-    const fileMetadata: FileMetadata = await this.fileService.saveFile(
-      file,
-      AccessTypeEnum.PUBLIC,
-      user.id,
-    );
+    const newProfileImageMetadata: FileMetadata =
+      await this.fileService.saveFile(
+        uploadedFile,
+        AccessTypeEnum.PUBLIC,
+        user.id,
+      );
     await this.userRepository.update(user.id, {
-      profileImage: fileMetadata.storageLocation,
+      profileImage: newProfileImageMetadata.storageLocation,
     });
 
+    return this.userRepository.findOneUserById(user.id);
+  }
+
+  /**
+   * 사용자의 프로필 이미지를 삭제합니다.
+   *
+   * @param {User} user 현재 로그인한 사용자
+   * @return {Promise<User>} 현재 로그인한 사용자의 정보
+   */
+  async removeProfileImage(user: User): Promise<User> {
+    if (!user.profileImage) {
+      return user;
+    }
+
+    const previousProfileImageMetadata =
+      await this.fileMetadataService.getOneFileMetadata(
+        this.publicBucketName,
+        user.profileImage,
+        user.id,
+      );
+
+    if (previousProfileImageMetadata) {
+      await this.fileMetadataService.softDeleteFileMetadata(
+        previousProfileImageMetadata.key,
+      );
+    }
+
+    await this.userRepository.update(user.id, { profileImage: null });
     return this.userRepository.findOneUserById(user.id);
   }
 

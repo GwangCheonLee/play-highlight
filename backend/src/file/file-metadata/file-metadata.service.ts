@@ -32,6 +32,12 @@ export class FileMetadataService {
     });
   }
 
+  /**
+   * 파일 메타데이터를 삭제합니다.
+   *
+   * @param {string} key - 파일 메타데이터 키
+   * @return {Promise<void>}
+   */
   async deleteFileMetadata(key: string): Promise<void> {
     await this.fileMetadataRepository.delete(key);
   }

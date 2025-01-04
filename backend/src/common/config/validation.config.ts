@@ -24,6 +24,7 @@ export const validationSchemaConfig = (): Joi.ObjectSchema => {
     NODE_ENV: Joi.string().default('production'),
     SERVER_PORT: Joi.number().default(3000),
     API_PREFIX: Joi.string().default('api'),
+    PROJECT_NAME: Joi.string().default('play-highlight'),
 
     // 데이터베이스
     DB_HOST: Joi.string().required(),
@@ -55,7 +56,6 @@ export const validationSchemaConfig = (): Joi.ObjectSchema => {
     AWS_S3_ACCESS_KEY_ID: Joi.string().required(),
     AWS_S3_SECRET_ACCESS_KEY: Joi.string().required(),
     AWS_S3_ENDPOINT: Joi.string().required(),
-    AWS_S3_BUCKET_NAME: Joi.string().default('play-highlight'),
 
     // 2FA
     TWO_FACTOR_AUTHENTICATION_APP_NAME: Joi.string().required(),

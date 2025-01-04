@@ -9,7 +9,7 @@ import {
 import { Video } from '../../video/entities/video.entity';
 import { UserRole } from '../enums/role.enum';
 import { Exclude } from 'class-transformer';
-import { FileMetadata } from '../../file-metadata/entities/file-metadata.entity';
+import { FileMetadata } from '../../file/file-metadata/entities/file-metadata.entity';
 
 /**
  * User 엔티티 클래스입니다.

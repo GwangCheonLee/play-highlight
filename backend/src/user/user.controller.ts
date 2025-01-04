@@ -18,7 +18,8 @@ import * as multer from 'multer';
 import { User } from './entities/user.entity';
 import { JwtAccessGuard } from '../authentication/guards/jwt-access.guard';
 import { GetUser } from './decorators/get-user';
-import { ChangeNicknameRequestBodyDto } from './dto/change-nickname-request-body.dto';
+import { UpdateNicknameRequestBodyDto } from './dto/update-nickname-request-body.dto';
+import { UpdateEmailRequestBodyDto } from './dto/update-email-request-body.dto';
 
 /**
  * 사용자 정보를 처리하는 컨트롤러입니다.
@@ -44,17 +45,34 @@ export class UserController {
    * 현재 로그인한 사용자의 닉네임을 변경합니다.
    *
    * @param {User} user 현재 로그인한 사용자
-   * @param {ChangeNicknameRequestBodyDto} dto 변경할 닉네임
+   * @param {UpdateNicknameRequestBodyDto} dto 변경할 닉네임
    * @return {Promise<User>} 변경된 사용자 정보
    */
   @Patch('/me/profile/nickname')
   @HttpCode(200)
   @UseGuards(JwtAccessGuard)
-  changeNickname(
+  updateNickname(
     @GetUser() user: User,
-    @Body() dto: ChangeNicknameRequestBodyDto,
+    @Body() dto: UpdateNicknameRequestBodyDto,
   ): Promise<User> {
-    return this.userService.changeNickname(user, dto.nickname);
+    return this.userService.updateNickname(user, dto.nickname);
+  }
+
+  /**
+   * 현재 로그인한 사용자의 이메일을 변경합니다.
+   *
+   * @param {User} user 현재 로그인한 사용자
+   * @param {UpdateEmailRequestBodyDto} dto 변경할 닉네임
+   * @return {Promise<User>} 변경된 사용자 정보
+   */
+  @Patch('/me/profile/email')
+  @HttpCode(200)
+  @UseGuards(JwtAccessGuard)
+  updateEmail(
+    @GetUser() user: User,
+    @Body() dto: UpdateEmailRequestBodyDto,
+  ): Promise<User> {
+    return this.userService.updateEmail(user, dto.email);
   }
 
   /**
@@ -73,7 +91,8 @@ export class UserController {
     @GetUser() user: User,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const updatedUser = await this.userService.updateProfileImage(user, file);
+    console.log(file);
+    // const updatedUser = await this.userService.updateProfileImage(user, file);
 
     return 'true';
   }

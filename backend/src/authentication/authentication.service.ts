@@ -10,7 +10,6 @@ import { Binary } from 'typeorm';
 import { UserRepository } from '../user/repositories/user.repository';
 import { User } from '../user/entities/user.entity';
 import { extractPayloadFromUser } from '../user/constants/user.constant';
-import { getPackageJsonField } from '../common/utils/package-info.util';
 import { UserWithoutPassword } from '../user/types/user.type';
 import { toFileStream } from 'qrcode';
 import { ApplicationSettingKeyEnum } from '../application-setting/enums/application-setting-key.enum';
@@ -46,7 +45,7 @@ export class AuthenticationService {
       {
         secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
         expiresIn: `${accessTokenExpirationTime}s`,
-        issuer: getPackageJsonField('name'),
+        issuer: this.configService.get('PROJECT_NAME'),
         audience: user.email,
         algorithm: 'HS256',
       },
@@ -83,7 +82,7 @@ export class AuthenticationService {
       {
         secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
         expiresIn: `${refreshTokenExpirationTime}s`,
-        issuer: getPackageJsonField('name'),
+        issuer: this.configService.get('PROJECT_NAME'),
         audience: user.email,
         algorithm: 'HS256',
       },

@@ -2,8 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import {
   Bucket,
   CreateBucketCommand,
+  DeleteObjectCommand,
   GetObjectCommand,
   GetObjectCommandOutput,
+  HeadObjectCommand,
   ListBucketsCommand,
   PutBucketPolicyCommand,
   PutObjectCommand,
@@ -13,6 +15,7 @@ import {
 import { Readable } from 'stream';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ConfigService } from '@nestjs/config';
+import { S3UploadResult } from './types/s3-upload-result.type';
 
 @Injectable()
 export class S3Service {
@@ -136,7 +139,7 @@ export class S3Service {
    * @param {string} key 파일의 키(이름)
    * @param {Buffer | Readable | string} body 업로드할 파일의 내용
    * @param {string} contentType 파일의 MIME 타입
-   * @return {Promise<string>} 업로드한 파일의 ETag
+   * @return {Promise<S3UploadResult>} 업로드한 파일의 정보
    * @throws {Error} 업로드 중 오류가 발생하면 에러를 던집니다.
    */
   async upload(
@@ -144,7 +147,7 @@ export class S3Service {
     key: string,
     body: Buffer | Readable | string,
     contentType: string,
-  ): Promise<string> {
+  ): Promise<S3UploadResult> {
     const command = new PutObjectCommand({
       Bucket: bucketName,
       Key: key,
@@ -157,7 +160,10 @@ export class S3Service {
         await this.s3Client.send(command);
       this.logger.log(`File uploaded successfully to ${bucketName}/${key}`);
 
-      return response.ETag;
+      return {
+        etag: response.ETag,
+        location: `${bucketName}/${key}`,
+      };
     } catch (error) {
       this.logger.error('Error uploading file:', error);
       throw error;
@@ -247,6 +253,54 @@ export class S3Service {
       return url;
     } catch (error) {
       this.logger.error('Error generating signed URL:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 특정 파일이 S3에 존재하는지 확인 (true/false 반환)
+   *
+   * @param {string} bucketName 파일이 존재하는지 확인할 버킷 이름
+   * @param {string} key 파일의 키(이름)
+   * @return {Promise<boolean>} 파일 존재 여부
+   */
+  async isFileExists(bucketName: string, key: string): Promise<boolean> {
+    try {
+      // 파일 정보 확인을 위해 HeadObjectCommand 사용
+      const command = new HeadObjectCommand({
+        Bucket: bucketName,
+        Key: key,
+      });
+      await this.s3Client.send(command);
+
+      return true;
+    } catch (error) {
+      if (error.name === 'NotFound') {
+        // S3가 404를 반환하면 파일이 없는 것
+        return false;
+      }
+      this.logger.error('Error checking file existence:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * S3에서 특정 파일을 삭제
+   *
+   * @param {string} bucketName 삭제할 파일이 있는 버킷 이름
+   * @param {string} key 삭제할 파일의 키(이름)
+   * @return {Promise<void>}
+   */
+  async deleteFile(bucketName: string, key: string): Promise<void> {
+    const command = new DeleteObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+    });
+    try {
+      await this.s3Client.send(command);
+      this.logger.log(`File deleted successfully from ${bucketName}/${key}`);
+    } catch (error) {
+      this.logger.error('Error deleting file:', error);
       throw error;
     }
   }

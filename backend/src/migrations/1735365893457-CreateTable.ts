@@ -12,21 +12,22 @@ export class CreateTable1735365893457 implements MigrationInterface {
     await queryRunner.query(`CREATE TABLE "file_metadata"
                              (
                                  "key"              character varying(36)  NOT NULL,
-                                 "owner_id"         uuid                   NOT NULL,
-                                 "original_name"    character varying(255) NOT NULL,
+                                 CONSTRAINT "PK_563b3bf09a6fa7bccea74d3ec03" PRIMARY KEY ("key"),
                                  "bucket_name"      character varying(255) NOT NULL,
+                                 "original_name"    character varying(255) NOT NULL,
+                                 "extension"        character varying(10)  NOT NULL,
                                  "storage_location" character varying(255) NOT NULL,
                                  "mime_type"        character varying(100) NOT NULL,
-                                 "extension"        character varying(10)  NOT NULL,
                                  "file_size"        bigint                 NOT NULL,
                                  "checksum"         character varying(40)  NOT NULL,
                                  "is_public"        boolean                NOT NULL DEFAULT true,
+                                 "is_deleted"       boolean                NOT NULL DEFAULT false,
                                  "createdAt"        TIMESTAMP              NOT NULL DEFAULT now(),
                                  "updatedAt"        TIMESTAMP              NOT NULL DEFAULT now(),
-                                 CONSTRAINT "PK_563b3bf09a6fa7bccea74d3ec03" PRIMARY KEY ("key")
+                                 "owner_id"         uuid                   NOT NULL
                              )`);
     await queryRunner.query(
-      `CREATE TYPE "public"."users_roles_enum" AS ENUM('USER', 'ADMIN')`,
+      `CREATE TYPE "public"."users_roles_enum" AS ENUM('USER', 'ADMIN', 'ROOT')`,
     );
     await queryRunner.query(`CREATE TABLE "users"
                              (
@@ -80,10 +81,21 @@ export class CreateTable1735365893457 implements MigrationInterface {
 
     await manager.save(User, {
       oauthProvider: null,
-      nickname: 'admin',
-      email: 'admin@example.com',
+      nickname: 'root',
+      email: 'root@play-highlight.com',
       password: hashedPassword,
-      roles: [UserRole.USER, UserRole.ADMIN],
+      roles: [UserRole.ROOT],
+      profileImage: null,
+      isActive: true,
+      twoFactorAuthenticationSecret: null,
+    });
+
+    await manager.save(User, {
+      oauthProvider: null,
+      nickname: 'asset',
+      email: 'asset@play-highlight.com',
+      password: null,
+      roles: [UserRole.ROOT],
       profileImage: null,
       isActive: true,
       twoFactorAuthenticationSecret: null,

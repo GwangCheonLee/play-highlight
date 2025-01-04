@@ -2,20 +2,32 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { RedisService } from './redis/redis.service';
 import { ApplicationSettingRepository } from './application-setting/repositories/application-setting.repository';
 import { ApplicationSetting } from './application-setting/entities/application-setting.entity';
-import { S3Service } from './s3/s3.service';
+import { S3Service } from './file/s3/s3.service';
 import { ConfigService } from '@nestjs/config';
-import { AccessTypeEnum } from './s3/enums/access-type.enum';
+import { AccessTypeEnum } from './file/enums/access-type.enum';
+import { join } from 'path';
+import { readFileSync } from 'node:fs';
+import { FileService } from './file/file.service';
+import { BufferUploadMetadata } from './file/types/buffer-upload-metadata.type';
+import { UserService } from './user/user.service';
+import { User } from './user/entities/user.entity';
 
 @Injectable()
 export class AppInitializationService implements OnApplicationBootstrap {
   private readonly logger = new Logger(AppInitializationService.name);
 
+  private readonly publicBucketName: string;
+
   constructor(
     private readonly s3Service: S3Service,
+    private readonly fileService: FileService,
+    private readonly userService: UserService,
     private readonly redisService: RedisService,
     private readonly configService: ConfigService,
     private readonly applicationSettingRepository: ApplicationSettingRepository,
-  ) {}
+  ) {
+    this.publicBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PUBLIC}`;
+  }
 
   /**
    * 애플리케이션 초기화 시 실행되는 함수입니다.
@@ -28,6 +40,10 @@ export class AppInitializationService implements OnApplicationBootstrap {
       this.logger.debug('Application settings initialized successfully.');
       await this.initializeS3Bucket();
       this.logger.debug('Application initialization complete.');
+      await this.uploadDefaultAssets();
+      this.logger.debug('Default assets uploaded successfully.');
+      await this.userService.ensureRootUsersExist();
+      this.logger.debug('Root users initialized successfully.');
     } catch (error) {
       this.logger.error(
         'Failed to initialize application settings',
@@ -78,8 +94,7 @@ export class AppInitializationService implements OnApplicationBootstrap {
    *
    */
   async initializeS3Bucket(): Promise<void> {
-    const defaultBucketName =
-      this.configService.get<string>('AWS_S3_BUCKET_NAME');
+    const defaultBucketName = this.configService.get<string>('PROJECT_NAME');
 
     for (const accessType of Object.values(AccessTypeEnum)) {
       const bucketName = `${defaultBucketName}-${accessType}`;
@@ -100,5 +115,45 @@ export class AppInitializationService implements OnApplicationBootstrap {
         this.logger.debug(`Bucket ${bucketName} already exists.`);
       }
     }
+  }
+
+  /**
+   * 기본 Assets을 S3 버킷에 업로드하는 함수입니다.
+   *
+   * @return {Promise<void>}
+   */
+  async uploadDefaultAssets(): Promise<void> {
+    const assetUser: User = await this.userService.getOrCreateAssetUser();
+
+    const fileExists = await this.fileService.isFileExists(
+      AccessTypeEnum.PUBLIC,
+      'default_profile.png',
+      assetUser.id,
+    );
+
+    if (fileExists) {
+      return;
+    }
+
+    const defaultProfileImagePath: string = join(
+      process.cwd(),
+      'assets',
+      'default_profile.png',
+    );
+    const defaultProfileImageBuffer: Buffer = readFileSync(
+      defaultProfileImagePath,
+    );
+
+    const bufferUploadMetadata: BufferUploadMetadata = {
+      buffer: defaultProfileImageBuffer,
+      accessType: AccessTypeEnum.PUBLIC,
+      contentType: 'image/png',
+      originalName: 'default_profile.png',
+      extension: 'png',
+      mimeType: 'image/png',
+      ownerId: assetUser.id,
+    };
+
+    await this.fileService.saveBufferAsFile(bufferUploadMetadata);
   }
 }

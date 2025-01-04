@@ -7,7 +7,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
+import { User } from '../../../user/entities/user.entity';
 
 @Entity('file_metadata')
 export class FileMetadata {
@@ -20,6 +20,13 @@ export class FileMetadata {
   key: string;
 
   /**
+   * 파일이 저장된 버킷 이름을 나타냅니다.
+   * @type {string}
+   */
+  @Column({ type: 'varchar', name: 'bucket_name', length: 255 })
+  bucketName: string;
+
+  /**
    * 파일의 원본 이름을 나타냅니다.
    * @type {string}
    */
@@ -27,11 +34,11 @@ export class FileMetadata {
   originalName: string;
 
   /**
-   * 파일이 저장된 버킷 이름을 나타냅니다.
+   * 파일의 확장자를 나타냅니다.
    * @type {string}
    */
-  @Column({ type: 'varchar', name: 'bucket_name', length: 255 })
-  bucketName: string;
+  @Column({ type: 'varchar', name: 'extension', length: 10 })
+  extension: string;
 
   /**
    * 파일이 저장된 경로를 나타냅니다.
@@ -48,13 +55,6 @@ export class FileMetadata {
   mimeType: string;
 
   /**
-   * 파일의 확장자를 나타냅니다.
-   * @type {string}
-   */
-  @Column({ type: 'varchar', name: 'extension', length: 10 })
-  extension: string;
-
-  /**
    * 파일의 크기를 나타냅니다.
    * @type {number}
    */
@@ -69,12 +69,20 @@ export class FileMetadata {
   checksum: string; // 파일 무결성 검증용
 
   /**
-   * 파일의 공개 여부를 나타냅니다. (소프트 삭제)
+   * 파일의 공개 여부를 나타냅니다.
    * 기본값은 `true`입니다.
    * @type {boolean}
    */
   @Column({ type: 'boolean', name: 'is_public', default: true })
   isPublic: boolean;
+
+  /**
+   * 파일의 삭제 여부를 나타냅니다.
+   * 기본값은 `false`입니다.
+   * @type {boolean}
+   */
+  @Column({ type: 'boolean', name: 'is_delete', default: false })
+  isDelete: boolean;
 
   /**
    * 파일 소유자의 고유 키 (UUID v4).

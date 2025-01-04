@@ -87,14 +87,19 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor('profileImage', { storage: multer.memoryStorage() }),
   )
+
+  /**
+   * 현재 로그인한 사용자의 프로필 이미지를 변경합니다.
+   *
+   * @param {User} user 현재 로그인한 사용자
+   * @param {Express.Multer.File} file 변경할 프로필 이미지 파일
+   * @return {Promise<User>} 변경된 사용자 정보
+   */
   async updateProfileImage(
     @GetUser() user: User,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log(file);
-    // const updatedUser = await this.userService.updateProfileImage(user, file);
-
-    return 'true';
+    return this.userService.updateProfileImage(user, file);
   }
 
   /**

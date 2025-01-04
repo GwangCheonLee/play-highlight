@@ -81,8 +81,8 @@ export class FileMetadata {
    * 기본값은 `false`입니다.
    * @type {boolean}
    */
-  @Column({ type: 'boolean', name: 'is_delete', default: false })
-  isDelete: boolean;
+  @Column({ type: 'boolean', name: 'is_deleted', default: false })
+  isDeleted: boolean;
 
   /**
    * 파일 소유자의 고유 키 (UUID v4).

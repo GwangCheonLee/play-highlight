@@ -8,6 +8,7 @@ import { FileMetadata } from './file-metadata/entities/file-metadata.entity';
 import { BufferUploadMetadata } from './types/buffer-upload-metadata.type';
 import { ConfigService } from '@nestjs/config';
 import { FileMetadataService } from './file-metadata/file-metadata.service';
+import { Express } from 'express';
 
 @Injectable()
 export class FileService {
@@ -71,7 +72,7 @@ export class FileService {
     let fileKey = `${bufferMetadata.ownerId}/${generatedUuid}.${bufferMetadata.extension}`;
 
     if (bufferMetadata.accessType === AccessTypeEnum.PUBLIC) {
-      fileKey = `${bufferMetadata.originalName}.${bufferMetadata.extension}`;
+      fileKey = `${bufferMetadata.originalName}`;
     }
 
     const bucketName: string =
@@ -111,6 +112,99 @@ export class FileService {
 
       await queryRunner.commitTransaction();
       this.logger.debug('Uploaded file and saved metadata successfully');
+    } catch (error) {
+      // 트랜잭션 롤백
+      await queryRunner.rollbackTransaction();
+
+      // 이미 S3에 업로드된 파일이 있을 경우 삭제
+      const fileExists: boolean = await this.s3Service.isFileExists(
+        bucketName,
+        fileKey,
+      );
+      if (fileExists) {
+        this.logger.warn(
+          `Rolling back transaction. Deleting partial file: ${fileKey}`,
+        );
+
+        try {
+          await this.s3Service.deleteFile(bucketName, fileKey);
+        } catch (deleteError) {
+          this.logger.error(
+            `Failed to delete partial file: ${fileKey}`,
+            deleteError,
+          );
+        }
+      }
+
+      this.logger.error('Failed to upload file and save metadata', error);
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  /**
+   * Multer File을 저장하고, 파일 메타데이터를 데이터베이스에 저장합니다.
+   *
+   * @param {Express.Multer.File} file - Multer File
+   * @param {AccessTypeEnum} accessType - 파일 접근 타입
+   * @param {string} ownerId - 파일 소유자 식별자
+   * @return {Promise<FileMetadata>} 파일 메타데이터
+   */
+  async saveFile(
+    file: Express.Multer.File,
+    accessType: AccessTypeEnum,
+    ownerId: string,
+  ): Promise<FileMetadata> {
+    const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    const bucketName: string =
+      accessType === AccessTypeEnum.PUBLIC
+        ? this.publicBucketName
+        : this.privateBucketName;
+
+    // 파일 식별을 위한 UUID 생성
+    const generatedUuid: string = uuidv4();
+    const fileKey = `${ownerId}/${generatedUuid}.${file.originalname.split('.').pop()}`;
+
+    try {
+      // S3에 업로드
+      const uploadResult: S3UploadResult = await this.s3Service.upload(
+        bucketName,
+        fileKey,
+        file.buffer,
+        file.mimetype,
+      );
+
+      const extension = file.originalname.split('.').pop();
+
+      // 메타데이터 생성
+      const uploadedFileMetadata: FileMetadata = queryRunner.manager.create(
+        FileMetadata,
+        {
+          bucketName,
+          key: generatedUuid,
+          originalName: file.originalname,
+          extension,
+          mimeType: file.mimetype,
+          ownerId,
+          checksum: uploadResult.etag,
+          size: file.size,
+          storageLocation: uploadResult.location,
+          isPublic: accessType === AccessTypeEnum.PUBLIC,
+          owner: { id: ownerId },
+        },
+      );
+
+      // 메타데이터 저장
+      await queryRunner.manager.save(uploadedFileMetadata);
+
+      await queryRunner.commitTransaction();
+
+      this.logger.debug('Uploaded file and saved metadata successfully');
+      return uploadedFileMetadata;
     } catch (error) {
       // 트랜잭션 롤백
       await queryRunner.rollbackTransaction();

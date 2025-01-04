@@ -1,20 +1,33 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs';
-import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
 import { UserRepository } from './repositories/user.repository';
 import { getBaseDir } from '../common/constants/common.constant';
 import { Express } from 'express';
 import { UserRole } from './enums/role.enum';
 import { hashPlainText } from '../common/constants/encryption.constant';
+import { FileService } from '../file/file.service';
+import { AccessTypeEnum } from '../file/enums/access-type.enum';
+import { FileMetadata } from '../file/file-metadata/entities/file-metadata.entity';
+import { FileMetadataService } from '../file/file-metadata/file-metadata.service';
+import { ConfigService } from '@nestjs/config';
 
 /**
  * 사용자 정보를 처리하는 서비스입니다.
  */
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  private readonly publicBucketName: string;
+
+  constructor(
+    configService: ConfigService,
+    private readonly fileService: FileService,
+    private readonly userRepository: UserRepository,
+    private readonly fileMetadataService: FileMetadataService,
+  ) {
+    this.publicBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PUBLIC}`;
+  }
 
   /**
    * 사용자의 닉네임을 변경합니다.
@@ -71,14 +84,36 @@ export class UserService {
     return this.userRepository.findOneUserById(user.id);
   }
 
+  /**
+   * 사용자의 프로필 이미지를 변경합니다.
+   *
+   * @param {User} user 현재 로그인한 사용자
+   * @param {Express.Multer.File} file 변경할 프로필 이미지 파일
+   */
   async updateProfileImage(user: User, file: Express.Multer.File) {
-    const uuid = uuidv4();
-    const baseDir = path.join(getBaseDir(), 'profiles');
-    const profileDirPath = path.join(baseDir, `${user.id}`);
-    const fileExtension = path.extname(file.originalname);
-    const fileName = `${uuid}${fileExtension}`;
+    if (user.profileImage) {
+      const beforeFileMetadata =
+        await this.fileMetadataService.getOneFileMetadata(
+          this.publicBucketName,
+          user.profileImage,
+          user.id,
+        );
 
-    await this.userRepository.update(user.id, { profileImage: fileName });
+      if (beforeFileMetadata) {
+        await this.fileMetadataService.softDeleteFileMetadata(
+          beforeFileMetadata.key,
+        );
+      }
+    }
+
+    const fileMetadata: FileMetadata = await this.fileService.saveFile(
+      file,
+      AccessTypeEnum.PUBLIC,
+      user.id,
+    );
+    await this.userRepository.update(user.id, {
+      profileImage: fileMetadata.storageLocation,
+    });
 
     return this.userRepository.findOneUserById(user.id);
   }

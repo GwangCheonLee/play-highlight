@@ -26,6 +26,15 @@ export class FileService {
     this.publicBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PUBLIC}`;
   }
 
+  /**
+   * 파일이 존재하는지 확인합니다.
+   *
+   * @param {AccessTypeEnum} accessType - 파일 식별자
+   * @param {string} fileKey - 파일 식별자
+   * @param {string} ownerId - 파일 소유자 식별자
+   * @return {Promise<FileMetadata>} 파일 메타데이터
+   *
+   */
   async isFileExists(
     accessType: AccessTypeEnum,
     fileKey: string,
@@ -62,7 +71,9 @@ export class FileService {
    * @param {BufferUploadMetadata} bufferMetadata - Buffer 업로드 메타데이터
    * @return {Promise<void>}
    */
-  async saveBufferAsFile(bufferMetadata: BufferUploadMetadata): Promise<void> {
+  async uploadBufferToStorage(
+    bufferMetadata: BufferUploadMetadata,
+  ): Promise<void> {
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -113,31 +124,7 @@ export class FileService {
       await queryRunner.commitTransaction();
       this.logger.debug('Uploaded file and saved metadata successfully');
     } catch (error) {
-      // 트랜잭션 롤백
-      await queryRunner.rollbackTransaction();
-
-      // 이미 S3에 업로드된 파일이 있을 경우 삭제
-      const fileExists: boolean = await this.s3Service.isFileExists(
-        bucketName,
-        fileKey,
-      );
-      if (fileExists) {
-        this.logger.warn(
-          `Rolling back transaction. Deleting partial file: ${fileKey}`,
-        );
-
-        try {
-          await this.s3Service.deleteFile(bucketName, fileKey);
-        } catch (deleteError) {
-          this.logger.error(
-            `Failed to delete partial file: ${fileKey}`,
-            deleteError,
-          );
-        }
-      }
-
-      this.logger.error('Failed to upload file and save metadata', error);
-      throw error;
+      await this.handleFileUploadError(error, bucketName, fileKey, queryRunner);
     } finally {
       await queryRunner.release();
     }
@@ -149,12 +136,14 @@ export class FileService {
    * @param {Express.Multer.File} file - Multer File
    * @param {AccessTypeEnum} accessType - 파일 접근 타입
    * @param {string} ownerId - 파일 소유자 식별자
+   * @param {string | null} customFileName - 사용자 정의 파일 이름
    * @return {Promise<FileMetadata>} 파일 메타데이터
    */
-  async saveFile(
+  async uploadMulterFileToStorage(
     file: Express.Multer.File,
     accessType: AccessTypeEnum,
     ownerId: string,
+    customFileName: string | null = null,
   ): Promise<FileMetadata> {
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -167,7 +156,14 @@ export class FileService {
 
     // 파일 식별을 위한 UUID 생성
     const generatedUuid: string = uuidv4();
-    const fileKey = `${ownerId}/${generatedUuid}.${file.originalname.split('.').pop()}`;
+
+    const extension = file.originalname.split('.').pop();
+
+    let fileKey = `${ownerId}/${generatedUuid}.${extension}`;
+
+    if (customFileName) {
+      fileKey = `${ownerId}/${customFileName}.${extension}`;
+    }
 
     try {
       // S3에 업로드
@@ -177,8 +173,6 @@ export class FileService {
         file.buffer,
         file.mimetype,
       );
-
-      const extension = file.originalname.split('.').pop();
 
       // 메타데이터 생성
       const uploadedFileMetadata: FileMetadata = queryRunner.manager.create(
@@ -206,33 +200,65 @@ export class FileService {
       this.logger.debug('Uploaded file and saved metadata successfully');
       return uploadedFileMetadata;
     } catch (error) {
-      // 트랜잭션 롤백
-      await queryRunner.rollbackTransaction();
-
-      // 이미 S3에 업로드된 파일이 있을 경우 삭제
-      const fileExists: boolean = await this.s3Service.isFileExists(
-        bucketName,
-        fileKey,
-      );
-      if (fileExists) {
-        this.logger.warn(
-          `Rolling back transaction. Deleting partial file: ${fileKey}`,
-        );
-
-        try {
-          await this.s3Service.deleteFile(bucketName, fileKey);
-        } catch (deleteError) {
-          this.logger.error(
-            `Failed to delete partial file: ${fileKey}`,
-            deleteError,
-          );
-        }
-      }
-
-      this.logger.error('Failed to upload file and save metadata', error);
-      throw error;
+      await this.handleFileUploadError(error, bucketName, fileKey, queryRunner);
     } finally {
       await queryRunner.release();
     }
+  }
+
+  /**
+   * 특정 유저가 사용하고 있는 스토리지 크기를 계산합니다.
+   *
+   * @param {string} userId 유저의 ID (폴더 경로)
+   * @param {string[]} ignoredExtensions 무시할 확장자 리스트
+   * @return {Promise<number>} 유저가 사용 중인 총 스토리지 크기 (바이트 단위)
+   */
+  async getUserStorageSize(
+    userId: string,
+    ignoredExtensions: string[] = [],
+  ): Promise<number> {
+    return this.s3Service.getUserStorageSize(userId, ignoredExtensions);
+  }
+
+  /**
+   * 파일 업로드 중 에러가 발생했을 때 처리합니다.
+   *
+   * @param {any} error - 에러 객체
+   * @param {string} bucketName - S3 버킷 이름
+   * @param {string} fileKey - 파일 식별자
+   * @param {QueryRunner} queryRunner - QueryRunner 객체
+   * @return {Promise<void>}
+   */
+  private async handleFileUploadError(
+    error: any,
+    bucketName: string,
+    fileKey: string,
+    queryRunner: QueryRunner,
+  ) {
+    // 트랜잭션 롤백
+    await queryRunner.rollbackTransaction();
+
+    // 이미 S3에 업로드된 파일이 있을 경우 삭제
+    const fileExists: boolean = await this.s3Service.isFileExists(
+      bucketName,
+      fileKey,
+    );
+    if (fileExists) {
+      this.logger.warn(
+        `Rolling back transaction. Deleting partial file: ${fileKey}`,
+      );
+
+      try {
+        await this.s3Service.deleteFile(bucketName, fileKey);
+      } catch (deleteError) {
+        this.logger.error(
+          `Failed to delete partial file: ${fileKey}`,
+          deleteError,
+        );
+      }
+    }
+
+    this.logger.error('Failed to upload file and save metadata', error);
+    throw error;
   }
 }

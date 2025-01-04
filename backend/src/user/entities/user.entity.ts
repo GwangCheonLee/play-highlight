@@ -18,7 +18,7 @@ import { FileMetadata } from '../../file/file-metadata/entities/file-metadata.en
 @Entity('users')
 export class User {
   /**
-   * 사용자의 고유 식별자 (UUID 형식).
+   * 사용자의 고유 식별자 (UUID v4)
    * @type {string}
    */
   @PrimaryGeneratedColumn('uuid')
@@ -98,7 +98,7 @@ export class User {
    * 사용자가 업로드한 비디오 목록입니다.
    * @type {Video[]}
    */
-  @OneToMany(() => Video, (video) => video.user)
+  @OneToMany(() => Video, (video) => video.owner)
   videos: Video[];
 
   /**

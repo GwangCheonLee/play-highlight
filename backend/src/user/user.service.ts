@@ -93,7 +93,7 @@ export class UserService {
     }
 
     const newProfileImageMetadata: FileMetadata =
-      await this.fileService.saveFile(
+      await this.fileService.uploadMulterFileToStorage(
         uploadedFile,
         AccessTypeEnum.PUBLIC,
         user.id,

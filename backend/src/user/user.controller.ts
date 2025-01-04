@@ -4,8 +4,8 @@ import {
   Delete,
   Get,
   HttpCode,
-  Logger,
   Patch,
+  PayloadTooLargeException,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -15,19 +15,23 @@ import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { User } from './entities/user.entity';
-import { JwtAccessGuard } from '../authentication/guards/jwt-access.guard';
 import { GetUser } from './decorators/get-user';
 import { UpdateNicknameRequestBodyDto } from './dto/update-nickname-request-body.dto';
 import { UpdateEmailRequestBodyDto } from './dto/update-email-request-body.dto';
+import { JwtAccessGuard } from '../authentication/guards/jwt-access.guard';
+import { RedisService } from '../redis/redis.service';
+import { ApplicationSettingKeyEnum } from '../application-setting/enums/application-setting-key.enum';
 
 /**
  * 사용자 정보를 처리하는 컨트롤러입니다.
  */
+@UseGuards(JwtAccessGuard)
 @Controller({ version: '1', path: 'users' })
 export class UserController {
-  private readonly logger = new Logger(UserController.name);
-
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly redisService: RedisService,
+  ) {}
 
   /**
    * 현재 로그인한 사용자의 정보를 반환합니다.
@@ -35,7 +39,6 @@ export class UserController {
    * @return {Promise<User>} 현재 로그인한 사용자의 정보
    */
   @Get('/me')
-  @UseGuards(JwtAccessGuard)
   async getMe(@GetUser() user: User): Promise<User> {
     return user;
   }
@@ -49,7 +52,6 @@ export class UserController {
    */
   @Patch('/me/profile/nickname')
   @HttpCode(200)
-  @UseGuards(JwtAccessGuard)
   updateNickname(
     @GetUser() user: User,
     @Body() dto: UpdateNicknameRequestBodyDto,
@@ -66,7 +68,6 @@ export class UserController {
    */
   @Patch('/me/profile/email')
   @HttpCode(200)
-  @UseGuards(JwtAccessGuard)
   updateEmail(
     @GetUser() user: User,
     @Body() dto: UpdateEmailRequestBodyDto,
@@ -79,25 +80,26 @@ export class UserController {
    *
    * @param {User} user 현재 로그인한 사용자
    * @param {Express.Multer.File} file 변경할 프로필 이미지 파일
+   * @return {Promise<User>}  변경된 사용자 정보
    */
   @Patch('/me/profile/image')
   @HttpCode(200)
-  @UseGuards(JwtAccessGuard)
   @UseInterceptors(
     FileInterceptor('profileImage', { storage: multer.memoryStorage() }),
   )
-
-  /**
-   * 현재 로그인한 사용자의 프로필 이미지를 변경합니다.
-   *
-   * @param {User} user 현재 로그인한 사용자
-   * @param {Express.Multer.File} file 변경할 프로필 이미지 파일
-   * @return {Promise<User>} 변경된 사용자 정보
-   */
   async updateProfileImage(
     @GetUser() user: User,
     @UploadedFile() file: Express.Multer.File,
-  ) {
+  ): Promise<User> {
+    const uploadProfileImageSizeLimit: number =
+      (await this.redisService.getApplicationSetting(
+        ApplicationSettingKeyEnum.UPLOAD_PROFILE_IMAGE_SIZE_LIMIT,
+      )) as number;
+
+    if (file.size > uploadProfileImageSizeLimit) {
+      throw new PayloadTooLargeException('Profile image size is too large');
+    }
+
     return this.userService.updateProfileImage(user, file);
   }
 
@@ -109,7 +111,6 @@ export class UserController {
    */
   @Delete('/me/profile/image')
   @HttpCode(200)
-  @UseGuards(JwtAccessGuard)
   removeProfileImage(@GetUser() user: User): Promise<User> {
     return this.userService.removeProfileImage(user);
   }

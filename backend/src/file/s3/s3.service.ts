@@ -7,6 +7,7 @@ import {
   GetObjectCommandOutput,
   HeadObjectCommand,
   ListBucketsCommand,
+  ListObjectsV2Command,
   PutBucketPolicyCommand,
   PutObjectCommand,
   PutObjectCommandOutput,
@@ -16,11 +17,14 @@ import { Readable } from 'stream';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ConfigService } from '@nestjs/config';
 import { S3UploadResult } from './types/s3-upload-result.type';
+import { AccessTypeEnum } from '../enums/access-type.enum';
 
 @Injectable()
 export class S3Service {
   private readonly logger = new Logger(S3Service.name);
   private readonly s3Client: S3Client;
+  private readonly privateBucketName: string;
+  private readonly publicBucketName: string;
 
   constructor(private readonly configService: ConfigService) {
     this.s3Client = new S3Client({
@@ -34,6 +38,9 @@ export class S3Service {
       endpoint: this.configService.get<string>('AWS_S3_ENDPOINT'),
       forcePathStyle: true,
     });
+
+    this.privateBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PRIVATE}`;
+    this.publicBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PUBLIC}`;
   }
 
   /**
@@ -301,6 +308,61 @@ export class S3Service {
       this.logger.log(`File deleted successfully from ${bucketName}/${key}`);
     } catch (error) {
       this.logger.error('Error deleting file:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 특정 유저가 사용하고 있는 스토리지 크기를 계산합니다.
+   *
+   * @param {string} userId 유저의 ID (폴더 경로)
+   * @param {string[]} ignoredExtensions 무시할 확장자 리스트
+   * @return {Promise<number>} 유저가 사용 중인 총 스토리지 크기 (바이트 단위)
+   */
+  async getUserStorageSize(
+    userId: string,
+    ignoredExtensions: string[] = [],
+  ): Promise<number> {
+    let totalSize = 0;
+    const bucketTypes = [this.publicBucketName, this.privateBucketName];
+
+    try {
+      for (const bucketName of bucketTypes) {
+        let continuationToken: string | undefined;
+
+        do {
+          const command = new ListObjectsV2Command({
+            Bucket: bucketName,
+            Prefix: userId.endsWith('/') ? userId : `${userId}/`, // 폴더 경로
+            ContinuationToken: continuationToken,
+          });
+
+          const response = await this.s3Client.send(command);
+
+          // 객체 크기 합산, 무시할 확장자 필터링
+          if (response.Contents) {
+            totalSize += response.Contents.reduce((sum, obj) => {
+              const extension = obj.Key?.split('.').pop()?.toLowerCase();
+              if (ignoredExtensions.includes(extension)) {
+                return sum; // 무시할 확장자라면 합산 제외
+              }
+              return sum + (obj.Size || 0);
+            }, 0);
+          }
+
+          continuationToken = response.NextContinuationToken; // 다음 페이지 처리
+        } while (continuationToken);
+      }
+
+      this.logger.debug(
+        `Total storage size for user '${userId}': ${totalSize} bytes`,
+      );
+      return totalSize;
+    } catch (error) {
+      this.logger.error(
+        `Error calculating storage size for user '${userId}'`,
+        error,
+      );
       throw error;
     }
   }

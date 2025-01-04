@@ -12,7 +12,6 @@ export class CreateTable1735365893457 implements MigrationInterface {
     await queryRunner.query(`CREATE TABLE "file_metadata"
                              (
                                  "key"              character varying(36)  NOT NULL,
-                                 CONSTRAINT "PK_563b3bf09a6fa7bccea74d3ec03" PRIMARY KEY ("key"),
                                  "bucket_name"      character varying(255) NOT NULL,
                                  "original_name"    character varying(255) NOT NULL,
                                  "extension"        character varying(10)  NOT NULL,
@@ -24,7 +23,8 @@ export class CreateTable1735365893457 implements MigrationInterface {
                                  "is_deleted"       boolean                NOT NULL DEFAULT false,
                                  "createdAt"        TIMESTAMP              NOT NULL DEFAULT now(),
                                  "updatedAt"        TIMESTAMP              NOT NULL DEFAULT now(),
-                                 "owner_id"         uuid                   NOT NULL
+                                 "owner_id"         uuid                   NOT NULL,
+                                 CONSTRAINT "PK_563b3bf09a6fa7bccea74d3ec03" PRIMARY KEY ("key")
                              )`);
     await queryRunner.query(
       `CREATE TYPE "public"."users_roles_enum" AS ENUM('USER', 'ADMIN', 'ROOT')`,
@@ -45,18 +45,23 @@ export class CreateTable1735365893457 implements MigrationInterface {
                                  CONSTRAINT "UQ_97672ac88f789774dd47f7c8be3" UNIQUE ("email"),
                                  CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id")
                              )`);
+    await queryRunner.query(
+      `CREATE TYPE "public"."videos_status_enum" AS ENUM('ORIGINAL_UPLOADED', 'THUMBNAIL_GENERATED', 'HLS_ENCODING_COMPLETED')`,
+    );
     await queryRunner.query(`CREATE TABLE "videos"
                              (
-                                 "id"                  uuid              NOT NULL DEFAULT uuid_generate_v4(),
-                                 "uuid"                character varying NOT NULL,
-                                 "base_dir"            character varying NOT NULL,
-                                 "thumbnail_file_name" character varying NOT NULL,
-                                 "hls_file_name"       character varying NOT NULL,
-                                 "video_file_name"     character varying NOT NULL,
-                                 "is_deleted"          boolean           NOT NULL DEFAULT false,
-                                 "createdAt"           TIMESTAMP         NOT NULL DEFAULT now(),
-                                 "updatedAt"           TIMESTAMP         NOT NULL DEFAULT now(),
-                                 "userId"              uuid,
+                                 "id"                      uuid              NOT NULL DEFAULT uuid_generate_v4(),
+                                 "title"                   character varying NOT NULL,
+                                 "video_hls_file_location" character varying,
+                                 "is_deleted"              boolean           NOT NULL DEFAULT false,
+                                 "status"                  "public"."videos_status_enum",
+                                 "createdAt"               TIMESTAMP         NOT NULL DEFAULT now(),
+                                 "updatedAt"               TIMESTAMP         NOT NULL DEFAULT now(),
+                                 "owner_id"                uuid              NOT NULL,
+                                 "thumbnail_metadata_key"  character varying(36),
+                                 "origin_metadata_key"     character varying(36),
+                                 CONSTRAINT "REL_cb4ecd81bb02c7da8b6e785357" UNIQUE ("thumbnail_metadata_key"),
+                                 CONSTRAINT "REL_424b772864b06383f00fc30de8" UNIQUE ("origin_metadata_key"),
                                  CONSTRAINT "PK_e4c86c0cf95aff16e9fb8220f6b" PRIMARY KEY ("id")
                              )`);
     await queryRunner.query(`CREATE TABLE "application_settings"
@@ -74,7 +79,11 @@ export class CreateTable1735365893457 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE "file_metadata"
         ADD CONSTRAINT "FK_57ad00dd4b3856233cf569954af" FOREIGN KEY ("owner_id") REFERENCES "users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
     await queryRunner.query(`ALTER TABLE "videos"
-        ADD CONSTRAINT "FK_9003d36fcc646f797c42074d82b" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        ADD CONSTRAINT "FK_b89ed5035c8cb525f39f7f8b6b9" FOREIGN KEY ("owner_id") REFERENCES "users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+    await queryRunner.query(`ALTER TABLE "videos"
+        ADD CONSTRAINT "FK_cb4ecd81bb02c7da8b6e7853577" FOREIGN KEY ("thumbnail_metadata_key") REFERENCES "file_metadata" ("key") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+    await queryRunner.query(`ALTER TABLE "videos"
+        ADD CONSTRAINT "FK_424b772864b06383f00fc30de84" FOREIGN KEY ("origin_metadata_key") REFERENCES "file_metadata" ("key") ON DELETE NO ACTION ON UPDATE NO ACTION`);
 
     const manager = queryRunner.manager;
     const hashedPassword = await hashPlainText('changeme');
@@ -114,17 +123,45 @@ export class CreateTable1735365893457 implements MigrationInterface {
       valueType: 'boolean',
       description: 'Duplicate login prevention',
     });
+
+    await manager.save(ApplicationSetting, {
+      settingKey: ApplicationSettingKeyEnum.UPLOAD_PROFILE_IMAGE_SIZE_LIMIT,
+      _settingValue: '20971520',
+      valueType: 'number',
+      description: 'Upload profile image size limit',
+    });
+
+    await manager.save(ApplicationSetting, {
+      settingKey: ApplicationSettingKeyEnum.UPLOAD_THUMBNAIL_IMAGE_SIZE_LIMIT,
+      _settingValue: '20971520',
+      valueType: 'number',
+      description: 'Upload thumbnail image size limit',
+    });
+
+    await manager.save(ApplicationSetting, {
+      settingKey: ApplicationSettingKeyEnum.USER_STORAGE_LIMIT,
+      _settingValue: '10737418240',
+      valueType: 'number',
+      description: 'User storage limit',
+    });
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "videos" DROP CONSTRAINT "FK_9003d36fcc646f797c42074d82b"`,
+      `ALTER TABLE "videos" DROP CONSTRAINT "FK_424b772864b06383f00fc30de84"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "videos" DROP CONSTRAINT "FK_cb4ecd81bb02c7da8b6e7853577"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "videos" DROP CONSTRAINT "FK_b89ed5035c8cb525f39f7f8b6b9"`,
     );
     await queryRunner.query(
       `ALTER TABLE "file_metadata" DROP CONSTRAINT "FK_57ad00dd4b3856233cf569954af"`,
     );
     await queryRunner.query(`DROP TABLE "application_settings"`);
     await queryRunner.query(`DROP TABLE "videos"`);
+    await queryRunner.query(`DROP TYPE "public"."videos_status_enum"`);
     await queryRunner.query(`DROP TABLE "users"`);
     await queryRunner.query(`DROP TYPE "public"."users_roles_enum"`);
     await queryRunner.query(`DROP TABLE "file_metadata"`);

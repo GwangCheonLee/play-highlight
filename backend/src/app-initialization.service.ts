@@ -44,6 +44,11 @@ export class AppInitializationService implements OnApplicationBootstrap {
       this.logger.debug('Default assets uploaded successfully.');
       await this.userService.ensureRootUsersExist();
       this.logger.debug('Root users initialized successfully.');
+
+      const size = await this.s3Service.getUserStorageSize(
+        '8320f3fe-cd1d-4309-8716-27a6d0967b91',
+      );
+      console.log(size);
     } catch (error) {
       this.logger.error(
         'Failed to initialize application settings',
@@ -154,6 +159,6 @@ export class AppInitializationService implements OnApplicationBootstrap {
       ownerId: assetUser.id,
     };
 
-    await this.fileService.saveBufferAsFile(bufferUploadMetadata);
+    await this.fileService.uploadBufferToStorage(bufferUploadMetadata);
   }
 }

@@ -39,6 +39,11 @@ export const validationSchemaConfig = (): Joi.ObjectSchema => {
     REDIS_USERNAME: Joi.string().optional(),
     REDIS_PASSWORD: Joi.string().optional(),
 
+    // RabbitMQ
+    RABBITMQ_URLS: Joi.string().required(),
+    RABBITMQ_QUEUE: Joi.string().required(),
+    RABBITMQ_QUEUE_DURABLE: Joi.boolean().default(false),
+
     // JWT
     JWT_ACCESS_TOKEN_SECRET: Joi.string().required(),
     JWT_ACCESS_TOKEN_EXPIRATION_TIME: Joi.string().required(),

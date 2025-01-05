@@ -15,6 +15,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 import { AppInitializationService } from './app-initialization.service';
 import { ApplicationSettingModule } from './application-setting/application-setting.module';
 import { FileModule } from './file/file.module';
+import { RabbitMQProducerModule } from './rabbitmq/producer/rabbit-mq-producer.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { FileModule } from './file/file.module';
     VideoModule,
     RedisModule,
     AuthenticationModule,
+    RabbitMQProducerModule,
     ApplicationSettingModule,
     TypeOrmModule.forRootAsync({
       useClass: TypeormConfig,

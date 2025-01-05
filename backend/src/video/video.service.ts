@@ -20,11 +20,13 @@ import { ApplicationSettingKeyEnum } from '../application-setting/enums/applicat
 import { RedisService } from '../redis/redis.service';
 import { DataSource, QueryRunner } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
+import { RabbitMQProducerService } from '../rabbitmq/producer/rabbit-mq-producer.service';
 
 @Injectable()
 export class VideoService {
   private readonly logger = new Logger(VideoService.name);
   private readonly privateBucketName: string;
+  private readonly rabbitmqQueue: string;
 
   constructor(
     configService: ConfigService,
@@ -32,8 +34,10 @@ export class VideoService {
     private readonly fileService: FileService,
     private readonly redisService: RedisService,
     private readonly videoRepository: VideoRepository,
+    private readonly rabbitMQProducerService: RabbitMQProducerService,
   ) {
     this.privateBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PRIVATE}`;
+    this.rabbitmqQueue = configService.get<string>('RABBITMQ_QUEUE');
   }
 
   findVideo(uuid: string): Promise<Video> {
@@ -204,8 +208,11 @@ export class VideoService {
         status: videoUploadStatus,
       });
 
-      // TODO: 비디오 변환 작업을 큐에 추가
       await queryRunner.commitTransaction();
+
+      this.rabbitMQProducerService.sendMessage(this.rabbitmqQueue, {
+        videoId: videoId,
+      });
 
       return savedVideo;
     } catch (error) {

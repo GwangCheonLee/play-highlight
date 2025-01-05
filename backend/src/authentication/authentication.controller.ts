@@ -19,7 +19,6 @@ import { ConfigService } from '@nestjs/config';
 import { GoogleGuard } from './guards/google.guard';
 import { JwtAccessGuard } from './guards/jwt-access.guard';
 import { Binary } from 'typeorm';
-import { UserWithoutPassword } from '../user/types/user.type';
 import { GetUser } from '../user/decorators/get-user';
 import { User } from '../user/entities/user.entity';
 import RequestWithUser from '../user/interfaces/request-with-user.interface';
@@ -38,13 +37,36 @@ export class AuthenticationController {
    * 회원가입 엔드포인트입니다.
    *
    * @param {SignUpRequestBodyDto} signUpDto - 회원가입 요청 데이터
-   * @return {Promise<UserWithoutPassword>} - 회원가입 완료 후 응답 데이터
+   * @param {Response} res - HTTP 응답 객체로, 리프레시 토큰을 HttpOnly 쿠키로 설정합니다.
+   * @return {Promise<SignInResponse>} - 회원가입 성공 후 액세스 토큰을 반환합니다.
    */
   @Post('/sign-up')
   async signUp(
     @Body() signUpDto: SignUpRequestBodyDto,
-  ): Promise<UserWithoutPassword> {
-    return this.authenticationService.signUp(signUpDto);
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<SignInResponse> {
+    const user = await this.authenticationService.signUp(signUpDto);
+
+    const accessToken =
+      await this.authenticationService.generateAccessToken(user);
+    const refreshToken =
+      await this.authenticationService.generateRefreshToken(user);
+
+    const refreshTokenExpirationTime: number = this.configService.get(
+      'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
+    );
+    const isProduction = this.configService.get('NODE_ENV') === 'production';
+
+    // Refresh Token을 HttpOnly 쿠키로 설정
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'strict',
+      maxAge: refreshTokenExpirationTime,
+      path: '/',
+    });
+
+    return { accessToken };
   }
 
   /**
@@ -182,5 +204,17 @@ export class AuthenticationController {
 
     response.setHeader('Content-Type', 'image/png');
     return this.authenticationService.pipeQrCodeStream(response, otpauthUrl);
+  }
+
+  @Post('/sign-out')
+  @UseGuards(JwtAccessGuard)
+  async signOut(@Res() response: Response) {
+    response.cookie('refreshToken', '', {
+      httpOnly: true,
+      path: '/',
+      maxAge: 0,
+      secure: this.configService.get<string>('NODE_ENV') === 'production',
+    });
+    return response.status(204).send();
   }
 }

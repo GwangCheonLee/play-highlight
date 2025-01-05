@@ -106,9 +106,7 @@ export class AuthenticationService {
    * @param {SignUpRequestBodyDto} signUpRequestBodyDto - 회원 가입 요청 데이터
    * @return {Promise<UserWithoutPassword>} - 회원 가입 후 인증된 사용자 데이터
    */
-  async signUp(
-    signUpRequestBodyDto: SignUpRequestBodyDto,
-  ): Promise<UserWithoutPassword> {
+  async signUp(signUpRequestBodyDto: SignUpRequestBodyDto): Promise<User> {
     const isSignUpRestriction: boolean =
       await this.redisService.getApplicationSetting(
         ApplicationSettingKeyEnum.SIGN_UP_RESTRICTION,
@@ -132,13 +130,11 @@ export class AuthenticationService {
 
     const hashedPassword = await hashPlainText(signUpRequestBodyDto.password);
 
-    const user: User = await this.userRepository.signUp(
+    return await this.userRepository.signUp(
       signUpRequestBodyDto.email,
       hashedPassword,
       signUpRequestBodyDto.nickname,
     );
-
-    return extractPayloadFromUser(user);
   }
 
   /**

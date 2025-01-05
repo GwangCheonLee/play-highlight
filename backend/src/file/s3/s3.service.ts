@@ -165,7 +165,7 @@ export class S3Service {
     try {
       const response: PutObjectCommandOutput =
         await this.s3Client.send(command);
-      this.logger.log(`File uploaded successfully to ${bucketName}/${key}`);
+      this.logger.debug(`File uploaded successfully to ${bucketName}/${key}`);
 
       return {
         etag: response.ETag,

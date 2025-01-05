@@ -13,5 +13,6 @@ import { RabbitMQProducerModule } from '../rabbitmq/producer/rabbit-mq-producer.
   imports: [RabbitMQProducerModule, RedisModule, FileModule],
   controllers: [VideoController],
   providers: [VideoService, VideoRepository],
+  exports: [VideoService, VideoRepository],
 })
 export class VideoModule {}

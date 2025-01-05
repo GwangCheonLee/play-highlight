@@ -124,7 +124,8 @@ export class FileService {
       await queryRunner.commitTransaction();
       this.logger.debug('Uploaded file and saved metadata successfully');
     } catch (error) {
-      await this.handleFileUploadError(error, bucketName, fileKey, queryRunner);
+      await queryRunner.rollbackTransaction();
+      await this.handleFileUploadError(error, bucketName, fileKey);
     } finally {
       await queryRunner.release();
     }
@@ -200,7 +201,8 @@ export class FileService {
       this.logger.debug('Uploaded file and saved metadata successfully');
       return uploadedFileMetadata;
     } catch (error) {
-      await this.handleFileUploadError(error, bucketName, fileKey, queryRunner);
+      await queryRunner.rollbackTransaction();
+      await this.handleFileUploadError(error, bucketName, fileKey);
     } finally {
       await queryRunner.release();
     }
@@ -221,28 +223,36 @@ export class FileService {
   }
 
   /**
+   * S3에서 특정 키를 가진 폴더를 삭제합니다.
+   *
+   * @param {string} bucketName 삭제할 폴더가 있는 버킷 이름
+   * @param {string} folderKey 삭제할 폴더의 키 (접두사)
+   * @return {Promise<void>}
+   * @throws {Error} 삭제 중 오류가 발생하면 에러를 던집니다.
+   */
+  deleteFolder(bucketName: string, folderKey: string): Promise<void> {
+    return this.s3Service.deleteFolder(bucketName, folderKey);
+  }
+
+  /**
    * 파일 업로드 중 에러가 발생했을 때 처리합니다.
    *
    * @param {any} error - 에러 객체
    * @param {string} bucketName - S3 버킷 이름
    * @param {string} fileKey - 파일 식별자
-   * @param {QueryRunner} queryRunner - QueryRunner 객체
    * @return {Promise<void>}
    */
-  private async handleFileUploadError(
+  public async handleFileUploadError(
     error: any,
     bucketName: string,
     fileKey: string,
-    queryRunner: QueryRunner,
-  ) {
-    // 트랜잭션 롤백
-    await queryRunner.rollbackTransaction();
-
+  ): Promise<void> {
     // 이미 S3에 업로드된 파일이 있을 경우 삭제
     const fileExists: boolean = await this.s3Service.isFileExists(
       bucketName,
       fileKey,
     );
+
     if (fileExists) {
       this.logger.warn(
         `Rolling back transaction. Deleting partial file: ${fileKey}`,

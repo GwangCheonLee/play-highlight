@@ -144,6 +144,13 @@ export class CreateTable1735365893457 implements MigrationInterface {
       valueType: 'number',
       description: 'User storage limit',
     });
+
+    await manager.save(ApplicationSetting, {
+      settingKey: ApplicationSettingKeyEnum.UPLOAD_VIDEO_SIZE_LIMIT,
+      _settingValue: '1073741824',
+      valueType: 'number',
+      description: 'Upload video size limit',
+    });
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

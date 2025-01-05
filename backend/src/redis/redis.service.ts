@@ -97,7 +97,7 @@ export class RedisService {
       applicationSettingKey(settingKey),
     );
 
-    if (applicationSetting) {
+    if (applicationSetting !== null) {
       return applicationSetting;
     }
 

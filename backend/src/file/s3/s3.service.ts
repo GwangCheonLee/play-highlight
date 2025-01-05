@@ -292,6 +292,61 @@ export class S3Service {
   }
 
   /**
+   * S3에서 특정 키를 가진 폴더를 삭제합니다.
+   *
+   * @param {string} bucketName 삭제할 폴더가 있는 버킷 이름
+   * @param {string} folderKey 삭제할 폴더의 키 (접두사)
+   * @return {Promise<void>}
+   * @throws {Error} 삭제 중 오류가 발생하면 에러를 던집니다.
+   */
+  async deleteFolder(bucketName: string, folderKey: string): Promise<void> {
+    try {
+      let continuationToken: string | undefined;
+
+      do {
+        // 해당 폴더 내의 객체 리스트 가져오기
+        const command = new ListObjectsV2Command({
+          Bucket: bucketName,
+          Prefix: folderKey.endsWith('/') ? folderKey : `${folderKey}/`,
+          ContinuationToken: continuationToken,
+        });
+
+        const response = await this.s3Client.send(command);
+
+        if (response.Contents && response.Contents.length > 0) {
+          // 객체 삭제
+          const deleteCommands = response.Contents.map((item) => {
+            return this.s3Client.send(
+              new DeleteObjectCommand({
+                Bucket: bucketName,
+                Key: item.Key,
+              }),
+            );
+          });
+
+          // 모든 삭제 작업 병렬 실행
+          await Promise.all(deleteCommands);
+          this.logger.warn(
+            `Deleted ${response.Contents.length} objects from folder: ${folderKey}`,
+          );
+        }
+
+        continuationToken = response.NextContinuationToken; // 다음 페이지 처리
+      } while (continuationToken);
+
+      this.logger.warn(
+        `Folder '${folderKey}' deleted successfully from bucket '${bucketName}'`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Error deleting folder '${folderKey}' from bucket '${bucketName}'`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
    * S3에서 특정 파일을 삭제
    *
    * @param {string} bucketName 삭제할 파일이 있는 버킷 이름

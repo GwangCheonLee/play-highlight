@@ -4,7 +4,6 @@ import {
   Controller,
   Get,
   Param,
-  PayloadTooLargeException,
   Post,
   Query,
   UploadedFiles,
@@ -22,7 +21,6 @@ import { GetUser } from '../user/decorators/get-user';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Video } from './entities/video.entity';
 import { RedisService } from '../redis/redis.service';
-import { ApplicationSettingKeyEnum } from '../application-setting/enums/application-setting-key.enum';
 
 /**
  * 비디오 컨트롤러
@@ -74,21 +72,16 @@ export class VideoController {
     files: { video?: Express.Multer.File[]; thumbnail?: Express.Multer.File[] },
     @Body() uploadVideoRequestBodyDto: UploadVideoRequestBodyDto,
   ): Promise<Video> {
-    const videoFile = files.video?.[0];
-    if (!videoFile) {
-      throw new BadRequestException('Video file is required');
-    }
-
+    // 섬네일 파일에 대한 검증 로직
     const thumbnailFile = files.thumbnail?.[0];
+    await this.videoService.validateThumbnailFile(thumbnailFile);
 
-    const thumbnailProfileImageSizeLimit: number =
-      (await this.redisService.getApplicationSetting(
-        ApplicationSettingKeyEnum.UPLOAD_THUMBNAIL_IMAGE_SIZE_LIMIT,
-      )) as number;
+    // 비디오 파일에 대한 검증 로직
+    const videoFile = files.video?.[0];
+    await this.videoService.validateVideoFile(videoFile);
 
-    if (thumbnailFile?.size > thumbnailProfileImageSizeLimit) {
-      throw new PayloadTooLargeException('Thumbnail image size is too large');
-    }
+    // 사용자의 저장 용량 제한 검증 로직
+    await this.videoService.validateUserStorageLimit(user, videoFile);
 
     return await this.videoService.uploadVideo(
       user,

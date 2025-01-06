@@ -13,8 +13,8 @@ export function getLogLevels(env: string): LogLevel[] {
     case 'dev':
       return ['log', 'error', 'warn'];
     case 'prod':
-      return ['error', 'warn'];
+      return ['log', 'error', 'warn'];
     default:
-      return ['error', 'warn'];
+      return ['log', 'error', 'warn'];
   }
 }

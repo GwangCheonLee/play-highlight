@@ -11,9 +11,6 @@ import { FileService } from './file/file.service';
 import { BufferUploadMetadata } from './file/types/buffer-upload-metadata.type';
 import { UserService } from './user/user.service';
 import { User } from './user/entities/user.entity';
-import { VideoRepository } from './video/repositories/video.repository';
-import { VideoUploadStatus } from './video/enums/video-upload-status.enum';
-import { RabbitMQProducerService } from './rabbitmq/producer/rabbit-mq-producer.service';
 
 @Injectable()
 export class AppInitializationService implements OnApplicationBootstrap {
@@ -26,8 +23,6 @@ export class AppInitializationService implements OnApplicationBootstrap {
     private readonly userService: UserService,
     private readonly redisService: RedisService,
     private readonly configService: ConfigService,
-    private readonly videoRepository: VideoRepository,
-    private readonly rabbitMQProducerService: RabbitMQProducerService,
     private readonly applicationSettingRepository: ApplicationSettingRepository,
   ) {
     this.rabbitmqQueue = configService.get<string>('RABBITMQ_QUEUE');
@@ -55,10 +50,6 @@ export class AppInitializationService implements OnApplicationBootstrap {
       // Root 사용자 초기화
       await this.userService.ensureRootUsersExist();
       this.logger.debug('Root users initialized successfully.');
-
-      // 인코딩이 완료되지 않은 video mq 전송
-      await this.requeueUnprocessedVideos();
-      this.logger.debug('Unprocessed videos requeued successfully.');
     } catch (error) {
       this.logger.error(
         'Failed to initialize application settings',
@@ -170,21 +161,5 @@ export class AppInitializationService implements OnApplicationBootstrap {
     };
 
     await this.fileService.uploadBufferToStorage(bufferUploadMetadata);
-  }
-
-  // 인코딩이 완료되지 않은 video 다시 mq 전송
-  async requeueUnprocessedVideos(): Promise<void> {
-    const unprocessedVideos = await this.videoRepository.find({
-      where: [
-        { status: VideoUploadStatus.ORIGINAL_UPLOADED },
-        { status: VideoUploadStatus.THUMBNAIL_GENERATED },
-      ],
-    });
-
-    for (const video of unprocessedVideos) {
-      this.rabbitMQProducerService.sendMessage(this.rabbitmqQueue, {
-        videoId: video.id,
-      });
-    }
   }
 }

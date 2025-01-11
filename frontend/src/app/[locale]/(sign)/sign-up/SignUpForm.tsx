@@ -1,34 +1,34 @@
-"use client";
-import styles from "@/app/[locale]/(sign)/sign.module.scss";
-import { useForm } from "react-hook-form";
-import Logo from "@/components/common/Logo";
-import SignInput from "@/app/[locale]/(sign)/SignInput";
-import { SignUpBody } from "@/types/authTypes";
-import { useAppDispatch } from "@/store/selectors";
-import { parseJwt } from "@/utils/constants";
-import { signIn } from "@/store/features/auth/authSlice";
-import { useRouter } from "next/navigation";
-import { fetchSignUp } from "@/services/auth/authService";
-import { extractAxiosErrorDetails } from "@/utils/axiosError";
-import { useModal } from "@/contexts/ModalContext";
-import { rootPath } from "@/utils/routes/constants";
+'use client';
+import styles from '@/app/[locale]/(sign)/sign.module.scss';
+import {useForm} from 'react-hook-form';
+import Logo from '@/components/common/Logo';
+import SignInput from '@/app/[locale]/(sign)/SignInput';
+import {SignUpBody} from '@/types/authTypes';
+import {useAppDispatch} from '@/store/selectors';
+import {parseJwt} from '@/utils/constants';
+import {signIn} from '@/store/features/auth/authSlice';
+import {useRouter} from 'next/navigation';
+import {fetchSignUp} from '@/services/auth/authService';
+import {extractAxiosErrorDetails} from '@/utils/axiosError';
+import {useModal} from '@/contexts/ModalContext';
+import {rootPath} from '@/utils/routes/constants';
 
 const SignUpForm = () => {
   const dispatch = useAppDispatch();
-  const { showModal } = useModal();
+  const {showModal} = useModal();
   const router = useRouter();
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: {errors},
   } = useForm<SignUpBody>();
 
   const onSubmit = async (formData: SignUpBody) => {
     try {
-      const { accessToken } = await fetchSignUp(formData);
-      const { user } = parseJwt(accessToken);
-      sessionStorage.setItem("accessToken", accessToken);
-      dispatch(signIn({ user: user }));
+      const {accessToken} = await fetchSignUp(formData);
+      const {user} = parseJwt(accessToken);
+      sessionStorage.setItem('accessToken', accessToken);
+      dispatch(signIn({user: user}));
 
       router.push(rootPath);
     } catch (e) {
@@ -43,7 +43,7 @@ const SignUpForm = () => {
       <SignInput
         register={register}
         validation={{
-          required: "Required.",
+          required: 'Required.',
         }}
         name="nickname"
         type="text"
@@ -53,10 +53,10 @@ const SignUpForm = () => {
       <SignInput
         register={register}
         validation={{
-          required: "Required.",
+          required: 'Required.',
           pattern: {
             value: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i,
-            message: "It's not in the form of an email.",
+            message: 'It\'s not in the form of an email.',
           },
         }}
         name="email"
@@ -70,7 +70,7 @@ const SignUpForm = () => {
 
       <SignInput
         register={register}
-        validation={{ required: "Required." }}
+        validation={{required: 'Required.'}}
         name="password"
         type="password"
         placeholder="Enter your password"

@@ -1,18 +1,18 @@
-import axios, { AxiosResponse } from "axios";
+import axios, {AxiosResponse} from 'axios';
 import {
   fetchFindVideoResponse,
   fetchFindVideosQuery,
   fetchFindVideosResponse,
   fetchVideoUploadResponse,
-} from "@/types/videoTypes";
+} from '@/types/videoTypes';
 
 export const fetchFindVideos = async (query: fetchFindVideosQuery) => {
   const params = new URLSearchParams({
     limit: query.limit.toString(),
-    ...(query.cursor && { cursor: query.cursor.toString() }),
+    ...(query.cursor && {cursor: query.cursor.toString()}),
   }).toString();
   const response: AxiosResponse<fetchFindVideosResponse, any> = await axios.get(
-    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/videos?${params}`,
+    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/v1/videos?${params}`,
   );
   return response.data.data;
 };
@@ -30,12 +30,12 @@ export const fetchUploadVideos = async (
 ) => {
   const response: AxiosResponse<fetchVideoUploadResponse, any> =
     await axios.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/videos`,
+      `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/v1/videos`,
       formData,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       },
     );

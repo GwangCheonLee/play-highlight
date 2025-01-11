@@ -1,15 +1,9 @@
-import axios, { AxiosResponse } from "axios";
-import {
-  ChangeNicknameResponse,
-  SignInBody,
-  SignInResponse,
-  SignUpBody,
-  SignUpResponse,
-} from "@/types/authTypes";
+import axios, {AxiosResponse} from 'axios';
+import {ChangeNicknameResponse, SignInBody, SignInResponse, SignUpBody, SignUpResponse} from '@/types/authTypes';
 
 export const fetchSignUp = async (data: SignUpBody) => {
   const response: AxiosResponse<SignUpResponse, any> = await axios.post(
-    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/authentication/sign-up`,
+    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/v1/authentication/sign-up`,
     data,
   );
   return response.data.data;
@@ -17,7 +11,7 @@ export const fetchSignUp = async (data: SignUpBody) => {
 
 export const fetchSignIn = async (data: SignInBody) => {
   const response: AxiosResponse<SignUpResponse, any> = await axios.post(
-    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/authentication/sign-in`,
+    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/v1/authentication/sign-in`,
     data,
   );
   return response.data.data;
@@ -25,14 +19,14 @@ export const fetchSignIn = async (data: SignInBody) => {
 
 export const fetchAccessToken = async () => {
   const response: AxiosResponse<SignInResponse, any> = await axios.get(
-    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/authentication/access-token`,
+    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/v1/authentication/access-token`,
   );
   return response.data.data;
 };
 
 export const fetchSignOut = async (accessToken: string) => {
   const response: AxiosResponse<null, any> = await axios.post(
-    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/authentication/sign-out`,
+    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/v1/authentication/sign-out`,
     null,
     {
       headers: {
@@ -49,8 +43,8 @@ export const fetchChangeNickname = async (
 ) => {
   const response: AxiosResponse<ChangeNicknameResponse, any> =
     await axios.patch(
-      `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/users/me/nickname`,
-      { nickname },
+      `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/v1/users/me/profile/nickname`,
+      {nickname},
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,

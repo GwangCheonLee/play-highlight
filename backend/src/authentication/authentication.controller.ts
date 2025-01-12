@@ -208,13 +208,12 @@ export class AuthenticationController {
 
   @Post('/sign-out')
   @UseGuards(JwtAccessGuard)
-  async signOut(@Res() response: Response) {
+  @HttpCode(204)
+  async signOut(@Res({ passthrough: true }) response: Response) {
     response.cookie('refreshToken', '', {
       httpOnly: true,
       path: '/',
       maxAge: 0,
-      secure: this.configService.get<string>('NODE_ENV') === 'production',
     });
-    return response.status(204).send();
   }
 }

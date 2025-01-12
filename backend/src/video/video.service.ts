@@ -50,7 +50,7 @@ export class VideoService {
 
   findVideo(uuid: string): Promise<Video> {
     const video: Promise<Video> = this.videoRepository.findOne({
-      where: { id: uuid },
+      where: { id: uuid, status: VideoUploadStatus.HLS_ENCODING_COMPLETED },
       relations: {
         originMetadata: true,
         thumbnailMetadata: true,
@@ -249,5 +249,11 @@ export class VideoService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async onModuleInit() {
+    this.rabbitMQProducerService.sendMessage(this.rabbitmqQueue, {
+      videoId: '2ef60977-1f71-4c6e-ad54-f51773ea1412',
+    });
   }
 }

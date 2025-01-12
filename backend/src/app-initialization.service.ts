@@ -100,7 +100,7 @@ export class AppInitializationService implements OnApplicationBootstrap {
         if (accessType === AccessTypeEnum.PUBLIC) {
           await this.s3Service.createPublicBucket(bucketName);
         } else if (accessType === AccessTypeEnum.PRIVATE) {
-          await this.s3Service.createPrivateBucket(bucketName);
+          await this.s3Service.createPublicBucket(bucketName);
         }
 
         this.logger.debug(`Bucket ${bucketName} created successfully.`);

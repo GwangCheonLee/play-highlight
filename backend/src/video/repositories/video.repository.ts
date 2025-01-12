@@ -17,6 +17,7 @@ export class VideoRepository extends Repository<Video> {
       .leftJoinAndSelect('videos.thumbnailMetadata', 'tumbnailMetadata')
       .select()
       .andWhere('videos.isDeleted = :isDeleted', { isDeleted: false })
+      .andWhere('videos.status = :status', { status: 'HLS_ENCODING_COMPLETED' })
       .orderBy('videos.id', 'DESC')
       .take(limit + 1);
 

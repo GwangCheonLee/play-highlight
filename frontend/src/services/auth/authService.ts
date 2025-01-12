@@ -37,6 +37,7 @@ export const fetchSignOut = async (accessToken: string) => {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+      withCredentials: true,
     },
   );
   return response.data;

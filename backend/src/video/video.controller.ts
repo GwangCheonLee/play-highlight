@@ -20,7 +20,6 @@ import * as multer from 'multer';
 import { GetUser } from '../user/decorators/get-user';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Video } from './entities/video.entity';
-import { RedisService } from '../redis/redis.service';
 
 /**
  * 비디오 컨트롤러
@@ -28,13 +27,18 @@ import { RedisService } from '../redis/redis.service';
 @UseGuards(JwtAccessGuard)
 @Controller({ version: '1', path: 'videos' })
 export class VideoController {
-  constructor(
-    private readonly redisService: RedisService,
-    private readonly videoService: VideoService,
-  ) {}
+  constructor(private readonly videoService: VideoService) {}
 
   @Get()
-  async findVideos(@Query() findVideosDto: FindVideosDto) {}
+  async findVideos(@Query() findVideosDto: FindVideosDto) {
+    const { videos, nextCursor } =
+      await this.videoService.findVideos(findVideosDto);
+
+    return {
+      videos,
+      nextCursor,
+    };
+  }
 
   /**
    * 비디오 단일 조회 API

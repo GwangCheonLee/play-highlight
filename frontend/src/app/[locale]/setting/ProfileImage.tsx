@@ -1,60 +1,60 @@
-"use client";
-import styles from "@/app/[locale]/setting/setting.module.scss";
-import { useTranslations } from "next-intl";
-import { useAppDispatch, useAppSelector } from "@/store/selectors";
-import React, { ChangeEvent } from "react";
-import {
-  fetchDeleteProfileImage,
-  fetchUploadProfileImage,
-} from "@/services/profile/profileService";
-import { parseJwt } from "@/utils/constants";
-import { signIn } from "@/store/features/auth/authSlice";
-import Image from "next/image";
+'use client';
+import styles from '@/app/[locale]/setting/setting.module.scss';
+import {useTranslations} from 'next-intl';
+import {useAppDispatch, useAppSelector} from '@/store/selectors';
+import React, {ChangeEvent} from 'react';
+import {fetchDeleteProfileImage, fetchUploadProfileImage} from '@/services/profile/profileService';
+import {parseJwt} from '@/utils/constants';
+import {signIn} from '@/store/features/auth/authSlice';
+import Image from 'next/image';
+import {fetchAccessToken} from '@/services/auth/authService';
 
 export default function ProfileImage() {
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.auth);
-  const t = useTranslations("Setting");
+  const {user} = useAppSelector((state) => state.auth);
+  const t = useTranslations('Setting');
   if (!user) return;
 
   const profileImage = user.profileImage
-    ? `/static/profiles/${user.id}/${user.profileImage}`
-    : "/assets/images/default_user_profile.png";
+    ? `${process.env.NEXT_PUBLIC_BUCKET}/${user.profileImage}`
+    : '/assets/images/default_user_profile.png';
 
   const onChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const formData = new FormData();
     if (e.target.files?.length) {
-      formData.append("profileImage", e.target.files[0]);
+      formData.append('profileImage', e.target.files[0]);
     }
 
     try {
-      const accessToken = sessionStorage.getItem("accessToken");
+      const accessToken = sessionStorage.getItem('accessToken');
       if (!accessToken) return;
 
-      const { accessToken: responseAccessToken } =
-        await fetchUploadProfileImage(formData, accessToken);
+      await fetchUploadProfileImage(formData, accessToken);
 
-      const { user } = parseJwt(responseAccessToken);
-      sessionStorage.setItem("accessToken", responseAccessToken);
-      dispatch(signIn({ user: user }));
+      const {accessToken: responseAccessToken} = await fetchAccessToken();
+
+      const {user} = parseJwt(responseAccessToken);
+      sessionStorage.setItem('accessToken', responseAccessToken);
+      dispatch(signIn({user: user}));
     } catch (error) {
-      console.error("File upload failed", error);
+      console.error('File upload failed', error);
     }
   };
 
   const handleDeleteProfileImage = async () => {
     try {
-      const accessToken = sessionStorage.getItem("accessToken");
+      const accessToken = sessionStorage.getItem('accessToken');
       if (!accessToken) return;
 
-      const { accessToken: responseAccessToken } =
-        await fetchDeleteProfileImage(accessToken);
+      await fetchDeleteProfileImage(accessToken);
 
-      const { user } = parseJwt(responseAccessToken);
-      sessionStorage.setItem("accessToken", responseAccessToken);
-      dispatch(signIn({ user: user }));
+      const {accessToken: responseAccessToken} = await fetchAccessToken();
+
+      const {user} = parseJwt(responseAccessToken);
+      sessionStorage.setItem('accessToken', responseAccessToken);
+      dispatch(signIn({user: user}));
     } catch (error) {
-      console.error("File upload failed", error);
+      console.error('File upload failed', error);
     }
   };
 
@@ -78,11 +78,11 @@ export default function ProfileImage() {
       </div>
       <div className={styles.settingProfileImageButtonWrapper}>
         <button
-          onClick={() => document.getElementById("image-upload")?.click()}
+          onClick={() => document.getElementById('image-upload')?.click()}
         >
-          {t("uploadImage")}
+          {t('uploadImage')}
         </button>
-        <button onClick={handleDeleteProfileImage}>{t("deleteImage")}</button>
+        <button onClick={handleDeleteProfileImage}>{t('deleteImage')}</button>
       </div>
     </div>
   );

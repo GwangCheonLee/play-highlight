@@ -1,4 +1,4 @@
-import { User } from "@/types/user";
+import {User} from '@/types/user';
 
 export type fetchFindVideosQuery = {
   cursor: number | null;
@@ -25,13 +25,14 @@ export type fetchVideoUploadResponse = {
 };
 
 export type videoDetails = {
-  id: number;
-  uuid: string;
+  id: string;
   baseDir: string;
   thumbnailFileName: string;
   hlsFileName: string;
   videoFileName: string;
   createdAt: Date;
   updatedAt: Date;
-  user: User;
+  owner: User;
+  videoHlsFileLocation: string;
+  thumbnailMetadata: {storageLocation: string}
 };

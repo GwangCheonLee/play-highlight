@@ -122,11 +122,11 @@ export class S3Service {
 
       return true;
     } catch (error) {
+      this.logger.error('Error checking file existence:', error);
       if (error.name === 'NotFound') {
         // S3가 404를 반환하면 파일이 없는 것
         return false;
       }
-      this.logger.error('Error checking file existence:', error);
       throw error;
     }
   }

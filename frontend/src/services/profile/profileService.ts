@@ -1,17 +1,17 @@
-import axios, { AxiosResponse } from "axios";
-import { UploadProfileResponse } from "@/types/profileTypes";
+import axios, {AxiosResponse} from 'axios';
+import {UploadProfileResponse} from '@/types/profileTypes';
 
 export const fetchUploadProfileImage = async (
   formData: FormData,
   accessToken: string,
 ) => {
   const response: AxiosResponse<UploadProfileResponse, any> = await axios.patch(
-    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/users/me/profile/image`,
+    `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/v1/users/me/profile/image`,
     formData,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     },
   );
@@ -21,7 +21,7 @@ export const fetchUploadProfileImage = async (
 export const fetchDeleteProfileImage = async (accessToken: string) => {
   const response: AxiosResponse<UploadProfileResponse, any> =
     await axios.delete(
-      `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/users/me/profile/image`,
+      `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/v1/users/me/profile/image`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,

@@ -4,7 +4,10 @@ const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'standalone',
+  images: {
+    domains: ['localhost'], // 'localhost'를 허용된 호스트에 추가
+  },
+  output: 'standalone',
 };
 
 export default withNextIntl(nextConfig);

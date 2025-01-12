@@ -13,13 +13,18 @@ export const fetchSignIn = async (data: SignInBody) => {
   const response: AxiosResponse<SignUpResponse, any> = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/v1/authentication/sign-in`,
     data,
+    {withCredentials: true},
   );
   return response.data.data;
 };
 
 export const fetchAccessToken = async () => {
-  const response: AxiosResponse<SignInResponse, any> = await axios.get(
+  const response: AxiosResponse<SignInResponse, any> = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_HOST}/api/v1/authentication/access-token`,
+    {},
+    {
+      withCredentials: true,
+    },
   );
   return response.data.data;
 };

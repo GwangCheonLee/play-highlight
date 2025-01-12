@@ -21,6 +21,7 @@ import { RedisService } from '../redis/redis.service';
 import { DataSource, QueryRunner } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { RabbitMQProducerService } from '../rabbitmq/producer/rabbit-mq-producer.service';
+import { FindVideosDto } from './dto/find-videos.dto';
 
 @Injectable()
 export class VideoService {
@@ -40,9 +41,21 @@ export class VideoService {
     this.rabbitmqQueue = configService.get<string>('RABBITMQ_QUEUE');
   }
 
+  findVideos(findVideosDto: FindVideosDto) {
+    return this.videoRepository.findVideos(
+      findVideosDto.cursor,
+      findVideosDto.limit,
+    );
+  }
+
   findVideo(uuid: string): Promise<Video> {
     const video: Promise<Video> = this.videoRepository.findOne({
       where: { id: uuid },
+      relations: {
+        originMetadata: true,
+        thumbnailMetadata: true,
+        owner: true,
+      },
     });
 
     if (!video) {

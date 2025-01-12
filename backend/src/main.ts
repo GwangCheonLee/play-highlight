@@ -31,7 +31,16 @@ async function bootstrap(): Promise<void> {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   // CORS 허용
-  app.enableCors();
+  app.enableCors({
+    credentials: true,
+    origin: (origin, callback) => {
+      if (!origin || origin === '*') {
+        callback(null, true); // 모든 출처 허용
+      } else {
+        callback(null, true); // 특정 조건 추가 가능
+      }
+    },
+  });
 
   // URI 기반의 API 버전 관리 활성화
   app.enableVersioning({ type: VersioningType.URI });

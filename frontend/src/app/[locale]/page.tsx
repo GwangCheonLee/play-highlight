@@ -1,11 +1,11 @@
-"use client";
-import Header from "@/components/common/Header";
-import styles from "./home.module.scss";
-import VideoCard from "@/app/[locale]/VideoCard";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import NoVideos from "@/app/[locale]/NoVideos";
-import { videoDetails } from "@/types/videoTypes";
-import { fetchFindVideos } from "@/services/videos/videosService";
+'use client';
+import Header from '@/components/common/Header';
+import styles from './home.module.scss';
+import VideoCard from '@/app/[locale]/VideoCard';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import NoVideos from '@/app/[locale]/NoVideos';
+import {videoDetails} from '@/types/videoTypes';
+import {fetchFindVideos} from '@/services/videos/videosService';
 
 export default function Home() {
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -14,7 +14,7 @@ export default function Home() {
   const [nextCursor, setNextCursor] = useState<number | null>(0);
 
   const findVideos = useCallback(async () => {
-    const response = await fetchFindVideos({ cursor: nextCursor, limit: 25 });
+    const response = await fetchFindVideos({cursor: nextCursor, limit: 25});
     setNextCursor(response.nextCursor);
     setVideos((currentVideos) => {
       const newVideos = response.videos.filter(
@@ -54,18 +54,18 @@ export default function Home() {
         <section className={styles.section}>
           {videos.length > 0 ? (
             videos.map((video) => {
-              const userProfileImage = video.user.profileImage
-                ? `/static/profiles/${video.user.id}/${video.user.profileImage}`
-                : "/assets/images/default_user_profile.png";
+              const userProfileImage = video.owner.profileImage
+                ? `${process.env.NEXT_PUBLIC_BUCKET}/${video.owner.profileImage}`
+                : '/assets/images/default_user_profile.png';
               return (
                 <VideoCard
                   key={video.id}
-                  videoId={video.uuid}
-                  alt={`Video by ${video.user.nickname}`}
-                  src={`/static/videos/${video.uuid}/${video.thumbnailFileName}`}
-                  nickname={video.user.nickname}
+                  videoId={video.id}
+                  alt={`Video by ${video.owner.nickname}`}
+                  src={`${process.env.NEXT_PUBLIC_BUCKET}/${video.thumbnailMetadata.storageLocation}`}
+                  nickname={video.owner.nickname}
                   createdAt={new Date(video.createdAt)}
-                  email={video.user.email}
+                  email={video.owner.email}
                   userProfileImg={userProfileImage}
                 />
               );

@@ -42,7 +42,6 @@ export class RabbitMqConsumerService {
   async handleVideoEncoding(message: VideoEncodingMessageInterface) {
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
-    await queryRunner.startTransaction();
 
     const video: Video = await this.videoService.findVideoById(message.videoId);
 
@@ -64,6 +63,7 @@ export class RabbitMqConsumerService {
     );
 
     try {
+      await queryRunner.startTransaction();
       const originalVideoBuffer: Buffer = await this.s3Service.download(
         this.privateBucketName,
         originalVideoKey,
@@ -77,6 +77,7 @@ export class RabbitMqConsumerService {
 
       await queryRunner.manager.update(Video, video.id, {
         status: VideoUploadStatus.HLS_ENCODING_COMPLETED,
+        videoHlsFileLocation: `${this.privateBucketName}/${video.owner.id}/${message.videoId}/master.m3u8`,
       });
 
       await queryRunner.commitTransaction();

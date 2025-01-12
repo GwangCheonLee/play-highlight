@@ -1,12 +1,12 @@
-"use client";
-import styles from "./profile.module.scss";
-import Image from "next/image";
-import { useState } from "react";
-import Dropdown from "@/components/common/profile/Dropdown";
-import { useAppSelector } from "@/store/selectors";
+'use client';
+import styles from './profile.module.scss';
+import Image from 'next/image';
+import {useState} from 'react';
+import Dropdown from '@/components/common/profile/Dropdown';
+import {useAppSelector} from '@/store/selectors';
 
 export default function Profile() {
-  const { user } = useAppSelector((state) => state.auth);
+  const {user} = useAppSelector((state) => state.auth);
   const [isOpened, setIsOpened] = useState(false);
 
   const handleDropdownClick = () => {
@@ -14,15 +14,15 @@ export default function Profile() {
   };
 
   const userProfileImage = user?.profileImage
-    ? `/static/profiles/${user.id}/${user.profileImage}`
-    : "/assets/images/default_user_profile.png";
+    ? `${process.env.NEXT_PUBLIC_BUCKET}/${user.profileImage}`
+    : '/assets/images/default_user_profile.png';
 
   return (
     <div className={styles.profileWrapper} onClick={handleDropdownClick}>
       <Image
         className={styles.profileImage}
         src={userProfileImage}
-        alt={"image"}
+        alt={'image'}
         width={36}
         height={36}
         unoptimized={true}

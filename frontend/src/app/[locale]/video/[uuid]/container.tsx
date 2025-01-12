@@ -1,24 +1,24 @@
-"use client";
-import styles from "./video.module.scss";
-import React, { useEffect, useState } from "react";
-import VideoPlayer from "@/app/[locale]/video/VideoPlayer";
-import Header from "@/components/common/Header";
-import { fetchFindVideo } from "@/services/videos/videosService";
-import { videoDetails } from "@/types/videoTypes";
-import { useParams } from "next/navigation";
+'use client';
+import styles from './video.module.scss';
+import React, {useEffect, useState} from 'react';
+import VideoPlayer from '@/app/[locale]/video/VideoPlayer';
+import Header from '@/components/common/Header';
+import {fetchFindVideo} from '@/services/videos/videosService';
+import {videoDetails} from '@/types/videoTypes';
+import {useParams} from 'next/navigation';
 
 const Container: React.FC = () => {
-  const { uuid } = useParams<{ uuid: string }>();
+  const {uuid} = useParams<{uuid: string}>();
   const [videoData, setVideoData] = useState<videoDetails | null>(null);
 
   useEffect(() => {
     const fetchVideoData = async () => {
       try {
         if (uuid === undefined) return;
-        const { video: videoDetail } = await fetchFindVideo(uuid);
+        const videoDetail: videoDetails = await fetchFindVideo(uuid);
         setVideoData(videoDetail);
       } catch (error) {
-        console.error("Failed to fetch video data", error);
+        console.error('Failed to fetch video data', error);
       }
     };
 
@@ -36,7 +36,7 @@ const Container: React.FC = () => {
             <></>
           ) : (
             <VideoPlayer
-              url={`${window.location.origin}/static/videos/${videoData.uuid}/${videoData.hlsFileName}`}
+              url={`${process.env.NEXT_PUBLIC_BUCKET}/${videoData.videoHlsFileLocation}`}
             />
           )}
         </section>

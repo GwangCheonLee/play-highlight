@@ -3,7 +3,7 @@ import {useAppDispatch, useAppSelector} from '@/store/selectors';
 import styles from '@/app/[locale]/setting/setting.module.scss';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {fetchChangeNickname} from '@/services/auth/authService';
+import {fetchAccessToken, fetchChangeNickname} from '@/services/auth/authService';
 import {parseJwt} from '@/utils/constants';
 import {signIn} from '@/store/features/auth/authSlice';
 import {useTranslations} from 'next-intl';
@@ -24,10 +24,13 @@ export default function Nickname() {
     const accessToken = sessionStorage.getItem('accessToken');
     if (!accessToken) return;
 
-    const {accessToken: responseAccessToken} = await fetchChangeNickname(
+    await fetchChangeNickname(
       accessToken,
       nickname,
     );
+
+    const {accessToken: responseAccessToken} = await fetchAccessToken();
+
     const {user} = parseJwt(responseAccessToken);
     sessionStorage.setItem('accessToken', responseAccessToken);
     dispatch(signIn({user: user}));

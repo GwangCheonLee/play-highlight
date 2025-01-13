@@ -24,7 +24,6 @@ import { Video } from './entities/video.entity';
 /**
  * 비디오 컨트롤러
  */
-@UseGuards(JwtAccessGuard)
 @Controller({ version: '1', path: 'videos' })
 export class VideoController {
   constructor(private readonly videoService: VideoService) {}
@@ -60,7 +59,9 @@ export class VideoController {
    * @return {Promise<Video>} 업로드된 비디오 정보
    * @throws {BadRequestException} 비디오 파일이 필요한 경우
    */
+
   @Post()
+  @UseGuards(JwtAccessGuard)
   @UseInterceptors(
     FileFieldsInterceptor(
       [

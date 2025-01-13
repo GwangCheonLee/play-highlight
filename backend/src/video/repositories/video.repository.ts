@@ -15,10 +15,11 @@ export class VideoRepository extends Repository<Video> {
     const queryBuilder = this.createQueryBuilder('videos')
       .leftJoinAndSelect('videos.owner', 'user')
       .leftJoinAndSelect('videos.thumbnailMetadata', 'tumbnailMetadata')
+      .leftJoinAndSelect('videos.originMetadata', 'originMetadata')
       .select()
       .andWhere('videos.isDeleted = :isDeleted', { isDeleted: false })
       .andWhere('videos.status = :status', { status: 'HLS_ENCODING_COMPLETED' })
-      .orderBy('videos.id', 'DESC')
+      .orderBy('videos.createdAt', 'DESC')
       .take(limit + 1);
 
     if (cursor) {

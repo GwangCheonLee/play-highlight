@@ -12,7 +12,6 @@ import { VideoRepository } from './repositories/video.repository';
 import { User } from '../user/entities/user.entity';
 import { Express } from 'express';
 import { FileService } from '../file/file.service';
-import { AccessTypeEnum } from '../file/enums/access-type.enum';
 import { VideoUploadStatus } from './enums/video-upload-status.enum';
 import { FileMetadata } from '../file/file-metadata/entities/file-metadata.entity';
 import { Video } from './entities/video.entity';
@@ -26,7 +25,7 @@ import { FindVideosDto } from './dto/find-videos.dto';
 @Injectable()
 export class VideoService {
   private readonly logger = new Logger(VideoService.name);
-  private readonly privateBucketName: string;
+  private readonly bucketName: string;
   private readonly rabbitmqQueue: string;
 
   constructor(
@@ -37,7 +36,7 @@ export class VideoService {
     private readonly videoRepository: VideoRepository,
     private readonly rabbitMQProducerService: RabbitMQProducerService,
   ) {
-    this.privateBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PRIVATE}`;
+    this.bucketName = configService.get<string>('PROJECT_NAME');
     this.rabbitmqQueue = configService.get<string>('RABBITMQ_QUEUE');
   }
 
@@ -181,7 +180,6 @@ export class VideoService {
         thumbnailFileMetadata =
           await this.fileService.uploadMulterFileToStorage(
             thumbnailFile,
-            AccessTypeEnum.PRIVATE,
             user.id,
             `${videoId}/thumbnail`,
           );
@@ -192,7 +190,6 @@ export class VideoService {
       // 동영상 파일 처리
       videoFileMetadata = await this.fileService.uploadMulterFileToStorage(
         videoFile,
-        AccessTypeEnum.PRIVATE,
         user.id,
         `${videoId}/video`,
       );
@@ -241,7 +238,7 @@ export class VideoService {
 
       this.logger.warn(`Cleaning up uploaded files for video ID: ${videoId}`);
       await this.fileService.deleteFolder(
-        this.privateBucketName,
+        this.bucketName,
         `${user.id}/${videoId}`,
       );
 
@@ -249,11 +246,5 @@ export class VideoService {
     } finally {
       await queryRunner.release();
     }
-  }
-
-  async onModuleInit() {
-    this.rabbitMQProducerService.sendMessage(this.rabbitmqQueue, {
-      videoId: '2ef60977-1f71-4c6e-ad54-f51773ea1412',
-    });
   }
 }

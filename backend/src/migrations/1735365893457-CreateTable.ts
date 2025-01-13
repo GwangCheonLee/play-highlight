@@ -19,7 +19,6 @@ export class CreateTable1735365893457 implements MigrationInterface {
                                  "mime_type"        character varying(100) NOT NULL,
                                  "file_size"        bigint                 NOT NULL,
                                  "checksum"         character varying(40)  NOT NULL,
-                                 "is_public"        boolean                NOT NULL DEFAULT true,
                                  "is_deleted"       boolean                NOT NULL DEFAULT false,
                                  "createdAt"        TIMESTAMP              NOT NULL DEFAULT now(),
                                  "updatedAt"        TIMESTAMP              NOT NULL DEFAULT now(),
@@ -93,17 +92,6 @@ export class CreateTable1735365893457 implements MigrationInterface {
       nickname: 'root',
       email: 'root@play-highlight.com',
       password: hashedPassword,
-      roles: [UserRole.ROOT],
-      profileImage: null,
-      isActive: true,
-      twoFactorAuthenticationSecret: null,
-    });
-
-    await manager.save(User, {
-      oauthProvider: null,
-      nickname: 'asset',
-      email: 'asset@play-highlight.com',
-      password: null,
       roles: [UserRole.ROOT],
       profileImage: null,
       isActive: true,

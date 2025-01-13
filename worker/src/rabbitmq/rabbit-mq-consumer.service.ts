@@ -9,7 +9,6 @@ import { VideoService } from '../video/video.service';
 import { Video } from '../video/entities/video.entity';
 import { S3Service } from '../s3/s3.service';
 import { ConfigService } from '@nestjs/config';
-import { AccessTypeEnum } from '../s3/enums/access-type.enum';
 import { FfmpegService } from '../ffmpeg/ffmpeg.service';
 import { DataSource, QueryRunner } from 'typeorm';
 import { VideoUploadStatus } from '../video/enums/video-upload-status.enum';
@@ -21,7 +20,7 @@ import * as fs from 'fs';
 export class RabbitMqConsumerService {
   private readonly logger = new Logger(RabbitMqConsumerService.name);
 
-  private readonly privateBucketName: string;
+  private readonly bucketName: string;
 
   constructor(
     configService: ConfigService,
@@ -30,7 +29,7 @@ export class RabbitMqConsumerService {
     private readonly videoService: VideoService,
     private readonly ffmpegService: FfmpegService,
   ) {
-    this.privateBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PRIVATE}`;
+    this.bucketName = configService.get<string>('PROJECT_NAME');
   }
 
   /**
@@ -47,7 +46,7 @@ export class RabbitMqConsumerService {
 
     const originalVideoKey = `${video.owner.id}/${message.videoId}/video.${video.originMetadata.extension}`;
     const isFileExist = await this.s3Service.isFileExists(
-      this.privateBucketName,
+      this.bucketName,
       originalVideoKey,
     );
 
@@ -65,7 +64,7 @@ export class RabbitMqConsumerService {
     try {
       await queryRunner.startTransaction();
       const originalVideoBuffer: Buffer = await this.s3Service.download(
-        this.privateBucketName,
+        this.bucketName,
         originalVideoKey,
       );
 
@@ -77,7 +76,7 @@ export class RabbitMqConsumerService {
 
       await queryRunner.manager.update(Video, video.id, {
         status: VideoUploadStatus.HLS_ENCODING_COMPLETED,
-        videoHlsFileLocation: `${this.privateBucketName}/${video.owner.id}/${message.videoId}/master.m3u8`,
+        videoHlsFileLocation: `${this.bucketName}/${video.owner.id}/${message.videoId}/master.m3u8`,
       });
 
       await queryRunner.commitTransaction();
@@ -128,7 +127,7 @@ export class RabbitMqConsumerService {
       );
 
       const uploadResult = await this.s3Service.upload(
-        this.privateBucketName,
+        this.bucketName,
         thumbnailKey,
         thumbnailBuffer,
         'image/jpeg',
@@ -139,7 +138,7 @@ export class RabbitMqConsumerService {
       const uploadedFileMetadata: FileMetadata = queryRunner.manager.create(
         FileMetadata,
         {
-          bucketName: this.privateBucketName,
+          bucketName: this.bucketName,
           key: generatedUuid,
           originalName: 'thumbnail.jpg',
           extension: 'jpg',
@@ -163,7 +162,7 @@ export class RabbitMqConsumerService {
       await queryRunner.commitTransaction();
     } catch (error) {
       const fileExists: boolean = await this.s3Service.isFileExists(
-        this.privateBucketName,
+        this.bucketName,
         thumbnailKey,
       );
 
@@ -173,7 +172,7 @@ export class RabbitMqConsumerService {
         );
 
         try {
-          await this.s3Service.deleteFile(this.privateBucketName, thumbnailKey);
+          await this.s3Service.deleteFile(this.bucketName, thumbnailKey);
         } catch (deleteError) {
           this.logger.error(
             `Failed to delete partial file: ${thumbnailKey}`,
@@ -236,7 +235,7 @@ export class RabbitMqConsumerService {
               });
 
               return this.s3Service.upload(
-                this.privateBucketName,
+                this.bucketName,
                 `${video.owner.id}/${relativePath}`,
                 buffer,
                 mimeType,
@@ -263,7 +262,7 @@ export class RabbitMqConsumerService {
 
         // master.m3u8 파일 업로드
         await this.s3Service.upload(
-          this.privateBucketName,
+          this.bucketName,
           `${video.owner.id}/${relativePath}`,
           buffer,
           mimeType,

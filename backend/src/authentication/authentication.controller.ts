@@ -52,9 +52,9 @@ export class AuthenticationController {
     const refreshToken =
       await this.authenticationService.generateRefreshToken(user);
 
-    const refreshTokenExpirationTime: number = this.configService.get(
-      'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
-    );
+    const refreshTokenExpirationTime: number =
+      this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME') * 1000;
+
     const isProduction = this.configService.get('NODE_ENV') === 'production';
 
     // Refresh Token을 HttpOnly 쿠키로 설정
@@ -91,9 +91,9 @@ export class AuthenticationController {
     const refreshToken =
       await this.authenticationService.generateRefreshToken(user);
 
-    const refreshTokenExpirationTime: number = this.configService.get(
-      'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
-    );
+    const refreshTokenExpirationTime: number =
+      this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME') * 1000;
+
     const isProduction = this.configService.get('NODE_ENV') === 'production';
 
     // Refresh Token을 HttpOnly 쿠키로 설정
@@ -162,9 +162,8 @@ export class AuthenticationController {
     const refreshToken =
       await this.authenticationService.generateRefreshToken(authenticatedUser);
 
-    const refreshTokenExpirationTime: number = this.configService.get<number>(
-      'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
-    );
+    const refreshTokenExpirationTime: number =
+      this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME') * 1000;
 
     const isProduction = this.configService.get('NODE_ENV') === 'production';
 

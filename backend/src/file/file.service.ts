@@ -3,7 +3,6 @@ import { S3Service } from './s3/s3.service';
 import { v4 as uuidv4 } from 'uuid';
 import { DataSource, QueryRunner } from 'typeorm';
 import { S3UploadResult } from './s3/types/s3-upload-result.type';
-import { AccessTypeEnum } from './enums/access-type.enum';
 import { FileMetadata } from './file-metadata/entities/file-metadata.entity';
 import { BufferUploadMetadata } from './types/buffer-upload-metadata.type';
 import { ConfigService } from '@nestjs/config';
@@ -13,8 +12,7 @@ import { Express } from 'express';
 @Injectable()
 export class FileService {
   private readonly logger = new Logger(FileService.name);
-  private readonly privateBucketName: string;
-  private readonly publicBucketName: string;
+  private readonly bucketName: string;
 
   constructor(
     configService: ConfigService,
@@ -22,40 +20,32 @@ export class FileService {
     private readonly s3Service: S3Service,
     private readonly fileMetadataService: FileMetadataService,
   ) {
-    this.privateBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PRIVATE}`;
-    this.publicBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PUBLIC}`;
+    this.bucketName = configService.get<string>('PROJECT_NAME');
   }
 
   /**
    * 파일이 존재하는지 확인합니다.
    *
-   * @param {AccessTypeEnum} accessType - 파일 식별자
    * @param {string} fileKey - 파일 식별자
    * @param {string} ownerId - 파일 소유자 식별자
    * @return {Promise<FileMetadata>} 파일 메타데이터
    *
    */
-  async isFileExists(
-    accessType: AccessTypeEnum,
-    fileKey: string,
-    ownerId: string,
-  ): Promise<boolean> {
-    const bucketName: string =
-      accessType === AccessTypeEnum.PUBLIC
-        ? this.publicBucketName
-        : this.privateBucketName;
-
-    const s3Exists = await this.s3Service.isFileExists(bucketName, fileKey);
+  async isFileExists(fileKey: string, ownerId: string): Promise<boolean> {
+    const s3Exists = await this.s3Service.isFileExists(
+      this.bucketName,
+      fileKey,
+    );
 
     const fileMetadata: FileMetadata =
       await this.fileMetadataService.getOneFileMetadata(
-        bucketName,
-        `${bucketName}/${fileKey}`,
+        this.bucketName,
+        `${this.bucketName}/${fileKey}`,
         ownerId,
       );
 
     if (s3Exists === true && fileMetadata === null) {
-      await this.s3Service.deleteFile(bucketName, fileKey);
+      await this.s3Service.deleteFile(this.bucketName, fileKey);
     }
 
     if (s3Exists === false && fileMetadata) {
@@ -80,21 +70,12 @@ export class FileService {
 
     // 파일 식별을 위한 UUID 생성
     const generatedUuid: string = uuidv4();
-    let fileKey = `${bufferMetadata.ownerId}/${generatedUuid}.${bufferMetadata.extension}`;
-
-    if (bufferMetadata.accessType === AccessTypeEnum.PUBLIC) {
-      fileKey = `${bufferMetadata.originalName}`;
-    }
-
-    const bucketName: string =
-      bufferMetadata.accessType === AccessTypeEnum.PUBLIC
-        ? this.publicBucketName
-        : this.privateBucketName;
+    const fileKey = `${bufferMetadata.ownerId}/${generatedUuid}.${bufferMetadata.extension}`;
 
     try {
       // S3에 업로드
       const uploadResult: S3UploadResult = await this.s3Service.upload(
-        bucketName,
+        this.bucketName,
         fileKey,
         bufferMetadata.buffer,
         bufferMetadata.contentType,
@@ -104,7 +85,7 @@ export class FileService {
       const uploadedFileMetadata: FileMetadata = queryRunner.manager.create(
         FileMetadata,
         {
-          bucketName,
+          bucketName: this.bucketName,
           key: generatedUuid,
           originalName: bufferMetadata.originalName,
           extension: bufferMetadata.extension,
@@ -113,7 +94,6 @@ export class FileService {
           checksum: uploadResult.etag,
           size: bufferMetadata.buffer.length,
           storageLocation: uploadResult.location,
-          isPublic: bufferMetadata.accessType === AccessTypeEnum.PUBLIC,
           owner: { id: bufferMetadata.ownerId },
         },
       );
@@ -125,7 +105,7 @@ export class FileService {
       this.logger.debug('Uploaded file and saved metadata successfully');
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      await this.handleFileUploadError(error, bucketName, fileKey);
+      await this.handleFileUploadError(error, this.bucketName, fileKey);
     } finally {
       await queryRunner.release();
     }
@@ -135,25 +115,18 @@ export class FileService {
    * Multer File을 저장하고, 파일 메타데이터를 데이터베이스에 저장합니다.
    *
    * @param {Express.Multer.File} file - Multer File
-   * @param {AccessTypeEnum} accessType - 파일 접근 타입
    * @param {string} ownerId - 파일 소유자 식별자
    * @param {string | null} customFileName - 사용자 정의 파일 이름
    * @return {Promise<FileMetadata>} 파일 메타데이터
    */
   async uploadMulterFileToStorage(
     file: Express.Multer.File,
-    accessType: AccessTypeEnum,
     ownerId: string,
     customFileName: string | null = null,
   ): Promise<FileMetadata> {
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
-
-    const bucketName: string =
-      accessType === AccessTypeEnum.PUBLIC
-        ? this.publicBucketName
-        : this.privateBucketName;
 
     // 파일 식별을 위한 UUID 생성
     const generatedUuid: string = uuidv4();
@@ -169,7 +142,7 @@ export class FileService {
     try {
       // S3에 업로드
       const uploadResult: S3UploadResult = await this.s3Service.upload(
-        bucketName,
+        this.bucketName,
         fileKey,
         file.buffer,
         file.mimetype,
@@ -179,7 +152,7 @@ export class FileService {
       const uploadedFileMetadata: FileMetadata = queryRunner.manager.create(
         FileMetadata,
         {
-          bucketName,
+          bucketName: this.bucketName,
           key: generatedUuid,
           originalName: file.originalname,
           extension,
@@ -188,7 +161,6 @@ export class FileService {
           checksum: uploadResult.etag,
           size: file.size,
           storageLocation: uploadResult.location,
-          isPublic: accessType === AccessTypeEnum.PUBLIC,
           owner: { id: ownerId },
         },
       );
@@ -202,7 +174,7 @@ export class FileService {
       return uploadedFileMetadata;
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      await this.handleFileUploadError(error, bucketName, fileKey);
+      await this.handleFileUploadError(error, this.bucketName, fileKey);
     } finally {
       await queryRunner.release();
     }

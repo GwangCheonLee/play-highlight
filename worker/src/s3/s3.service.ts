@@ -11,14 +11,11 @@ import {
 import { Readable } from 'stream';
 import { ConfigService } from '@nestjs/config';
 import { S3UploadResult } from './types/s3-upload-result.type';
-import { AccessTypeEnum } from './enums/access-type.enum';
 
 @Injectable()
 export class S3Service {
   private readonly logger = new Logger(S3Service.name);
   private readonly s3Client: S3Client;
-  private readonly privateBucketName: string;
-  private readonly publicBucketName: string;
 
   constructor(private readonly configService: ConfigService) {
     this.s3Client = new S3Client({
@@ -32,9 +29,6 @@ export class S3Service {
       endpoint: this.configService.get<string>('AWS_S3_ENDPOINT'),
       forcePathStyle: true,
     });
-
-    this.privateBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PRIVATE}`;
-    this.publicBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PUBLIC}`;
   }
 
   /**

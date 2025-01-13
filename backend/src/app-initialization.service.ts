@@ -4,7 +4,6 @@ import { ApplicationSettingRepository } from './application-setting/repositories
 import { ApplicationSetting } from './application-setting/entities/application-setting.entity';
 import { S3Service } from './file/s3/s3.service';
 import { ConfigService } from '@nestjs/config';
-import { AccessTypeEnum } from './file/enums/access-type.enum';
 import { UserService } from './user/user.service';
 
 @Injectable()
@@ -89,24 +88,18 @@ export class AppInitializationService implements OnApplicationBootstrap {
   async initializeS3Bucket(): Promise<void> {
     const defaultBucketName = this.configService.get<string>('PROJECT_NAME');
 
-    for (const accessType of Object.values(AccessTypeEnum)) {
-      const bucketName = `${defaultBucketName}-${accessType}`;
+    const bucketName = `${defaultBucketName}`;
 
-      const exists = await this.s3Service.isBucketExists(bucketName);
+    const exists = await this.s3Service.isBucketExists(bucketName);
 
-      if (!exists) {
-        this.logger.debug(`Bucket ${bucketName} does not exist. Creating...`);
+    if (!exists) {
+      this.logger.debug(`Bucket ${bucketName} does not exist. Creating...`);
 
-        if (accessType === AccessTypeEnum.PUBLIC) {
-          await this.s3Service.createPublicBucket(bucketName);
-        } else if (accessType === AccessTypeEnum.PRIVATE) {
-          await this.s3Service.createPublicBucket(bucketName);
-        }
+      await this.s3Service.createPublicBucket(bucketName);
 
-        this.logger.debug(`Bucket ${bucketName} created successfully.`);
-      } else {
-        this.logger.debug(`Bucket ${bucketName} already exists.`);
-      }
+      this.logger.debug(`Bucket ${bucketName} created successfully.`);
+    } else {
+      this.logger.debug(`Bucket ${bucketName} already exists.`);
     }
   }
 }

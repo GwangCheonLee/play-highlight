@@ -17,14 +17,12 @@ import { Readable } from 'stream';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ConfigService } from '@nestjs/config';
 import { S3UploadResult } from './types/s3-upload-result.type';
-import { AccessTypeEnum } from '../enums/access-type.enum';
 
 @Injectable()
 export class S3Service {
   private readonly logger = new Logger(S3Service.name);
   private readonly s3Client: S3Client;
-  private readonly privateBucketName: string;
-  private readonly publicBucketName: string;
+  private readonly bucketName: string;
 
   constructor(private readonly configService: ConfigService) {
     this.s3Client = new S3Client({
@@ -39,8 +37,7 @@ export class S3Service {
       forcePathStyle: true,
     });
 
-    this.privateBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PRIVATE}`;
-    this.publicBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PUBLIC}`;
+    this.bucketName = configService.get<string>('PROJECT_NAME');
   }
 
   /**
@@ -379,35 +376,32 @@ export class S3Service {
     ignoredExtensions: string[] = [],
   ): Promise<number> {
     let totalSize = 0;
-    const bucketTypes = [this.publicBucketName, this.privateBucketName];
 
     try {
-      for (const bucketName of bucketTypes) {
-        let continuationToken: string | undefined;
+      let continuationToken: string | undefined;
 
-        do {
-          const command = new ListObjectsV2Command({
-            Bucket: bucketName,
-            Prefix: userId.endsWith('/') ? userId : `${userId}/`, // 폴더 경로
-            ContinuationToken: continuationToken,
-          });
+      do {
+        const command = new ListObjectsV2Command({
+          Bucket: this.bucketName,
+          Prefix: userId.endsWith('/') ? userId : `${userId}/`, // 폴더 경로
+          ContinuationToken: continuationToken,
+        });
 
-          const response = await this.s3Client.send(command);
+        const response = await this.s3Client.send(command);
 
-          // 객체 크기 합산, 무시할 확장자 필터링
-          if (response.Contents) {
-            totalSize += response.Contents.reduce((sum, obj) => {
-              const extension = obj.Key?.split('.').pop()?.toLowerCase();
-              if (ignoredExtensions.includes(extension)) {
-                return sum; // 무시할 확장자라면 합산 제외
-              }
-              return sum + (obj.Size || 0);
-            }, 0);
-          }
+        // 객체 크기 합산, 무시할 확장자 필터링
+        if (response.Contents) {
+          totalSize += response.Contents.reduce((sum, obj) => {
+            const extension = obj.Key?.split('.').pop()?.toLowerCase();
+            if (ignoredExtensions.includes(extension)) {
+              return sum; // 무시할 확장자라면 합산 제외
+            }
+            return sum + (obj.Size || 0);
+          }, 0);
+        }
 
-          continuationToken = response.NextContinuationToken; // 다음 페이지 처리
-        } while (continuationToken);
-      }
+        continuationToken = response.NextContinuationToken; // 다음 페이지 처리
+      } while (continuationToken);
 
       this.logger.debug(
         `Total storage size for user '${userId}': ${totalSize} bytes`,

@@ -5,7 +5,6 @@ import { Express } from 'express';
 import { UserRole } from './enums/role.enum';
 import { hashPlainText } from '../common/constants/encryption.constant';
 import { FileService } from '../file/file.service';
-import { AccessTypeEnum } from '../file/enums/access-type.enum';
 import { FileMetadata } from '../file/file-metadata/entities/file-metadata.entity';
 import { FileMetadataService } from '../file/file-metadata/file-metadata.service';
 import { ConfigService } from '@nestjs/config';
@@ -15,7 +14,7 @@ import { ConfigService } from '@nestjs/config';
  */
 @Injectable()
 export class UserService {
-  private readonly publicBucketName: string;
+  private readonly bucketName: string;
 
   constructor(
     configService: ConfigService,
@@ -23,7 +22,7 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly fileMetadataService: FileMetadataService,
   ) {
-    this.publicBucketName = `${configService.get<string>('PROJECT_NAME')}-${AccessTypeEnum.PUBLIC}`;
+    this.bucketName = `${configService.get<string>('PROJECT_NAME')}`;
   }
 
   /**
@@ -78,14 +77,18 @@ export class UserService {
    */
   async updateProfileImage(user: User, uploadedFile: Express.Multer.File) {
     if (user.profileImage) {
+      console.log(user);
       const previousProfileImageMetadata =
         await this.fileMetadataService.getOneFileMetadata(
-          this.publicBucketName,
+          this.bucketName,
           user.profileImage,
           user.id,
         );
 
+      console.log(previousProfileImageMetadata);
+
       if (previousProfileImageMetadata) {
+        console.log('?');
         await this.fileMetadataService.softDeleteFileMetadata(
           previousProfileImageMetadata.key,
         );
@@ -93,11 +96,7 @@ export class UserService {
     }
 
     const newProfileImageMetadata: FileMetadata =
-      await this.fileService.uploadMulterFileToStorage(
-        uploadedFile,
-        AccessTypeEnum.PUBLIC,
-        user.id,
-      );
+      await this.fileService.uploadMulterFileToStorage(uploadedFile, user.id);
     await this.userRepository.update(user.id, {
       profileImage: newProfileImageMetadata.storageLocation,
     });
@@ -118,7 +117,7 @@ export class UserService {
 
     const previousProfileImageMetadata =
       await this.fileMetadataService.getOneFileMetadata(
-        this.publicBucketName,
+        this.bucketName,
         user.profileImage,
         user.id,
       );

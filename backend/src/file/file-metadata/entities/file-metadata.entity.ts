@@ -69,14 +69,6 @@ export class FileMetadata {
   checksum: string; // 파일 무결성 검증용
 
   /**
-   * 파일의 공개 여부를 나타냅니다.
-   * 기본값은 `true`입니다.
-   * @type {boolean}
-   */
-  @Column({ type: 'boolean', name: 'is_public', default: true })
-  isPublic: boolean;
-
-  /**
    * 파일의 삭제 여부를 나타냅니다.
    * 기본값은 `false`입니다.
    * @type {boolean}

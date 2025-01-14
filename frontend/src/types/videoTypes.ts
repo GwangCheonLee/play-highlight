@@ -34,5 +34,6 @@ export type videoDetails = {
   updatedAt: Date;
   owner: User;
   videoHlsFileLocation: string;
-  thumbnailMetadata: {storageLocation: string}
+  thumbnailMetadata: {storageLocation: string, extension: string};
+  originMetadata: {storageLocation: string, extension: string};
 };

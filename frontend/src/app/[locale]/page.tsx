@@ -39,7 +39,7 @@ export default function Home() {
         findVideos();
       }
     });
-
+    
     if (sentinelRef.current) {
       observer.observe(sentinelRef.current);
     }
@@ -55,18 +55,20 @@ export default function Home() {
           {videos.length > 0 ? (
             videos.map((video) => {
               const userProfileImage = video.owner.profileImage
-                ? `${process.env.NEXT_PUBLIC_BUCKET}/${video.owner.profileImage}`
+                ? `${process.env.NEXT_PUBLIC_BUCKET_URL}/${video.owner.profileImage}`
                 : '/assets/images/default_user_profile.png';
               return (
                 <VideoCard
                   key={video.id}
                   videoId={video.id}
                   alt={`Video by ${video.owner.nickname}`}
-                  src={`${process.env.NEXT_PUBLIC_BUCKET}/${video.thumbnailMetadata.storageLocation}`}
+                  src={`${process.env.NEXT_PUBLIC_BUCKET_URL}/${video.thumbnailMetadata.storageLocation}`}
                   nickname={video.owner.nickname}
                   createdAt={new Date(video.createdAt)}
                   email={video.owner.email}
                   userProfileImg={userProfileImage}
+                  userId={video.owner.id}
+                  extension={video.originMetadata.extension}
                 />
               );
             })

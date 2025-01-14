@@ -1,7 +1,7 @@
-import { USER_ROLE } from "@/types/userRole";
+import {USER_ROLE} from '@/types/userRole';
 
 export type User = {
-  id: number;
+  id: string;
   role: USER_ROLE;
   nickname: string;
   email: string;

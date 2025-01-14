@@ -16,7 +16,7 @@ export default function ProfileImage() {
   if (!user) return;
 
   const profileImage = user.profileImage
-    ? `${process.env.NEXT_PUBLIC_BUCKET}/${user.profileImage}`
+    ? `${process.env.NEXT_PUBLIC_BUCKET_URL}/${user.profileImage}`
     : '/assets/images/default_user_profile.png';
 
   const onChange = async (e: ChangeEvent<HTMLInputElement>) => {

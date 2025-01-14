@@ -36,7 +36,7 @@ const Container: React.FC = () => {
             <></>
           ) : (
             <VideoPlayer
-              url={`${process.env.NEXT_PUBLIC_BUCKET}/${videoData.videoHlsFileLocation}`}
+              url={`${process.env.NEXT_PUBLIC_BUCKET_URL}/${videoData.videoHlsFileLocation}`}
             />
           )}
         </section>

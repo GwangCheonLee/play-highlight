@@ -15,7 +15,6 @@ export default function Dropdown({isOpened}: {isOpened: boolean}) {
 
   const router = useRouter();
 
-
   const handleSignOut = async () => {
     try {
       const accessToken = sessionStorage.getItem('accessToken');
@@ -23,7 +22,7 @@ export default function Dropdown({isOpened}: {isOpened: boolean}) {
         await fetchSignOut(accessToken);
         sessionStorage.removeItem('accessToken');
         dispatch(signOut());
-        router.push('/sign-in');
+        router.push('/');
       }
     } catch (e) {
       if (isAxiosError(e)) {

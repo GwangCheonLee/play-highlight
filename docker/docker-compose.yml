@@ -1,4 +1,20 @@
 services:
+  play-highlight-backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: play-highlight-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      SERVER_PORT: 3001
+    depends_on:
+      play-highlight-mq:
+        condition: service_healthy
+      play-highlight-postgres:
+        condition: service_started
+
   play-highlight-worker:
     build:
       context: ../worker

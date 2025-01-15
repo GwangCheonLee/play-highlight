@@ -37,7 +37,7 @@ COPY package.json pnpm-lock.yaml ./
 RUN npm install -g pnpm && pnpm install --frozen-lockfile --prod
 
 # Expose the application port
-EXPOSE 3000
+EXPOSE 3001
 
 # Run the application in production mode
 CMD ["npm", "run", "start:prod"]

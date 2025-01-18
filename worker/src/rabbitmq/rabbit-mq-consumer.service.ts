@@ -39,9 +39,6 @@ export class RabbitMqConsumerService {
    * @throws {InternalServerErrorException} 비디오 파일이 존재하지 않을 경우
    */
   async handleVideoEncoding(message: VideoEncodingMessageInterface) {
-    const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-
     const video: Video = await this.videoService.findVideoById(message.videoId);
 
     const originalVideoKey = `${video.owner.id}/${message.videoId}/video.${video.originMetadata.extension}`;
@@ -61,8 +58,11 @@ export class RabbitMqConsumerService {
       message.videoId,
     );
 
+    const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
-      await queryRunner.startTransaction();
       const originalVideoBuffer: Buffer = await this.s3Service.download(
         this.bucketName,
         originalVideoKey,
@@ -158,8 +158,6 @@ export class RabbitMqConsumerService {
         status: VideoUploadStatus.THUMBNAIL_GENERATED,
         thumbnailMetadata: uploadedFileMetadata,
       });
-
-      await queryRunner.commitTransaction();
     } catch (error) {
       const fileExists: boolean = await this.s3Service.isFileExists(
         this.bucketName,
